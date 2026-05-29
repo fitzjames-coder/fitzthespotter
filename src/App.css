@@ -4,6 +4,8 @@
   background-color: #fbf7ec;
   display: flex;
   flex-direction: column;
+  /* reserve space for fixed bottom nav (bar 52px + 3px border) */
+  padding-bottom: 55px;
 }
 
 /* ── Top bar ────────────────────────────────────────────────────── */
@@ -16,7 +18,14 @@
   z-index: 10;
 }
 
-.top-bar__title {
+/* Wordmark-as-button */
+.top-bar__wordmark {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: baseline;
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 1.5rem;
   font-weight: bold;
@@ -30,6 +39,56 @@
 
 .top-bar__title--amber {
   color: var(--color-amber);
+}
+
+.top-bar__plus {
+  color: var(--color-amber);
+  font-size: 0.65em;
+  vertical-align: super;
+  line-height: 0;
+  margin-left: 1px;
+}
+
+/* ── Entry modal ─────────────────────────────────────────────────── */
+.entry-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 32, 59, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1.5rem;
+}
+
+.entry-modal {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.5rem 1.25rem 1.25rem;
+  max-width: 340px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: 0 8px 32px rgba(22, 32, 59, 0.22);
+}
+
+.entry-modal__text {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1rem;
+  color: var(--color-ink);
+  text-align: center;
+}
+
+.entry-modal__close {
+  background: none;
+  border: 1.5px solid rgba(22, 32, 59, 0.2);
+  border-radius: 6px;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+  cursor: pointer;
+  align-self: center;
 }
 
 /* ── Main content ───────────────────────────────────────────────── */
@@ -610,4 +669,150 @@
   flex-wrap: wrap;
   gap: 0.35rem;
   flex: 1;
+}
+
+/* ── Placeholder screen ─────────────────────────────────────────── */
+.placeholder-screen {
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.placeholder-screen__name {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-ink);
+}
+
+.placeholder-screen__message {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Bottom Nav Drawer ──────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+/* Dimmed backdrop — behind drawer, above content */
+.nav-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 32, 59, 0.4);
+  z-index: 49;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.nav-backdrop--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Fixed shell that holds tabs + bar */
+.nav-shell {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  /* total height = tabs (72px) + bar (52px) */
+  height: 124px;
+  z-index: 50;
+  pointer-events: none; /* shell itself transparent; children opt-in */
+}
+
+/* ── Tab row (sits at the bottom of the shell) ──────────────────── */
+.nav-tabs {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  display: flex;
+  align-items: stretch;
+  background-color: var(--color-navy);
+  pointer-events: auto;
+}
+
+.nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px 0 8px;
+}
+
+.nav-tab__icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  /* inactive: muted cream-ish look */
+  filter: brightness(0.82) sepia(0.15);
+}
+
+.nav-tab--active .nav-tab__icon {
+  /* active: vivid — amber accent pops */
+  filter: brightness(1.08) saturate(1.25);
+}
+
+.nav-tab__label {
+  font-size: 0.6rem;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-cream);
+  opacity: 0.65;
+}
+
+.nav-tab--active .nav-tab__label {
+  color: var(--color-amber);
+  opacity: 1;
+}
+
+/* ── Nav bar (slides up as one unit with the logo) ──────────────── */
+.nav-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 52px;
+  background-color: var(--color-navy);
+  border-top: 3px solid var(--color-amber);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* bar lifts in 0.34s ease-out */
+  transition: transform 0.34s ease-out;
+  pointer-events: auto;
+}
+
+/* open: slide up by tabs height (72px) */
+.nav-bar--open {
+  transform: translateY(-72px);
+}
+
+/* ── Logo — crests the bar ──────────────────────────────────────── */
+.nav-logo {
+  position: absolute;
+  bottom: 0;                  /* flush with bar's base */
+  left: 50%;
+  /* center + push top above bar */
+  transform: translateX(-50%) rotate(0deg);
+  height: 68px;               /* spans bar (52px) + 16px crest */
+  width: auto;
+  cursor: pointer;
+  /* same soft shadow as cards */
+  filter: drop-shadow(0 1px 4px rgba(22, 32, 59, 0.10));
+  /* logo rotates 0.62s linear — independent of bar motion */
+  transition: transform 0.62s linear;
+}
+
+.nav-bar--open .nav-logo {
+  transform: translateX(-50%) rotate(180deg);
 }
