@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import { supabase } from './lib/supabaseClient'
+import AirlineDetailView from './AirlineDetailView'
 
 function TopBar() {
   return (
@@ -14,7 +15,7 @@ function TopBar() {
   )
 }
 
-function FlagIcon({ countryCode }) {
+export function FlagIcon({ countryCode }) {
   if (!countryCode) {
     return <span className="airline-card__flag-placeholder" aria-hidden="true" />
   }
@@ -26,10 +27,10 @@ function FlagIcon({ countryCode }) {
   )
 }
 
-function AirlineCard({ airline }) {
+function AirlineCard({ airline, onSelect }) {
   const isClosed = airline.status === 'closed'
   return (
-    <div className="airline-card">
+    <button className="airline-card" onClick={() => onSelect(airline)}>
       <div className="airline-card__main">
         <FlagIcon countryCode={airline.country_code} />
         <div className="airline-card__text">
@@ -40,7 +41,7 @@ function AirlineCard({ airline }) {
         </div>
       </div>
       {isClosed && <span className="airline-card__closed-badge">CLOSED</span>}
-    </div>
+    </button>
   )
 }
 
@@ -48,6 +49,7 @@ export default function App() {
   const [airlines, setAirlines] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [selectedAirline, setSelectedAirline] = useState(null)
 
   useEffect(() => {
     if (!supabase) {
@@ -71,6 +73,15 @@ export default function App() {
       })
   }, [])
 
+  if (selectedAirline) {
+    return (
+      <AirlineDetailView
+        airline={selectedAirline}
+        onBack={() => setSelectedAirline(null)}
+      />
+    )
+  }
+
   function renderBody() {
     if (loading) {
       return <p className="state-message">Loading airlines…</p>
@@ -85,7 +96,7 @@ export default function App() {
       <ul className="airline-list">
         {airlines.map((airline) => (
           <li key={airline.id}>
-            <AirlineCard airline={airline} />
+            <AirlineCard airline={airline} onSelect={setSelectedAirline} />
           </li>
         ))}
       </ul>
