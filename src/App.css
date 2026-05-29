@@ -272,6 +272,142 @@
   white-space: nowrap;
 }
 
+/* ── Manufacturer breakdown card ────────────────────────────────── */
+.breakdown-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(22, 32, 59, 0.10);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.breakdown-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.breakdown-title {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: var(--color-navy);
+}
+
+.breakdown-chevron {
+  color: var(--color-navy);
+  font-size: 1rem;
+  display: inline-block;
+  transition: transform 0.2s ease;
+  line-height: 1;
+}
+
+.breakdown-chevron--open {
+  transform: rotate(180deg);
+}
+
+.breakdown-body {
+  border-top: 1px solid rgba(22, 32, 59, 0.08);
+}
+
+/* ── Manufacturer row ───────────────────────────────────────────── */
+.mfr-group {
+  border-bottom: 1px solid rgba(22, 32, 59, 0.06);
+}
+
+.mfr-group:last-child {
+  border-bottom: none;
+}
+
+.mfr-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  gap: 0.5rem;
+}
+
+.mfr-row__name {
+  font-size: 0.9rem;
+  color: var(--color-ink);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mfr-row__right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.mfr-row__count {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--color-deep-blue);
+}
+
+.mfr-row__chevron {
+  font-size: 0.85rem;
+  color: var(--color-deep-blue);
+  display: inline-block;
+  transition: transform 0.2s ease;
+  line-height: 1;
+}
+
+.mfr-row__chevron--open {
+  transform: rotate(90deg);
+}
+
+/* ── Model sub-rows ─────────────────────────────────────────────── */
+.model-rows {
+  background-color: rgba(44, 66, 123, 0.03);
+  border-top: 1px solid rgba(22, 32, 59, 0.06);
+}
+
+.model-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem 0.5rem 2rem;
+  border-bottom: 1px solid rgba(22, 32, 59, 0.04);
+  gap: 0.5rem;
+}
+
+.model-row:last-child {
+  border-bottom: none;
+}
+
+.model-row__name {
+  font-size: 0.82rem;
+  color: rgba(22, 32, 59, 0.65);
+  flex: 1;
+  min-width: 0;
+}
+
+.model-row__count {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.82rem;
+  font-weight: bold;
+  color: var(--color-deep-blue);
+  flex-shrink: 0;
+}
+
 /* ── Registration list ──────────────────────────────────────────── */
 .reg-list {
   list-style: none;
