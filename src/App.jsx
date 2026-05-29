@@ -14,16 +14,24 @@ function TopBar() {
   )
 }
 
+function FlagIcon({ countryCode }) {
+  if (!countryCode) {
+    return <span className="airline-card__flag-placeholder" aria-hidden="true" />
+  }
+  return (
+    <span
+      className={`fi fi-${countryCode.toLowerCase()} airline-card__flag-svg`}
+      aria-hidden="true"
+    />
+  )
+}
+
 function AirlineCard({ airline }) {
   const isClosed = airline.status === 'closed'
   return (
     <div className="airline-card">
       <div className="airline-card__main">
-        {airline.flag_emoji && (
-          <span className="airline-card__flag" aria-hidden="true">
-            {airline.flag_emoji}
-          </span>
-        )}
+        <FlagIcon countryCode={airline.country_code} />
         <div className="airline-card__text">
           <span className="airline-card__name">{airline.name}</span>
           {airline.country && (

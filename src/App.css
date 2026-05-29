@@ -80,10 +80,23 @@
   min-width: 0;
 }
 
-.airline-card__flag {
-  font-size: 1.6rem;
-  line-height: 1;
+.airline-card__flag-svg {
+  width: 24px !important;
+  height: auto !important;
+  border-radius: 3px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
   flex-shrink: 0;
+  display: inline-block;
+  line-height: 0;
+}
+
+.airline-card__flag-placeholder {
+  width: 24px;
+  height: 16px;
+  border-radius: 3px;
+  background-color: #d1d5db;
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .airline-card__text {
