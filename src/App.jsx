@@ -27,7 +27,15 @@ export function FlagIcon({ countryCode }) {
   )
 }
 
-function AirlineCard({ airline, onSelect }) {
+function RegCountPill({ count }) {
+  return (
+    <span className="reg-count-pill">
+      <span className="reg-count-pill__number">{count}</span>
+    </span>
+  )
+}
+
+function AirlineCard({ airline, regCount, onSelect }) {
   const isClosed = airline.status === 'closed'
   return (
     <button className="airline-card" onClick={() => onSelect(airline)}>
@@ -40,13 +48,17 @@ function AirlineCard({ airline, onSelect }) {
           )}
         </div>
       </div>
-      {isClosed && <span className="airline-card__closed-badge">CLOSED</span>}
+      <div className="airline-card__right">
+        {isClosed && <span className="airline-card__closed-badge">CLOSED</span>}
+        {regCount !== undefined && <RegCountPill count={regCount} />}
+      </div>
     </button>
   )
 }
 
 export default function App() {
   const [airlines, setAirlines] = useState([])
+  const [regCounts, setRegCounts] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedAirline, setSelectedAirline] = useState(null)
@@ -58,19 +70,34 @@ export default function App() {
       return
     }
 
-    supabase
-      .from('airlines')
-      .select('id, name, country, country_code, flag_emoji, logo_url, status, closed_date, parent_airline_id')
-      .order('name', { ascending: true })
-      .then(({ data, error: fetchError }) => {
-        if (fetchError) {
-          console.error('[fitzthespotter] Failed to fetch airlines:', fetchError)
-          setError(fetchError.message)
-        } else {
-          setAirlines(data)
+    Promise.all([
+      supabase
+        .from('airlines')
+        .select('id, name, country, country_code, flag_emoji, logo_url, status, closed_date, parent_airline_id')
+        .order('name', { ascending: true }),
+      supabase
+        .from('registrations')
+        .select('airline_id'),
+    ]).then(([airlinesResult, regsResult]) => {
+      if (airlinesResult.error) {
+        console.error('[fitzthespotter] Failed to fetch airlines:', airlinesResult.error)
+        setError(airlinesResult.error.message)
+      } else {
+        setAirlines(airlinesResult.data)
+      }
+
+      if (regsResult.error) {
+        console.error('[fitzthespotter] Failed to fetch reg counts:', regsResult.error)
+      } else {
+        const counts = {}
+        for (const row of regsResult.data) {
+          counts[row.airline_id] = (counts[row.airline_id] ?? 0) + 1
         }
-        setLoading(false)
-      })
+        setRegCounts(counts)
+      }
+
+      setLoading(false)
+    })
   }, [])
 
   if (selectedAirline) {
@@ -96,7 +123,11 @@ export default function App() {
       <ul className="airline-list">
         {airlines.map((airline) => (
           <li key={airline.id}>
-            <AirlineCard airline={airline} onSelect={setSelectedAirline} />
+            <AirlineCard
+              airline={airline}
+              regCount={regCounts[airline.id] ?? 0}
+              onSelect={setSelectedAirline}
+            />
           </li>
         ))}
       </ul>
