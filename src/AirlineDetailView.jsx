@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 
 function FlagIcon({ countryCode }) {
@@ -44,6 +44,96 @@ function deriveSpottingSince(registrations) {
     }
   }
   return earliestText
+}
+
+// Groups registrations by manufacturer → model, returns sorted breakdown.
+function deriveManufacturerBreakdown(registrations) {
+  const mfrMap = new Map()
+  for (const reg of registrations) {
+    const mfr = reg.aircraft_types?.manufacturers?.name
+    const model = reg.aircraft_types?.model
+    if (!mfr || !model) continue
+    if (!mfrMap.has(mfr)) mfrMap.set(mfr, { count: 0, models: new Map() })
+    const entry = mfrMap.get(mfr)
+    entry.count++
+    entry.models.set(model, (entry.models.get(model) ?? 0) + 1)
+  }
+  return Array.from(mfrMap.entries())
+    .map(([name, { count, models }]) => ({
+      name,
+      count,
+      models: Array.from(models.entries())
+        .map(([model, count]) => ({ model, count }))
+        .sort((a, b) => b.count - a.count || a.model.localeCompare(b.model)),
+    }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
+}
+
+function ManufacturerBreakdown({ registrations }) {
+  const [open, setOpen] = useState(false)
+  const [expandedMfrs, setExpandedMfrs] = useState(new Set())
+
+  const breakdown = useMemo(() => deriveManufacturerBreakdown(registrations), [registrations])
+
+  if (breakdown.length === 0) return null
+
+  function toggleMfr(name) {
+    setExpandedMfrs((prev) => {
+      const next = new Set(prev)
+      if (next.has(name)) next.delete(name)
+      else next.add(name)
+      return next
+    })
+  }
+
+  return (
+    <div className="breakdown-card">
+      <button
+        className="breakdown-title-row"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+      >
+        <span className="breakdown-title">Manufacturer Breakdown</span>
+        <span className={`breakdown-chevron${open ? ' breakdown-chevron--open' : ''}`} aria-hidden="true">
+          ▾
+        </span>
+      </button>
+      {open && (
+        <div className="breakdown-body">
+          {breakdown.map(({ name, count, models }) => {
+            const isExpanded = expandedMfrs.has(name)
+            return (
+              <div key={name} className="mfr-group">
+                <button
+                  className="mfr-row"
+                  onClick={() => toggleMfr(name)}
+                  aria-expanded={isExpanded}
+                >
+                  <span className="mfr-row__name">{name}</span>
+                  <div className="mfr-row__right">
+                    <span className="mfr-row__count">{count}</span>
+                    <span className={`mfr-row__chevron${isExpanded ? ' mfr-row__chevron--open' : ''}`} aria-hidden="true">
+                      ›
+                    </span>
+                  </div>
+                </button>
+                {isExpanded && (
+                  <div className="model-rows">
+                    {models.map(({ model, count: mc }) => (
+                      <div key={model} className="model-row">
+                        <span className="model-row__name">{model}</span>
+                        <span className="model-row__count">{mc}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      )}
+    </div>
+  )
 }
 
 function DetailTopBar({ airline, regCount, spottingSince, onBack }) {
@@ -153,13 +243,17 @@ export default function AirlineDetailView({ airline, onBack }) {
       return <p className="state-message">No registrations yet.</p>
     }
     return (
-      <ul className="reg-list">
-        {registrations.map((reg) => (
-          <li key={reg.id}>
-            <RegistrationCard reg={reg} />
-          </li>
-        ))}
-      </ul>
+      <>
+        <ManufacturerBreakdown registrations={registrations} />
+        <p className="section-label">Registrations</p>
+        <ul className="reg-list">
+          {registrations.map((reg) => (
+            <li key={reg.id}>
+              <RegistrationCard reg={reg} />
+            </li>
+          ))}
+        </ul>
+      </>
     )
   }
 
@@ -172,7 +266,6 @@ export default function AirlineDetailView({ airline, onBack }) {
         onBack={onBack}
       />
       <main className="content">
-        <p className="section-label">Registrations</p>
         {renderBody()}
       </main>
     </div>
