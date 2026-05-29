@@ -1,0 +1,32 @@
+.splash {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100%;
+  background-color: var(--color-navy);
+  gap: 1rem;
+}
+
+.brand-heading {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+.cream {
+  color: var(--color-cream);
+}
+
+.amber {
+  color: var(--color-amber);
+}
+
+.status {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  color: var(--color-amber);
+}
