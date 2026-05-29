@@ -416,15 +416,25 @@
   gap: 0.65rem;
 }
 
-/* ── Registration card ──────────────────────────────────────────── */
+/* ── Registration card (now a button) ──────────────────────────── */
 .reg-card {
   background: #ffffff;
+  border: none;
   border-radius: 10px;
   box-shadow: 0 1px 4px rgba(22, 32, 59, 0.10);
   padding: 0.9rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.reg-card:active {
+  transform: scale(0.985);
+  box-shadow: 0 1px 2px rgba(22, 32, 59, 0.08);
 }
 
 .reg-card__top {
@@ -433,12 +443,24 @@
   gap: 0.15rem;
 }
 
+.reg-card__reg-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .reg-card__reg {
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 1.1rem;
   font-weight: bold;
   color: var(--color-ink);
   letter-spacing: 0.04em;
+}
+
+.reg-card__remark-star {
+  font-size: 0.9rem;
+  color: var(--color-amber);
+  line-height: 1;
 }
 
 .reg-card__aircraft {
@@ -461,4 +483,131 @@
   background-color: rgba(44, 66, 123, 0.10);
   border-radius: 4px;
   padding: 0.15rem 0.4rem;
+}
+
+/* ── Remark star button (top bar) ───────────────────────────────── */
+.remark-star {
+  background: none;
+  border: none;
+  color: var(--color-amber);
+  font-size: 1.15rem;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ── Spotlight overlay ──────────────────────────────────────────── */
+.spotlight-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 32, 59, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1.5rem;
+}
+
+.spotlight-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.5rem 1.25rem 1.25rem;
+  max-width: 360px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 8px 32px rgba(22, 32, 59, 0.22);
+}
+
+.spotlight-label {
+  font-size: 0.65rem;
+  font-weight: bold;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-deep-blue);
+}
+
+.spotlight-text {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1rem;
+  color: var(--color-ink);
+  line-height: 1.55;
+}
+
+.spotlight-close {
+  background: none;
+  border: 1.5px solid rgba(22, 32, 59, 0.2);
+  border-radius: 6px;
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  color: var(--color-ink);
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+/* ── Gallery placeholder ────────────────────────────────────────── */
+.gallery-placeholder {
+  background: rgba(44, 66, 123, 0.07);
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-placeholder__caption {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.85rem;
+  color: rgba(44, 66, 123, 0.45);
+  letter-spacing: 0.02em;
+}
+
+/* ── Info card ──────────────────────────────────────────────────── */
+.info-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(22, 32, 59, 0.10);
+  overflow: hidden;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(22, 32, 59, 0.06);
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row--airports {
+  align-items: flex-start;
+}
+
+.info-row__label {
+  font-size: 0.72rem;
+  font-weight: bold;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-deep-blue);
+  min-width: 90px;
+  padding-top: 0.1rem;
+  flex-shrink: 0;
+}
+
+.info-row__value {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.95rem;
+  color: var(--color-ink);
+  flex: 1;
+}
+
+.info-row__pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  flex: 1;
 }
