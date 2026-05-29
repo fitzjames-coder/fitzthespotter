@@ -2,16 +2,38 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { supabase } from './lib/supabaseClient'
 import AirlineDetailView from './AirlineDetailView'
+import BottomNav from './BottomNav'
+import PlaceholderScreen from './PlaceholderScreen'
+
+function EntryModal({ onClose }) {
+  return (
+    <div className="entry-modal-backdrop" onClick={onClose}>
+      <div className="entry-modal" onClick={(e) => e.stopPropagation()}>
+        <p className="entry-modal__text">Entry form coming soon</p>
+        <button className="entry-modal__close" onClick={onClose}>Close</button>
+      </div>
+    </div>
+  )
+}
 
 function TopBar() {
+  const [showModal, setShowModal] = useState(false)
   return (
-    <header className="top-bar">
-      <h1 className="top-bar__title">
-        <span className="top-bar__title--cream">Fitz</span>
-        <span className="top-bar__title--amber">the</span>
-        <span className="top-bar__title--cream">spotter</span>
-      </h1>
-    </header>
+    <>
+      <header className="top-bar">
+        <button
+          className="top-bar__wordmark"
+          onClick={() => setShowModal(true)}
+          aria-label="Add new entry"
+        >
+          <span className="top-bar__title--cream">Fitz</span>
+          <span className="top-bar__title--amber">the</span>
+          <span className="top-bar__title--cream">spotter</span>
+          <sup className="top-bar__plus" aria-hidden="true">+</sup>
+        </button>
+      </header>
+      {showModal && <EntryModal onClose={() => setShowModal(false)} />}
+    </>
   )
 }
 
@@ -56,7 +78,7 @@ function AirlineCard({ airline, regCount, onSelect }) {
   )
 }
 
-export default function App() {
+function AirlinesTab() {
   const [airlines, setAirlines] = useState([])
   const [regCounts, setRegCounts] = useState({})
   const [loading, setLoading] = useState(true)
@@ -142,5 +164,31 @@ export default function App() {
         {renderBody()}
       </main>
     </div>
+  )
+}
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('airlines')
+  const [navOpen, setNavOpen] = useState(false)
+
+  function handleTabChange(tab) {
+    setActiveTab(tab)
+    setNavOpen(false)
+  }
+
+  return (
+    <>
+      {activeTab === 'airlines' && <AirlinesTab />}
+      {activeTab === 'stats'    && <PlaceholderScreen name="Stats" />}
+      {activeTab === 'airports' && <PlaceholderScreen name="Airports" />}
+      {activeTab === 'search'   && <PlaceholderScreen name="Search" />}
+
+      <BottomNav
+        activeTab={activeTab}
+        navOpen={navOpen}
+        onLogoTap={() => setNavOpen((o) => !o)}
+        onTabChange={handleTabChange}
+      />
+    </>
   )
 }
