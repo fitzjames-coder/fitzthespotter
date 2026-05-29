@@ -88,6 +88,14 @@
   align-items: center;
   gap: 0.65rem;
   min-width: 0;
+  flex: 1;
+}
+
+.airline-card__right {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
 }
 
 .airline-card__flag-svg {
@@ -156,6 +164,24 @@
   color: var(--color-coral);
 }
 
+/* ── Reg count pill (list cards) ────────────────────────────────── */
+.reg-count-pill {
+  background-color: var(--color-amber);
+  border-radius: 20px;
+  padding: 0.2rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reg-count-pill__number {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--color-ink);
+  line-height: 1;
+}
+
 /* ── Detail top bar ─────────────────────────────────────────────── */
 .top-bar--detail {
   display: flex;
@@ -195,6 +221,44 @@
   font-size: 0.8rem;
   color: rgba(246, 239, 220, 0.7);
   margin-top: 0.1rem;
+}
+
+.detail-since {
+  font-size: 0.65rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(246, 239, 220, 0.55);
+  margin-top: 0.15rem;
+}
+
+/* ── Reg count pill (detail header) ────────────────────────────── */
+.detail-reg-count-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  background-color: var(--color-amber);
+  border-radius: 20px;
+  padding: 0.3rem 0.75rem;
+  margin-top: 0.55rem;
+  align-self: flex-start;
+}
+
+.detail-reg-count-pill__number {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--color-ink);
+  line-height: 1;
+}
+
+.detail-reg-count-pill__label {
+  font-size: 0.6rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+  opacity: 0.7;
 }
 
 .detail-closed-badge {

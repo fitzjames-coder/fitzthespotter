@@ -13,7 +13,40 @@ function FlagIcon({ countryCode }) {
   )
 }
 
-function DetailTopBar({ airline, onBack }) {
+// Parse a free-text date string leniently. Returns a Date or null.
+function parseFirstSpotted(str) {
+  if (!str || !str.trim()) return null
+  const d = new Date(str)
+  if (!isNaN(d)) return d
+  // "Mar 2018" / "March 2018"
+  const monthYear = str.match(/([A-Za-z]+)\s+(\d{4})/)
+  if (monthYear) {
+    const attempt = new Date(`${monthYear[1]} 1 ${monthYear[2]}`)
+    if (!isNaN(attempt)) return attempt
+  }
+  // bare year "2018"
+  const yearOnly = str.match(/^(\d{4})$/)
+  if (yearOnly) return new Date(`Jan 1 ${yearOnly[1]}`)
+  return null
+}
+
+// Returns the original text of the registration with the earliest first_spotted.
+function deriveSpottingSince(registrations) {
+  let earliest = null
+  let earliestText = null
+  for (const reg of registrations) {
+    if (!reg.first_spotted) continue
+    const d = parseFirstSpotted(reg.first_spotted)
+    if (!d) continue
+    if (earliest === null || d < earliest) {
+      earliest = d
+      earliestText = reg.first_spotted.trim()
+    }
+  }
+  return earliestText
+}
+
+function DetailTopBar({ airline, regCount, spottingSince, onBack }) {
   const isClosed = airline.status === 'closed'
   return (
     <header className="top-bar top-bar--detail">
@@ -28,6 +61,13 @@ function DetailTopBar({ airline, onBack }) {
       {airline.country && (
         <p className="top-bar__detail-country">{airline.country}</p>
       )}
+      {spottingSince && (
+        <p className="detail-since">SPOTTING SINCE · {spottingSince}</p>
+      )}
+      <div className="detail-reg-count-pill">
+        <span className="detail-reg-count-pill__number">{regCount}</span>
+        <span className="detail-reg-count-pill__label">UNIQUE REGS</span>
+      </div>
     </header>
   )
 }
@@ -99,6 +139,9 @@ export default function AirlineDetailView({ airline, onBack }) {
       })
   }, [airline.id])
 
+  const regCount = registrations.length
+  const spottingSince = loading ? null : deriveSpottingSince(registrations)
+
   function renderBody() {
     if (loading) {
       return <p className="state-message">Loading registrations…</p>
@@ -122,7 +165,12 @@ export default function AirlineDetailView({ airline, onBack }) {
 
   return (
     <div className="page">
-      <DetailTopBar airline={airline} onBack={onBack} />
+      <DetailTopBar
+        airline={airline}
+        regCount={regCount}
+        spottingSince={spottingSince}
+        onBack={onBack}
+      />
       <main className="content">
         <p className="section-label">Registrations</p>
         {renderBody()}
