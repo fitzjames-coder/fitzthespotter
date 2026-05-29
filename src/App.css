@@ -30,3 +30,9 @@
   font-size: clamp(1rem, 3vw, 1.25rem);
   color: var(--color-amber);
 }
+
+.supabase-status {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: clamp(0.85rem, 2.5vw, 1rem);
+  color: var(--color-cream);
+}
