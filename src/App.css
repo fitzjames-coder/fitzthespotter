@@ -759,7 +759,7 @@
 }
 
 .nav-drawer--open .nav-logo {
-  transform: translateX(-50%) rotate(180deg);
+  transform: translateX(-50%) rotate(-180deg);
 }
 
 /* ── Tabs row (sits below bar, hidden at rest) ──────────────────── */
