@@ -1,4 +1,9 @@
 import './App.css'
+import { supabase } from './lib/supabaseClient'
+
+const supabaseStatus = supabase
+  ? 'Supabase connected ✓'
+  : 'Supabase not configured'
 
 function App() {
   return (
@@ -9,6 +14,7 @@ function App() {
         <span className="cream">spotter</span>
       </h1>
       <p className="status">Build pipeline working ✓</p>
+      <p className="supabase-status">{supabaseStatus}</p>
     </div>
   )
 }
