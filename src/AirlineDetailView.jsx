@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import RegistrationProfileView from './RegistrationProfileView'
 
 function FlagIcon({ countryCode }) {
   if (!countryCode) {
@@ -162,16 +163,20 @@ function DetailTopBar({ airline, regCount, spottingSince, onBack }) {
   )
 }
 
-function RegistrationCard({ reg }) {
+function RegistrationCard({ reg, onSelect }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
   const model = reg.aircraft_types?.model
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
   const airports = Array.isArray(reg.airport_codes) ? reg.airport_codes : []
+  const hasRemark = Boolean(reg.remark && reg.remark.trim())
 
   return (
-    <div className="reg-card">
+    <button className="reg-card" onClick={() => onSelect(reg)}>
       <div className="reg-card__top">
-        <span className="reg-card__reg">{reg.registration}</span>
+        <div className="reg-card__reg-row">
+          <span className="reg-card__reg">{reg.registration}</span>
+          {hasRemark && <span className="reg-card__remark-star" aria-label="Has remark">✷</span>}
+        </div>
         {aircraftLabel && (
           <span className="reg-card__aircraft">{aircraftLabel}</span>
         )}
@@ -183,7 +188,7 @@ function RegistrationCard({ reg }) {
           ))}
         </div>
       )}
-    </div>
+    </button>
   )
 }
 
@@ -191,6 +196,7 @@ export default function AirlineDetailView({ airline, onBack }) {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [selectedReg, setSelectedReg] = useState(null)
 
   useEffect(() => {
     if (!supabase) {
@@ -232,6 +238,15 @@ export default function AirlineDetailView({ airline, onBack }) {
   const regCount = registrations.length
   const spottingSince = loading ? null : deriveSpottingSince(registrations)
 
+  if (selectedReg) {
+    return (
+      <RegistrationProfileView
+        reg={selectedReg}
+        onBack={() => setSelectedReg(null)}
+      />
+    )
+  }
+
   function renderBody() {
     if (loading) {
       return <p className="state-message">Loading registrations…</p>
@@ -249,7 +264,7 @@ export default function AirlineDetailView({ airline, onBack }) {
         <ul className="reg-list">
           {registrations.map((reg) => (
             <li key={reg.id}>
-              <RegistrationCard reg={reg} />
+              <RegistrationCard reg={reg} onSelect={setSelectedReg} />
             </li>
           ))}
         </ul>
