@@ -1,0 +1,27 @@
+:root {
+  --color-navy: #2C427B;
+  --color-amber: #FBAD19;
+  --color-cream: #F6EFDC;
+  --color-deep-blue: #005281;
+  --color-coral: #E8607A;
+  --color-ink: #16203B;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  background-color: var(--color-navy);
+}
