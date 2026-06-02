@@ -478,63 +478,61 @@
   gap: 0.65rem;
 }
 
-/* ── Registration card (now a button) ──────────────────────────── */
+/* ── Registration card ──────────────────────────────────────────── */
 .reg-card {
-  background: #ffffff;
-  border: none;
-  border-radius: 10px;
-  box-shadow: 0 1px 4px rgba(22, 32, 59, 0.10);
-  padding: 0.9rem 1rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  padding: 0.6rem 0.9rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.85rem;
   width: 100%;
   text-align: left;
-  cursor: pointer;
-  transition: box-shadow 0.15s ease, transform 0.1s ease;
 }
 
-.reg-card:active {
-  transform: scale(0.985);
-  box-shadow: 0 1px 2px rgba(22, 32, 59, 0.08);
+.reg-card__thumb {
+  width: 44px;
+  height: 44px;
+  background: var(--color-navy);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.reg-card__top {
+.reg-card__thumb-text {
+  font-size: 0.6rem;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  color: rgba(246, 239, 220, 0.55);
+  text-align: center;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.reg-card__body {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-}
-
-.reg-card__reg-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .reg-card__reg {
   font-family: Georgia, 'Times New Roman', Times, serif;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: bold;
-  color: var(--color-ink);
+  color: var(--color-cream);
   letter-spacing: 0.04em;
 }
 
-.reg-card__remark-star {
-  font-size: 0.9rem;
-  color: var(--color-amber);
-  line-height: 1;
-}
-
-.reg-card__aircraft {
-  font-size: 0.8rem;
-  color: #666;
-}
-
-/* ── Airport pills ──────────────────────────────────────────────── */
-.reg-card__airports {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
+.reg-card__type {
+  font-size: 0.78rem;
+  color: rgba(246, 239, 220, 0.55);
 }
 
 .airport-pill {
@@ -982,4 +980,177 @@
 .type-card__count--zero {
   color: rgba(246, 239, 220, 0.40);
   background: rgba(246, 239, 220, 0.06);
+}
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Airline detail page ────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+/* ── Hero ────────────────────────────────────────────────────────── */
+.airline-hero {
+  background: radial-gradient(circle at 90% 10%, rgba(251, 173, 25, 0.12), transparent 70%),
+              linear-gradient(155deg, #1F3160, #172545);
+  border-bottom: 3px solid var(--color-amber);
+  padding: 0.65rem 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.airline-hero__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+/* ── Logo / initials placeholder ────────────────────────────────── */
+.airline-hero__logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(246, 239, 220, 0.08);
+  margin-bottom: 0.4rem;
+}
+
+.airline-hero__logo-placeholder {
+  width: 64px;
+  height: 64px;
+  background: rgba(246, 239, 220, 0.12);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.4rem;
+}
+
+.airline-hero__logo-initials {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--color-cream);
+  letter-spacing: 0.06em;
+}
+
+/* ── Name row ────────────────────────────────────────────────────── */
+.airline-hero__name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.airline-hero__name {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: var(--color-cream);
+  line-height: 1.15;
+}
+
+.airline-closed-chip {
+  font-size: 0.6rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(246, 239, 220, 0.65);
+  background: rgba(246, 239, 220, 0.10);
+  border: 1px solid rgba(246, 239, 220, 0.20);
+  border-radius: 4px;
+  padding: 0.15rem 0.4rem;
+  white-space: nowrap;
+  align-self: center;
+}
+
+/* ── Meta line ───────────────────────────────────────────────────── */
+.airline-hero__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: rgba(246, 239, 220, 0.6);
+  line-height: 1.5;
+  margin-top: 0.05rem;
+}
+
+.airline-hero__flag {
+  font-size: 1.05rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ── Quiet stat ──────────────────────────────────────────────────── */
+.airline-hero__stats {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.airline-regs-logged__number {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: rgba(246, 239, 220, 0.82);
+}
+
+.airline-regs-logged__label {
+  font-size: 0.6rem;
+  font-weight: bold;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(246, 239, 220, 0.52);
+}
+
+/* ── Dark-theme overrides for breakdown card on navy pages ────────── */
+.page--navy .breakdown-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+.page--navy .breakdown-title {
+  color: var(--color-cream);
+}
+
+.page--navy .breakdown-chevron {
+  color: rgba(246, 239, 220, 0.65);
+}
+
+.page--navy .breakdown-body {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+.page--navy .mfr-group {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+.page--navy .mfr-row__name {
+  color: var(--color-cream);
+}
+
+.page--navy .mfr-row__count {
+  color: rgba(246, 239, 220, 0.82);
+}
+
+.page--navy .mfr-row__chevron {
+  color: rgba(246, 239, 220, 0.65);
+}
+
+.page--navy .model-rows {
+  background-color: rgba(0, 0, 0, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.06);
+}
+
+.page--navy .model-row {
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+.page--navy .model-row__name {
+  color: rgba(246, 239, 220, 0.6);
+}
+
+.page--navy .model-row__count {
+  color: rgba(246, 239, 220, 0.75);
 }
