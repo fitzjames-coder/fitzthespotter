@@ -52,7 +52,7 @@ function deriveManufacturerBreakdown(registrations) {
   const mfrMap = new Map() // keyed by manufacturer id
   for (const reg of registrations) {
     const mfr = reg.aircraft_types?.manufacturers
-    const model = reg.aircraft_types?.model
+    const model = reg.aircraft_types?.name
     if (!mfr?.name || !model) continue
     if (!mfrMap.has(mfr.id)) mfrMap.set(mfr.id, { id: mfr.id, name: mfr.name, count: 0, models: new Map() })
     const entry = mfrMap.get(mfr.id)
@@ -173,9 +173,9 @@ function DetailTopBar({ airline, regCount, spottingSince, onBack }) {
 
 function RegistrationCard({ reg, onSelect }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
-  const model = reg.aircraft_types?.model
+  const model = reg.aircraft_types?.name
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
-  const airports = Array.isArray(reg.airport_codes) ? reg.airport_codes : []
+  const airports = Array.isArray(reg.airports) ? reg.airports : []
   const hasRemark = Boolean(reg.remark && reg.remark.trim())
 
   return (
@@ -218,12 +218,12 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
       .select(`
         id,
         registration,
-        airport_codes,
+        airports,
         first_spotted,
         remark,
         aircraft_types (
           id,
-          model,
+          name,
           manufacturers (
             id,
             name

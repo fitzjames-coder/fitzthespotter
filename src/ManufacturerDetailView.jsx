@@ -48,9 +48,9 @@ function TypeCard({ type, count }) {
   return (
     <div className="type-card">
       <div className="type-card__thumb" aria-hidden="true">
-        <span className="type-card__thumb-text">{thumbAbbrev(type.model)}</span>
+        <span className="type-card__thumb-text">{thumbAbbrev(type.name)}</span>
       </div>
-      <span className="type-card__name">{type.model}</span>
+      <span className="type-card__name">{type.name}</span>
       <span className={`type-card__count${count === 0 ? ' type-card__count--zero' : ''}`}>
         {count}
       </span>
@@ -80,9 +80,9 @@ export default function ManufacturerDetailView({ manufacturerId, onBack }) {
         .single(),
       supabase
         .from('aircraft_types')
-        .select('id, model')
+        .select('id, name')
         .eq('manufacturer_id', manufacturerId)
-        .order('model', { ascending: true }),
+        .order('name', { ascending: true }),
     ]).then(async ([mfrResult, typesResult]) => {
       if (mfrResult.error) {
         setError(mfrResult.error.message)
