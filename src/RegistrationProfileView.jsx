@@ -66,9 +66,9 @@ function GalleryPlaceholder() {
 
 function InfoSection({ reg }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
-  const model = reg.aircraft_types?.model
+  const model = reg.aircraft_types?.name
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
-  const airports = Array.isArray(reg.airport_codes) ? reg.airport_codes : []
+  const airports = Array.isArray(reg.airports) ? reg.airports : []
 
   return (
     <div className="info-card">

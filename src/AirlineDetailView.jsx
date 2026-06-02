@@ -49,18 +49,19 @@ function deriveSpottingSince(registrations) {
 
 // Groups registrations by manufacturer → model, returns sorted breakdown.
 function deriveManufacturerBreakdown(registrations) {
-  const mfrMap = new Map()
+  const mfrMap = new Map() // keyed by manufacturer id
   for (const reg of registrations) {
-    const mfr = reg.aircraft_types?.manufacturers?.name
-    const model = reg.aircraft_types?.model
-    if (!mfr || !model) continue
-    if (!mfrMap.has(mfr)) mfrMap.set(mfr, { count: 0, models: new Map() })
-    const entry = mfrMap.get(mfr)
+    const mfr = reg.aircraft_types?.manufacturers
+    const model = reg.aircraft_types?.name
+    if (!mfr?.name || !model) continue
+    if (!mfrMap.has(mfr.id)) mfrMap.set(mfr.id, { id: mfr.id, name: mfr.name, count: 0, models: new Map() })
+    const entry = mfrMap.get(mfr.id)
     entry.count++
     entry.models.set(model, (entry.models.get(model) ?? 0) + 1)
   }
-  return Array.from(mfrMap.entries())
-    .map(([name, { count, models }]) => ({
+  return Array.from(mfrMap.values())
+    .map(({ id, name, count, models }) => ({
+      id,
       name,
       count,
       models: Array.from(models.entries())
@@ -70,7 +71,7 @@ function deriveManufacturerBreakdown(registrations) {
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
 }
 
-function ManufacturerBreakdown({ registrations }) {
+function ManufacturerBreakdown({ registrations, onSelectManufacturer }) {
   const [open, setOpen] = useState(false)
   const [expandedMfrs, setExpandedMfrs] = useState(new Set())
 
@@ -78,11 +79,11 @@ function ManufacturerBreakdown({ registrations }) {
 
   if (breakdown.length === 0) return null
 
-  function toggleMfr(name) {
+  function toggleMfr(id) {
     setExpandedMfrs((prev) => {
       const next = new Set(prev)
-      if (next.has(name)) next.delete(name)
-      else next.add(name)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
       return next
     })
   }
@@ -101,23 +102,30 @@ function ManufacturerBreakdown({ registrations }) {
       </button>
       {open && (
         <div className="breakdown-body">
-          {breakdown.map(({ name, count, models }) => {
-            const isExpanded = expandedMfrs.has(name)
+          {breakdown.map(({ id, name, count, models }) => {
+            const isExpanded = expandedMfrs.has(id)
             return (
-              <div key={name} className="mfr-group">
-                <button
-                  className="mfr-row"
-                  onClick={() => toggleMfr(name)}
-                  aria-expanded={isExpanded}
-                >
-                  <span className="mfr-row__name">{name}</span>
-                  <div className="mfr-row__right">
+              <div key={id} className="mfr-group">
+                <div className="mfr-row">
+                  <button
+                    className="mfr-row__name-area"
+                    onClick={() => onSelectManufacturer?.({ id })}
+                    aria-label={`View ${name} details`}
+                  >
+                    <span className="mfr-row__name">{name}</span>
+                  </button>
+                  <button
+                    className="mfr-row__toggle-area"
+                    onClick={() => toggleMfr(id)}
+                    aria-expanded={isExpanded}
+                    aria-label={`${isExpanded ? 'Collapse' : 'Expand'} ${name} models`}
+                  >
                     <span className="mfr-row__count">{count}</span>
                     <span className={`mfr-row__chevron${isExpanded ? ' mfr-row__chevron--open' : ''}`} aria-hidden="true">
                       ›
                     </span>
-                  </div>
-                </button>
+                  </button>
+                </div>
                 {isExpanded && (
                   <div className="model-rows">
                     {models.map(({ model, count: mc }) => (
@@ -138,14 +146,14 @@ function ManufacturerBreakdown({ registrations }) {
 }
 
 function DetailTopBar({ airline, regCount, spottingSince, onBack }) {
-  const isClosed = airline.status === 'closed'
+  const isClosed = airline.is_closed
   return (
     <header className="top-bar top-bar--detail">
       <button className="top-bar__back" onClick={onBack} aria-label="Back to airlines list">
         ‹ Back
       </button>
       <div className="top-bar__detail-info">
-        <FlagIcon countryCode={airline.country_code} />
+        <FlagIcon countryCode={airline.country_flag} />
         <h1 className="top-bar__detail-name">{airline.name}</h1>
         {isClosed && <span className="detail-closed-badge">CLOSED</span>}
       </div>
@@ -165,9 +173,9 @@ function DetailTopBar({ airline, regCount, spottingSince, onBack }) {
 
 function RegistrationCard({ reg, onSelect }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
-  const model = reg.aircraft_types?.model
+  const model = reg.aircraft_types?.name
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
-  const airports = Array.isArray(reg.airport_codes) ? reg.airport_codes : []
+  const airports = Array.isArray(reg.airports) ? reg.airports : []
   const hasRemark = Boolean(reg.remark && reg.remark.trim())
 
   return (
@@ -192,7 +200,7 @@ function RegistrationCard({ reg, onSelect }) {
   )
 }
 
-export default function AirlineDetailView({ airline, onBack }) {
+export default function AirlineDetailView({ airline, onBack, onSelectManufacturer }) {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -210,12 +218,12 @@ export default function AirlineDetailView({ airline, onBack }) {
       .select(`
         id,
         registration,
-        airport_codes,
+        airports,
         first_spotted,
         remark,
         aircraft_types (
           id,
-          model,
+          name,
           manufacturers (
             id,
             name
@@ -259,7 +267,7 @@ export default function AirlineDetailView({ airline, onBack }) {
     }
     return (
       <>
-        <ManufacturerBreakdown registrations={registrations} />
+        <ManufacturerBreakdown registrations={registrations} onSelectManufacturer={onSelectManufacturer} />
         <p className="section-label">Registrations</p>
         <ul className="reg-list">
           {registrations.map((reg) => (
