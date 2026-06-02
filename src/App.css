@@ -383,31 +383,37 @@
 
 .mfr-row {
   display: flex;
+  align-items: stretch;
+}
+
+.mfr-row__name-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0.7rem 1rem;
   background: none;
   border: none;
-  cursor: pointer;
+  padding: 0.7rem 0.5rem 0.7rem 1rem;
   text-align: left;
-  gap: 0.5rem;
+  cursor: pointer;
 }
 
 .mfr-row__name {
   font-size: 0.9rem;
-  color: var(--color-ink);
-  flex: 1;
-  min-width: 0;
+  color: var(--color-deep-blue);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.mfr-row__right {
+.mfr-row__toggle-area {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  background: none;
+  border: none;
+  padding: 0.7rem 1rem 0.7rem 0.5rem;
+  cursor: pointer;
   flex-shrink: 0;
 }
 
@@ -808,4 +814,158 @@
 .nav-tab--active .nav-tab__label {
   color: var(--color-amber);
   opacity: 1;
+}
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Manufacturer detail page ───────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+/* ── Hero ────────────────────────────────────────────────────────── */
+.mfr-hero {
+  background: linear-gradient(155deg, #1F3160, #172545);
+  padding: 0.65rem 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.mfr-hero__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+/* ── Logo / initials placeholder ────────────────────────────────── */
+.mfr-hero__logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: rgba(246, 239, 220, 0.08);
+  margin-bottom: 0.4rem;
+}
+
+.mfr-hero__logo-placeholder {
+  width: 64px;
+  height: 64px;
+  background: rgba(246, 239, 220, 0.12);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.4rem;
+}
+
+.mfr-hero__logo-initials {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--color-cream);
+  letter-spacing: 0.06em;
+}
+
+/* ── Name + meta ─────────────────────────────────────────────────── */
+.mfr-hero__name {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: var(--color-cream);
+  line-height: 1.15;
+}
+
+.mfr-hero__meta {
+  font-size: 0.8rem;
+  color: rgba(246, 239, 220, 0.6);
+  line-height: 1.5;
+  margin-top: 0.1rem;
+}
+
+/* ── Quiet stat ──────────────────────────────────────────────────── */
+.mfr-hero__stats {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+}
+
+.mfr-regs-logged__number {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: rgba(246, 239, 220, 0.82);
+}
+
+.mfr-regs-logged__label {
+  font-size: 0.6rem;
+  font-weight: bold;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(246, 239, 220, 0.52);
+}
+
+/* ── Aircraft type list ──────────────────────────────────────────── */
+.type-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+/* ── Type card ───────────────────────────────────────────────────── */
+.type-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid rgba(44, 66, 123, 0.14);
+  box-shadow: 0 1px 3px rgba(22, 32, 59, 0.07);
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.type-card__thumb {
+  width: 44px;
+  height: 44px;
+  background: var(--color-navy);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  /* placeholder for aircraft illustration */
+}
+
+.type-card__thumb-text {
+  font-size: 0.6rem;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  color: rgba(246, 239, 220, 0.55);
+  text-align: center;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.type-card__name {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.95rem;
+  color: var(--color-ink);
+  flex: 1;
+  min-width: 0;
+}
+
+.type-card__count {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--color-navy);
+  background: var(--color-cream);
+  border-radius: 12px;
+  padding: 0.18rem 0.6rem;
+  flex-shrink: 0;
+}
+
+.type-card__count--zero {
+  color: rgba(44, 66, 123, 0.32);
+  background: rgba(246, 239, 220, 0.45);
 }
