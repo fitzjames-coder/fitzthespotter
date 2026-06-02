@@ -1,55 +1,88 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
-import RegistrationProfileView from './RegistrationProfileView'
+
+function heroInitials(name) {
+  return name.split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 3)
+}
+
+function thumbAbbrev(model) {
+  const seg = model.split(/[-\s]/)[0]
+  return seg.length <= 5 ? seg : seg.slice(0, 4)
+}
+
+function closedYear(airline) {
+  if (!airline.closed_date) return null
+  const y = new Date(airline.closed_date).getFullYear()
+  return isNaN(y) ? null : y
+}
 
 function FlagIcon({ countryCode }) {
-  if (!countryCode) {
-    return <span className="airline-card__flag-placeholder" aria-hidden="true" />
-  }
+  if (!countryCode) return null
   return (
     <span
-      className={`fi fi-${countryCode.toLowerCase()} airline-card__flag-svg`}
+      className={`fi fi-${countryCode.toLowerCase()} airline-hero__flag`}
       aria-hidden="true"
     />
   )
 }
 
-// Parse a free-text date string leniently. Returns a Date or null.
-function parseFirstSpotted(str) {
-  if (!str || !str.trim()) return null
-  const d = new Date(str)
-  if (!isNaN(d)) return d
-  // "Mar 2018" / "March 2018"
-  const monthYear = str.match(/([A-Za-z]+)\s+(\d{4})/)
-  if (monthYear) {
-    const attempt = new Date(`${monthYear[1]} 1 ${monthYear[2]}`)
-    if (!isNaN(attempt)) return attempt
+function AirlineHeroLogo({ airline }) {
+  if (airline.logo_url) {
+    return (
+      <img
+        className="airline-hero__logo"
+        src={airline.logo_url}
+        alt=""
+        aria-hidden="true"
+      />
+    )
   }
-  // bare year "2018"
-  const yearOnly = str.match(/^(\d{4})$/)
-  if (yearOnly) return new Date(`Jan 1 ${yearOnly[1]}`)
-  return null
+  return (
+    <div className="airline-hero__logo-placeholder" aria-hidden="true">
+      <span className="airline-hero__logo-initials">{heroInitials(airline.name)}</span>
+    </div>
+  )
 }
 
-// Returns the original text of the registration with the earliest first_spotted.
-function deriveSpottingSince(registrations) {
-  let earliest = null
-  let earliestText = null
-  for (const reg of registrations) {
-    if (!reg.first_spotted) continue
-    const d = parseFirstSpotted(reg.first_spotted)
-    if (!d) continue
-    if (earliest === null || d < earliest) {
-      earliest = d
-      earliestText = reg.first_spotted.trim()
-    }
-  }
-  return earliestText
+function AirlineHero({ airline, regCount, loading, onBack }) {
+  const isClosed = airline.is_closed
+  const year = closedYear(airline)
+
+  const metaParts = []
+  if (airline.country) metaParts.push(airline.country)
+  if (isClosed && year) metaParts.push(`closed ${year}`)
+  const meta = metaParts.join(' · ')
+
+  return (
+    <div className="airline-hero">
+      <button className="top-bar__back" onClick={onBack} aria-label="Back to airlines list">
+        ‹ Back
+      </button>
+      <div className="airline-hero__body">
+        <AirlineHeroLogo airline={airline} />
+        <div className="airline-hero__name-row">
+          <h1 className="airline-hero__name">{airline.name}</h1>
+          {isClosed && <span className="airline-closed-chip">CLOSED</span>}
+        </div>
+        {(airline.country_flag || meta) && (
+          <p className="airline-hero__meta">
+            <FlagIcon countryCode={airline.country_flag} />
+            {meta && <span>{meta}</span>}
+          </p>
+        )}
+        {!loading && (
+          <div className="airline-hero__stats">
+            <span className="airline-regs-logged__number">{regCount}</span>
+            <span className="airline-regs-logged__label">REGS LOGGED</span>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
-// Groups registrations by manufacturer → model, returns sorted breakdown.
 function deriveManufacturerBreakdown(registrations) {
-  const mfrMap = new Map() // keyed by manufacturer id
+  const mfrMap = new Map()
   for (const reg of registrations) {
     const mfr = reg.aircraft_types?.manufacturers
     const model = reg.aircraft_types?.name
@@ -145,58 +178,20 @@ function ManufacturerBreakdown({ registrations, onSelectManufacturer }) {
   )
 }
 
-function DetailTopBar({ airline, regCount, spottingSince, onBack }) {
-  const isClosed = airline.is_closed
-  return (
-    <header className="top-bar top-bar--detail">
-      <button className="top-bar__back" onClick={onBack} aria-label="Back to airlines list">
-        ‹ Back
-      </button>
-      <div className="top-bar__detail-info">
-        <FlagIcon countryCode={airline.country_flag} />
-        <h1 className="top-bar__detail-name">{airline.name}</h1>
-        {isClosed && <span className="detail-closed-badge">CLOSED</span>}
-      </div>
-      {airline.country && (
-        <p className="top-bar__detail-country">{airline.country}</p>
-      )}
-      {spottingSince && (
-        <p className="detail-since">SPOTTING SINCE · {spottingSince}</p>
-      )}
-      <div className="detail-reg-count-pill">
-        <span className="detail-reg-count-pill__number">{regCount}</span>
-        <span className="detail-reg-count-pill__label">UNIQUE REGS</span>
-      </div>
-    </header>
-  )
-}
-
-function RegistrationCard({ reg, onSelect }) {
-  const manufacturer = reg.aircraft_types?.manufacturers?.name
-  const model = reg.aircraft_types?.name
-  const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
-  const airports = Array.isArray(reg.airports) ? reg.airports : []
-  const hasRemark = Boolean(reg.remark && reg.remark.trim())
+function RegistrationCard({ reg }) {
+  const typeName = reg.aircraft_types?.name ?? null
+  const abbrev = typeName ? thumbAbbrev(typeName) : ''
 
   return (
-    <button className="reg-card" onClick={() => onSelect(reg)}>
-      <div className="reg-card__top">
-        <div className="reg-card__reg-row">
-          <span className="reg-card__reg">{reg.registration}</span>
-          {hasRemark && <span className="reg-card__remark-star" aria-label="Has remark">✷</span>}
-        </div>
-        {aircraftLabel && (
-          <span className="reg-card__aircraft">{aircraftLabel}</span>
-        )}
+    <div className="reg-card">
+      <div className="reg-card__thumb" aria-hidden="true">
+        <span className="reg-card__thumb-text">{abbrev}</span>
       </div>
-      {airports.length > 0 && (
-        <div className="reg-card__airports">
-          {airports.map((code) => (
-            <span key={code} className="airport-pill">{code}</span>
-          ))}
-        </div>
-      )}
-    </button>
+      <div className="reg-card__body">
+        <span className="reg-card__reg">{reg.registration}</span>
+        {typeName && <span className="reg-card__type">{typeName}</span>}
+      </div>
+    </div>
   )
 }
 
@@ -204,7 +199,6 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [selectedReg, setSelectedReg] = useState(null)
 
   useEffect(() => {
     if (!supabase) {
@@ -218,9 +212,6 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
       .select(`
         id,
         registration,
-        airports,
-        first_spotted,
-        remark,
         aircraft_types (
           id,
           name,
@@ -244,16 +235,6 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   }, [airline.id])
 
   const regCount = registrations.length
-  const spottingSince = loading ? null : deriveSpottingSince(registrations)
-
-  if (selectedReg) {
-    return (
-      <RegistrationProfileView
-        reg={selectedReg}
-        onBack={() => setSelectedReg(null)}
-      />
-    )
-  }
 
   function renderBody() {
     if (loading) {
@@ -272,7 +253,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
         <ul className="reg-list">
           {registrations.map((reg) => (
             <li key={reg.id}>
-              <RegistrationCard reg={reg} onSelect={setSelectedReg} />
+              <RegistrationCard reg={reg} />
             </li>
           ))}
         </ul>
@@ -281,11 +262,11 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   }
 
   return (
-    <div className="page">
-      <DetailTopBar
+    <div className="page page--navy">
+      <AirlineHero
         airline={airline}
         regCount={regCount}
-        spottingSince={spottingSince}
+        loading={loading}
         onBack={onBack}
       />
       <main className="content">
