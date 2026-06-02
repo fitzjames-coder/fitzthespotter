@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { supabase } from './lib/supabaseClient'
 import AirlineDetailView from './AirlineDetailView'
+import ManufacturerDetailView from './ManufacturerDetailView'
 import BottomNav from './BottomNav'
 import PlaceholderScreen from './PlaceholderScreen'
 
@@ -84,6 +85,7 @@ function AirlinesTab() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedAirline, setSelectedAirline] = useState(null)
+  const [selectedManufacturer, setSelectedManufacturer] = useState(null)
 
   useEffect(() => {
     if (!supabase) {
@@ -122,11 +124,21 @@ function AirlinesTab() {
     })
   }, [])
 
+  if (selectedManufacturer) {
+    return (
+      <ManufacturerDetailView
+        manufacturerId={selectedManufacturer.id}
+        onBack={() => setSelectedManufacturer(null)}
+      />
+    )
+  }
+
   if (selectedAirline) {
     return (
       <AirlineDetailView
         airline={selectedAirline}
         onBack={() => setSelectedAirline(null)}
+        onSelectManufacturer={setSelectedManufacturer}
       />
     )
   }
