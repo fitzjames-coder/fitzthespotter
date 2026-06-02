@@ -820,9 +820,23 @@
 /* ── Manufacturer detail page ───────────────────────────────────── */
 /* ════════════════════════════════════════════════════════════════ */
 
+/* ── Level-2 deep navy page shell ───────────────────────────────── */
+.page--navy {
+  background: linear-gradient(to bottom, #1F3160, #172545);
+}
+
+.page--navy .section-label {
+  color: rgba(246, 239, 220, 0.55);
+}
+
+.page--navy .state-message {
+  color: rgba(246, 239, 220, 0.65);
+}
+
 /* ── Hero ────────────────────────────────────────────────────────── */
 .mfr-hero {
-  background: linear-gradient(155deg, #1F3160, #172545);
+  background: transparent;
+  border-bottom: 3px solid var(--color-amber);
   padding: 0.65rem 1rem 1.5rem;
   display: flex;
   flex-direction: column;
@@ -914,11 +928,11 @@
 
 /* ── Type card ───────────────────────────────────────────────────── */
 .type-card {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  border: 1px solid rgba(44, 66, 123, 0.14);
-  box-shadow: 0 1px 3px rgba(22, 32, 59, 0.07);
-  padding: 0.75rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  padding: 0.5rem 0.9rem;
   display: flex;
   align-items: center;
   gap: 0.85rem;
@@ -949,7 +963,7 @@
 .type-card__name {
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 0.95rem;
-  color: var(--color-ink);
+  color: var(--color-cream);
   flex: 1;
   min-width: 0;
 }
@@ -958,14 +972,14 @@
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 0.85rem;
   font-weight: bold;
-  color: var(--color-navy);
-  background: var(--color-cream);
+  color: var(--color-cream);
+  background: rgba(246, 239, 220, 0.10);
   border-radius: 12px;
   padding: 0.18rem 0.6rem;
   flex-shrink: 0;
 }
 
 .type-card__count--zero {
-  color: rgba(44, 66, 123, 0.32);
-  background: rgba(246, 239, 220, 0.45);
+  color: rgba(246, 239, 220, 0.40);
+  background: rgba(246, 239, 220, 0.06);
 }

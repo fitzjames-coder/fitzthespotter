@@ -124,7 +124,7 @@ export default function ManufacturerDetailView({ manufacturerId, onBack }) {
   const meta = manufacturer ? buildMeta(manufacturer) : ''
 
   return (
-    <div className="page">
+    <div className="page page--navy">
       <div className="mfr-hero">
         <button className="top-bar__back" onClick={onBack} aria-label="Back">
           ‹ Back
