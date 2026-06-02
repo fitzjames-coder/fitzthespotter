@@ -146,14 +146,14 @@ function ManufacturerBreakdown({ registrations, onSelectManufacturer }) {
 }
 
 function DetailTopBar({ airline, regCount, spottingSince, onBack }) {
-  const isClosed = airline.status === 'closed'
+  const isClosed = airline.is_closed
   return (
     <header className="top-bar top-bar--detail">
       <button className="top-bar__back" onClick={onBack} aria-label="Back to airlines list">
         ‹ Back
       </button>
       <div className="top-bar__detail-info">
-        <FlagIcon countryCode={airline.country_code} />
+        <FlagIcon countryCode={airline.country_flag} />
         <h1 className="top-bar__detail-name">{airline.name}</h1>
         {isClosed && <span className="detail-closed-badge">CLOSED</span>}
       </div>

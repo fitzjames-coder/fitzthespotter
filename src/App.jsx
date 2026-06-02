@@ -59,11 +59,11 @@ function RegCountPill({ count }) {
 }
 
 function AirlineCard({ airline, regCount, onSelect }) {
-  const isClosed = airline.status === 'closed'
+  const isClosed = airline.is_closed
   return (
     <button className="airline-card" onClick={() => onSelect(airline)}>
       <div className="airline-card__main">
-        <FlagIcon countryCode={airline.country_code} />
+        <FlagIcon countryCode={airline.country_flag} />
         <div className="airline-card__text">
           <span className="airline-card__name">{airline.name}</span>
           {airline.country && (
@@ -97,7 +97,7 @@ function AirlinesTab() {
     Promise.all([
       supabase
         .from('airlines')
-        .select('id, name, country, country_code, flag_emoji, logo_url, status, closed_date, parent_airline_id')
+        .select('id, name, country, country_flag, logo_url, is_closed, closed_date, parent_id')
         .order('name', { ascending: true }),
       supabase
         .from('registrations')
