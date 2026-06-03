@@ -5,26 +5,16 @@ import AirlineDetailView from './AirlineDetailView'
 import ManufacturerDetailView from './ManufacturerDetailView'
 import BottomNav from './BottomNav'
 import PlaceholderScreen from './PlaceholderScreen'
-
-function EntryModal({ onClose }) {
-  return (
-    <div className="entry-modal-backdrop" onClick={onClose}>
-      <div className="entry-modal" onClick={(e) => e.stopPropagation()}>
-        <p className="entry-modal__text">Entry form coming soon</p>
-        <button className="entry-modal__close" onClick={onClose}>Close</button>
-      </div>
-    </div>
-  )
-}
+import NewRegistrationForm from './NewRegistrationForm'
 
 function TopBar() {
-  const [showModal, setShowModal] = useState(false)
+  const [showForm, setShowForm] = useState(false)
   return (
     <>
       <header className="top-bar">
         <button
           className="top-bar__wordmark"
-          onClick={() => setShowModal(true)}
+          onClick={() => setShowForm(true)}
           aria-label="Add new entry"
         >
           <span className="top-bar__title--cream">Fitz</span>
@@ -33,7 +23,7 @@ function TopBar() {
           <sup className="top-bar__plus" aria-hidden="true">+</sup>
         </button>
       </header>
-      {showModal && <EntryModal onClose={() => setShowModal(false)} />}
+      {showForm && <NewRegistrationForm onClose={() => setShowForm(false)} />}
     </>
   )
 }
