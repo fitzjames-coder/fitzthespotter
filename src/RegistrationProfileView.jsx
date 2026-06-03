@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { supabase } from './lib/supabaseClient'
+import NewRegistrationForm from './NewRegistrationForm'
 
 function SpotlightOverlay({ remark, onClose }) {
   return (
@@ -23,7 +25,7 @@ function SpotlightOverlay({ remark, onClose }) {
   )
 }
 
-function RegTopBar({ reg, onBack }) {
+function RegTopBar({ reg, onBack, onEdit }) {
   const [showSpotlight, setShowSpotlight] = useState(false)
   const hasRemark = Boolean(reg.remark && reg.remark.trim())
 
@@ -33,17 +35,22 @@ function RegTopBar({ reg, onBack }) {
         <button className="top-bar__back" onClick={onBack} aria-label="Back to airline">
           ‹ Back
         </button>
-        <div className="top-bar__detail-info">
-          <h1 className="top-bar__detail-name">{reg.registration}</h1>
-          {hasRemark && (
-            <button
-              className="remark-star"
-              onClick={() => setShowSpotlight(true)}
-              aria-label="View remark"
-            >
-              ✷
-            </button>
-          )}
+        <div className="top-bar__detail-row">
+          <div className="top-bar__detail-info">
+            <h1 className="top-bar__detail-name">{reg.registration}</h1>
+            {hasRemark && (
+              <button
+                className="remark-star"
+                onClick={() => setShowSpotlight(true)}
+                aria-label="View remark"
+              >
+                ✷
+              </button>
+            )}
+          </div>
+          <button className="top-bar__edit" onClick={onEdit} aria-label="Edit registration">
+            Edit
+          </button>
         </div>
       </header>
       {showSpotlight && (
@@ -98,15 +105,147 @@ function InfoSection({ reg }) {
   )
 }
 
-export default function RegistrationProfileView({ reg, onBack }) {
+function DeleteConfirmSheet({ regId, onConfirm, onCancel, deleting }) {
   return (
-    <div className="page">
-      <RegTopBar reg={reg} onBack={onBack} />
-      <GalleryPlaceholder />
-      <main className="content">
-        <p className="section-label">Details</p>
-        <InfoSection reg={reg} />
-      </main>
+    <div className="entry-modal-backdrop" onClick={onCancel}>
+      <div className="entry-modal delete-confirm" onClick={(e) => e.stopPropagation()}>
+        <button
+          className="btn-confirm-delete"
+          onClick={onConfirm}
+          disabled={deleting}
+        >
+          {deleting ? 'Deleting…' : 'Confirm Delete'}
+        </button>
+        <p className="delete-confirm__hint">This cannot be undone.</p>
+        <button className="btn-cancel-delete" onClick={onCancel}>
+          Cancel
+        </button>
+      </div>
     </div>
+  )
+}
+
+export default function RegistrationProfileView({ regId, airline, onBack, onChanged }) {
+  const [reg, setReg] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [showEdit, setShowEdit] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState(null)
+
+  function loadReg() {
+    if (!supabase) {
+      setError('Supabase is not configured.')
+      setLoading(false)
+      return
+    }
+    supabase
+      .from('registrations')
+      .select(`
+        id,
+        registration,
+        first_spotted,
+        airports,
+        remark,
+        statuses,
+        aircraft_types (
+          id,
+          name,
+          manufacturers (
+            id,
+            name
+          )
+        )
+      `)
+      .eq('id', regId)
+      .single()
+      .then(({ data, error: fetchError }) => {
+        if (fetchError) {
+          setError(fetchError.message)
+        } else {
+          setReg(data)
+        }
+        setLoading(false)
+      })
+  }
+
+  useEffect(() => {
+    loadReg()
+  }, [regId])
+
+  async function handleDelete() {
+    setDeleting(true)
+    setDeleteError(null)
+    const { error: err } = await supabase.from('registrations').delete().eq('id', regId)
+    setDeleting(false)
+    if (err) {
+      setDeleteError(err.message)
+    } else {
+      onChanged?.()
+      onBack()
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="page">
+        <p className="state-message">Loading…</p>
+      </div>
+    )
+  }
+
+  if (error || !reg) {
+    return (
+      <div className="page">
+        <button className="top-bar__back" style={{ padding: '1rem' }} onClick={onBack}>
+          ‹ Back
+        </button>
+        <p className="state-message state-message--error">{error ?? 'Not found.'}</p>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="page">
+        <RegTopBar reg={reg} onBack={onBack} onEdit={() => setShowEdit(true)} />
+        <GalleryPlaceholder />
+        <main className="content">
+          <p className="section-label">
+            {airline?.name ?? ''}
+          </p>
+          <InfoSection reg={reg} />
+          {deleteError && <p className="form-error" style={{ marginTop: '1rem' }}>{deleteError}</p>}
+          <button
+            className="btn-delete-reg"
+            onClick={() => setShowDeleteConfirm(true)}
+          >
+            Delete registration
+          </button>
+        </main>
+      </div>
+
+      {showEdit && (
+        <NewRegistrationForm
+          existingReg={reg}
+          initialAirline={airline}
+          onClose={() => setShowEdit(false)}
+          onSaved={() => {
+            loadReg()
+            onChanged?.()
+          }}
+        />
+      )}
+
+      {showDeleteConfirm && (
+        <DeleteConfirmSheet
+          regId={regId}
+          onConfirm={handleDelete}
+          onCancel={() => setShowDeleteConfirm(false)}
+          deleting={deleting}
+        />
+      )}
+    </>
   )
 }

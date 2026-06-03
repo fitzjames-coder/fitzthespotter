@@ -1489,3 +1489,83 @@
 .page--navy .model-row__count {
   color: rgba(246, 239, 220, 0.75);
 }
+
+/* ── Registration profile — top bar row ─────────────────────────── */
+.top-bar__detail-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.top-bar__edit {
+  background: none;
+  border: 1.5px solid var(--color-amber);
+  border-radius: 6px;
+  color: var(--color-amber);
+  font-size: 0.78rem;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* ── Delete registration button ─────────────────────────────────── */
+.btn-delete-reg {
+  display: block;
+  width: 100%;
+  margin-top: 1.5rem;
+  background: none;
+  border: 1.5px solid var(--color-coral);
+  border-radius: 10px;
+  color: var(--color-coral);
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  text-align: center;
+}
+
+/* ── Delete confirmation sheet ──────────────────────────────────── */
+.delete-confirm {
+  padding: 1.5rem 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.btn-confirm-delete {
+  width: 100%;
+  background: var(--color-coral);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.9rem 1rem;
+  cursor: pointer;
+}
+
+.btn-confirm-delete:disabled {
+  opacity: 0.6;
+}
+
+.delete-confirm__hint {
+  font-size: 0.8rem;
+  color: rgba(22, 32, 59, 0.5);
+  text-align: center;
+  margin: 0;
+}
+
+.btn-cancel-delete {
+  width: 100%;
+  background: none;
+  border: 1.5px solid rgba(22, 32, 59, 0.2);
+  border-radius: 10px;
+  color: var(--color-ink);
+  font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}

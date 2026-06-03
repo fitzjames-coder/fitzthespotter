@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import RegistrationProfileView from './RegistrationProfileView'
 
 function heroInitials(name) {
   return name.split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 3)
@@ -178,12 +179,12 @@ function ManufacturerBreakdown({ registrations, onSelectManufacturer }) {
   )
 }
 
-function RegistrationCard({ reg }) {
+function RegistrationCard({ reg, onSelect }) {
   const typeName = reg.aircraft_types?.name ?? null
   const abbrev = typeName ? thumbAbbrev(typeName) : ''
 
   return (
-    <div className="reg-card">
+    <button className="reg-card" onClick={() => onSelect(reg)}>
       <div className="reg-card__thumb" aria-hidden="true">
         <span className="reg-card__thumb-text">{abbrev}</span>
       </div>
@@ -191,7 +192,7 @@ function RegistrationCard({ reg }) {
         <span className="reg-card__reg">{reg.registration}</span>
         {typeName && <span className="reg-card__type">{typeName}</span>}
       </div>
-    </div>
+    </button>
   )
 }
 
@@ -199,8 +200,9 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [selectedReg, setSelectedReg] = useState(null)
 
-  useEffect(() => {
+  function loadRegistrations() {
     if (!supabase) {
       setError('Supabase is not configured.')
       setLoading(false)
@@ -234,7 +236,22 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
         }
         setLoading(false)
       })
+  }
+
+  useEffect(() => {
+    loadRegistrations()
   }, [airline.id])
+
+  if (selectedReg) {
+    return (
+      <RegistrationProfileView
+        regId={selectedReg.id}
+        airline={airline}
+        onBack={() => setSelectedReg(null)}
+        onChanged={loadRegistrations}
+      />
+    )
+  }
 
   const regCount = registrations.length
 
@@ -255,7 +272,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
         <ul className="reg-list">
           {registrations.map((reg) => (
             <li key={reg.id}>
-              <RegistrationCard reg={reg} />
+              <RegistrationCard reg={reg} onSelect={setSelectedReg} />
             </li>
           ))}
         </ul>
