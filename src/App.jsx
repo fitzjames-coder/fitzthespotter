@@ -181,18 +181,20 @@ function AirlinesTab() {
 export default function App() {
   const [activeTab, setActiveTab] = useState('airlines')
   const [navOpen, setNavOpen] = useState(false)
+  const [navNonce, setNavNonce] = useState(0)
 
   function handleTabChange(tab) {
     setActiveTab(tab)
     setNavOpen(false)
+    setNavNonce((n) => n + 1)
   }
 
   return (
     <>
-      {activeTab === 'airlines' && <AirlinesTab />}
-      {activeTab === 'stats'    && <PlaceholderScreen name="Stats" />}
-      {activeTab === 'airports' && <PlaceholderScreen name="Airports" />}
-      {activeTab === 'search'   && <PlaceholderScreen name="Search" />}
+      {activeTab === 'airlines' && <AirlinesTab key={navNonce} />}
+      {activeTab === 'stats'    && <PlaceholderScreen key={navNonce} name="Stats" />}
+      {activeTab === 'airports' && <PlaceholderScreen key={navNonce} name="Airports" />}
+      {activeTab === 'search'   && <PlaceholderScreen key={navNonce} name="Search" />}
 
       <BottomNav
         activeTab={activeTab}
