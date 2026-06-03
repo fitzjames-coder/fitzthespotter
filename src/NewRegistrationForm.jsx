@@ -90,7 +90,7 @@ async function fetchManufacturers(q) {
     .select('id, name')
     .ilike('name', `%${q}%`)
     .order('name')
-    .limit(8)
+    .limit(100)
   return (data ?? []).map((m) => ({ id: m.id, label: m.name }))
 }
 
@@ -102,7 +102,7 @@ function makeFetchTypes(manufacturerId) {
       .select('id, name')
       .ilike('name', `%${q}%`)
       .order('name')
-      .limit(8)
+      .limit(100)
     if (manufacturerId) qb = qb.eq('manufacturer_id', manufacturerId)
     const { data } = await qb
     return (data ?? []).map((t) => ({ id: t.id, label: t.name }))
@@ -235,6 +235,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 value={manufacturer}
                 onSelect={handleManufacturerSelect}
                 fetchOptions={fetchManufacturers}
+                openOnFocus
               />
             </div>
             <div className="form-group">
@@ -245,6 +246,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 onSelect={setType}
                 fetchOptions={makeFetchTypes(manufacturer?.id)}
                 disabled={!manufacturer}
+                openOnFocus
               />
             </div>
             <div className="form-illustration-stub">

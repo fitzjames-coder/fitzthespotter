@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOptions, disabled }) {
+export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOptions, disabled, openOnFocus = false }) {
   const [query, setQuery] = useState('')
   const [options, setOptions] = useState([])
   const [open, setOpen] = useState(false)
@@ -24,9 +24,18 @@ export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOpt
 
   const displayValue = value ? value.label : query
 
+  async function loadAll() {
+    const results = await fetchOptions('')
+    setOptions(results)
+    setOpen(true)
+  }
+
   function handleFocus() {
     if (value) {
       setTimeout(() => inputRef.current?.select(), 0)
+    }
+    if (openOnFocus) {
+      loadAll()
     }
   }
 
@@ -36,8 +45,12 @@ export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOpt
     if (value) onSelect(null)
     clearTimeout(timerRef.current)
     if (!q.trim()) {
-      setOptions([])
-      setOpen(false)
+      if (openOnFocus) {
+        loadAll()
+      } else {
+        setOptions([])
+        setOpen(false)
+      }
       return
     }
     timerRef.current = setTimeout(async () => {
