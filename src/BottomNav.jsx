@@ -1,6 +1,5 @@
 const TABS = [
   { id: 'airlines', label: 'Airlines', icon: '/airlines.PNG' },
-  { id: 'stats',    label: 'Stats',    icon: '/stats.PNG'    },
   { id: 'airports', label: 'Airports', icon: '/airports.PNG' },
   { id: 'search',   label: 'Search',   icon: '/search.PNG'   },
 ]
