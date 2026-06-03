@@ -6,6 +6,7 @@ import ManufacturerDetailView from './ManufacturerDetailView'
 import BottomNav from './BottomNav'
 import PlaceholderScreen from './PlaceholderScreen'
 import NewRegistrationForm from './NewRegistrationForm'
+import SearchView from './SearchView'
 
 function compareAirlineNames(a, b) {
   const an = (a.name ?? '').trim()
@@ -192,9 +193,8 @@ export default function App() {
   return (
     <>
       {activeTab === 'airlines' && <AirlinesTab key={navNonce} />}
-      {activeTab === 'stats'    && <PlaceholderScreen key={navNonce} name="Stats" />}
       {activeTab === 'airports' && <PlaceholderScreen key={navNonce} name="Airports" />}
-      {activeTab === 'search'   && <PlaceholderScreen key={navNonce} name="Search" />}
+      {activeTab === 'search'   && <SearchView key={navNonce} />}
 
       <BottomNav
         activeTab={activeTab}
