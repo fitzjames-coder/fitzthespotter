@@ -7,6 +7,15 @@ import BottomNav from './BottomNav'
 import PlaceholderScreen from './PlaceholderScreen'
 import NewRegistrationForm from './NewRegistrationForm'
 
+function compareAirlineNames(a, b) {
+  const an = (a.name ?? '').trim()
+  const bn = (b.name ?? '').trim()
+  const aDigit = /^\d/.test(an)
+  const bDigit = /^\d/.test(bn)
+  if (aDigit !== bDigit) return aDigit ? -1 : 1
+  return an.localeCompare(bn, 'en', { numeric: true, sensitivity: 'base' })
+}
+
 function TopBar() {
   const [showForm, setShowForm] = useState(false)
   return (
@@ -97,7 +106,7 @@ function AirlinesTab() {
         console.error('[fitzthespotter] Failed to fetch airlines:', airlinesResult.error)
         setError(airlinesResult.error.message)
       } else {
-        setAirlines(airlinesResult.data)
+        setAirlines([...airlinesResult.data].sort(compareAirlineNames))
       }
 
       if (regsResult.error) {
