@@ -231,6 +231,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
         )
       `)
       .eq('airline_id', airline.id)
+      .order('first_spotted', { ascending: true, nullsFirst: false })
       .order('registration', { ascending: true })
       .then(({ data, error: fetchError }) => {
         if (fetchError) {
