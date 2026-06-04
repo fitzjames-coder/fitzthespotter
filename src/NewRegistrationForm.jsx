@@ -113,6 +113,14 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const isEdit = Boolean(existingReg)
   const s = existingReg?.statuses ?? {}
 
+  const origLivery = useRef({
+    wasSpecial: Boolean(s.special_livery),
+    wasRetro: Boolean(s.retro),
+    wasAlliance: Boolean(s.alliance),
+    liveryName: s.livery_name ?? '',
+    allianceName: s.alliance_name ?? '',
+  })
+
   const [regNumber, setRegNumber] = useState(existingReg?.registration ?? '')
   const [airline, setAirline] = useState(
     initialAirline ? { id: initialAirline.id, label: initialAirline.name } : null
@@ -140,6 +148,11 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [saveError, setSaveError] = useState(null)
   const [existingMatch, setExistingMatch] = useState(null)
   const dupTimerRef = useRef(null)
+
+  const [sightingOpen, setSightingOpen] = useState(false)
+  const [sightingDate, setSightingDate] = useState('')
+  const [sightingAirport, setSightingAirport] = useState('')
+  const [sightingSaving, setSightingSaving] = useState(false)
 
   const showLiveryName = statusSpecialLivery || statusRetro
 
@@ -236,6 +249,71 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     }
   }
 
+  async function handleLogSighting() {
+    if (!supabase) { setSaveError('Supabase is not configured.'); return }
+    setSightingSaving(true)
+    setSaveError(null)
+
+    const effectiveDate = sightingDate || new Date().toISOString().slice(0, 10)
+
+    const lines = []
+    if (origLivery.current.wasSpecial && !statusSpecialLivery)
+      lines.push(`Used to wear ${origLivery.current.liveryName || 'special livery'} until ${effectiveDate}`)
+    if (origLivery.current.wasRetro && !statusRetro)
+      lines.push(`Used to wear ${origLivery.current.liveryName || 'retro livery'} until ${effectiveDate}`)
+    if (origLivery.current.wasAlliance && !statusAlliance)
+      lines.push(`Used to wear ${origLivery.current.allianceName ? origLivery.current.allianceName + ' alliance livery' : 'alliance livery'} until ${effectiveDate}`)
+
+    const newRemark = [remark.trim(), ...lines].filter(Boolean).join('\n')
+    setRemark(newRemark)
+
+    const statuses = {}
+    if (statusSpecialLivery) statuses.special_livery = true
+    if (statusRetro) statuses.retro = true
+    if (showLiveryName && liveryName.trim()) statuses.livery_name = liveryName.trim()
+    if (statusAlliance) {
+      statuses.alliance = true
+      if (allianceName) statuses.alliance_name = allianceName
+    }
+    if (newRemark.trim()) statuses.remarks = true
+    if (statusFlownIn) statuses.flown_in = true
+
+    const { error: regErr } = await supabase
+      .from('registrations')
+      .update({
+        registration: regNumber.trim().toUpperCase(),
+        airline_id: airline?.id ?? null,
+        aircraft_type_id: type?.id ?? null,
+        remark: newRemark.trim() || null,
+        statuses: Object.keys(statuses).length > 0 ? statuses : null,
+      })
+      .eq('id', existingReg.id)
+
+    if (regErr) {
+      setSightingSaving(false)
+      setSaveError(regErr.message)
+      return
+    }
+
+    const { error: sErr } = await supabase.from('sightings').insert({
+      registration_id: existingReg.id,
+      spotted_on: sightingDate || null,
+      airport: sightingAirport.trim().toUpperCase() || null,
+      special_livery: statusSpecialLivery,
+      retro: statusRetro,
+      alliance: statusAlliance,
+      livery_name: (showLiveryName && liveryName.trim()) ? liveryName.trim() : null,
+    })
+
+    setSightingSaving(false)
+    if (sErr) {
+      setSaveError(sErr.message)
+    } else {
+      onSaved?.()
+      onClose()
+    }
+  }
+
   return (
     <div className="entry-modal-backdrop" onClick={onClose}>
       <div className="entry-modal" onClick={(e) => e.stopPropagation()}>
@@ -276,6 +354,102 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               />
             </div>
           </div>
+
+          {isEdit && (
+            <div className="new-sighting-panel">
+              <button
+                type="button"
+                className="new-sighting-toggle"
+                onClick={() => setSightingOpen((o) => !o)}
+                aria-expanded={sightingOpen}
+              >
+                <span className="new-sighting-toggle__icon" aria-hidden="true">
+                  {sightingOpen ? '▾' : '+'}
+                </span>
+                New Sighting
+              </button>
+              {sightingOpen && (
+                <div className="new-sighting-body">
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="sighting-date-input">Date</label>
+                    <input
+                      id="sighting-date-input"
+                      className="form-input"
+                      type="date"
+                      value={sightingDate}
+                      onChange={(e) => setSightingDate(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="sighting-airport-input">Airport</label>
+                    <input
+                      id="sighting-airport-input"
+                      className="form-input form-input--mono"
+                      type="text"
+                      value={sightingAirport}
+                      onChange={(e) => setSightingAirport(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                      placeholder="EGLL"
+                      maxLength={6}
+                      autoComplete="off"
+                    />
+                  </div>
+                  <StatusSwitch
+                    label="Special livery"
+                    checked={statusSpecialLivery}
+                    onChange={(v) => { setStatusSpecialLivery(v); if (v) { setStatusRetro(false); setStatusAlliance(false) } }}
+                  />
+                  <StatusSwitch
+                    label="Retro"
+                    checked={statusRetro}
+                    onChange={(v) => { setStatusRetro(v); if (v) { setStatusSpecialLivery(false); setStatusAlliance(false) } }}
+                  />
+                  {showLiveryName && (
+                    <div className="form-group status-revealed-field">
+                      <label className="form-label" htmlFor="sighting-livery-name-input">Livery name (optional)</label>
+                      <input
+                        id="sighting-livery-name-input"
+                        className="form-input"
+                        type="text"
+                        value={liveryName}
+                        onChange={(e) => setLiveryName(e.target.value)}
+                        placeholder="e.g. Star Alliance 15yrs, Retrojet"
+                        autoComplete="off"
+                      />
+                    </div>
+                  )}
+                  <StatusSwitch
+                    label="Alliance"
+                    checked={statusAlliance}
+                    onChange={(v) => { setStatusAlliance(v); if (v) { setStatusSpecialLivery(false); setStatusRetro(false) } }}
+                  />
+                  {statusAlliance && (
+                    <div className="form-group status-revealed-field">
+                      <label className="form-label" htmlFor="sighting-alliance-select">Alliance name</label>
+                      <select
+                        id="sighting-alliance-select"
+                        className="form-input form-select"
+                        value={allianceName}
+                        onChange={(e) => setAllianceName(e.target.value)}
+                      >
+                        <option value="">Select…</option>
+                        {ALLIANCES.map((a) => (
+                          <option key={a} value={a}>{a}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  <button
+                    type="button"
+                    className="btn-log-sighting"
+                    onClick={handleLogSighting}
+                    disabled={sightingSaving}
+                  >
+                    {sightingSaving ? 'Logging…' : 'Log sighting'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           <div className="form-section">
             <p className="form-section__label">Aircraft</p>
@@ -326,38 +500,42 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
 
           <div className="form-section">
             <p className="form-section__label">Status</p>
-            <StatusSwitch label="Special livery" checked={statusSpecialLivery} onChange={setStatusSpecialLivery} />
-            <StatusSwitch label="Retro" checked={statusRetro} onChange={setStatusRetro} />
-            {showLiveryName && (
-              <div className="form-group status-revealed-field">
-                <label className="form-label" htmlFor="livery-name-input">Livery name (optional)</label>
-                <input
-                  id="livery-name-input"
-                  className="form-input"
-                  type="text"
-                  value={liveryName}
-                  onChange={(e) => setLiveryName(e.target.value)}
-                  placeholder="e.g. Star Alliance 15yrs, Retrojet"
-                  autoComplete="off"
-                />
-              </div>
-            )}
-            <StatusSwitch label="Alliance" checked={statusAlliance} onChange={setStatusAlliance} />
-            {statusAlliance && (
-              <div className="form-group status-revealed-field">
-                <label className="form-label" htmlFor="alliance-select">Alliance name</label>
-                <select
-                  id="alliance-select"
-                  className="form-input form-select"
-                  value={allianceName}
-                  onChange={(e) => setAllianceName(e.target.value)}
-                >
-                  <option value="">Select…</option>
-                  {ALLIANCES.map((a) => (
-                    <option key={a} value={a}>{a}</option>
-                  ))}
-                </select>
-              </div>
+            {!isEdit && (
+              <>
+                <StatusSwitch label="Special livery" checked={statusSpecialLivery} onChange={setStatusSpecialLivery} />
+                <StatusSwitch label="Retro" checked={statusRetro} onChange={setStatusRetro} />
+                {showLiveryName && (
+                  <div className="form-group status-revealed-field">
+                    <label className="form-label" htmlFor="livery-name-input">Livery name (optional)</label>
+                    <input
+                      id="livery-name-input"
+                      className="form-input"
+                      type="text"
+                      value={liveryName}
+                      onChange={(e) => setLiveryName(e.target.value)}
+                      placeholder="e.g. Star Alliance 15yrs, Retrojet"
+                      autoComplete="off"
+                    />
+                  </div>
+                )}
+                <StatusSwitch label="Alliance" checked={statusAlliance} onChange={setStatusAlliance} />
+                {statusAlliance && (
+                  <div className="form-group status-revealed-field">
+                    <label className="form-label" htmlFor="alliance-select">Alliance name</label>
+                    <select
+                      id="alliance-select"
+                      className="form-input form-select"
+                      value={allianceName}
+                      onChange={(e) => setAllianceName(e.target.value)}
+                    >
+                      <option value="">Select…</option>
+                      {ALLIANCES.map((a) => (
+                        <option key={a} value={a}>{a}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </>
             )}
             <StatusSwitch label="Flown in" checked={statusFlownIn} onChange={setStatusFlownIn} />
           </div>
