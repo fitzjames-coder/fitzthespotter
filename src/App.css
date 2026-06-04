@@ -2085,3 +2085,58 @@
   font-size: 0.85rem;
   color: var(--color-coral);
 }
+
+/* ── New Sighting collapsible panel (edit mode) ─────────────────── */
+.new-sighting-panel {
+  margin-bottom: 1.35rem;
+  border: 1.5px solid rgba(251, 173, 25, 0.35);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.new-sighting-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: rgba(251, 173, 25, 0.08);
+  border: none;
+  padding: 0.75rem 1rem;
+  font-size: 0.88rem;
+  font-weight: bold;
+  color: var(--color-amber);
+  cursor: pointer;
+  text-align: left;
+}
+
+.new-sighting-toggle__icon {
+  font-size: 0.9rem;
+  line-height: 1;
+  width: 1em;
+  display: inline-block;
+}
+
+.new-sighting-body {
+  padding: 0.85rem 1rem 1rem;
+  border-top: 1px solid rgba(251, 173, 25, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.btn-log-sighting {
+  margin-top: 0.85rem;
+  width: 100%;
+  background: var(--color-amber);
+  border: none;
+  border-radius: 8px;
+  color: var(--color-ink);
+  font-size: 0.95rem;
+  font-weight: bold;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+}
+
+.btn-log-sighting:disabled {
+  opacity: 0.6;
+}
