@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import NewRegistrationForm from './NewRegistrationForm'
 import RegistrationProfileView from './RegistrationProfileView'
+import StatsView from './StatsView'
 
 function SearchTopBar() {
   const [showForm, setShowForm] = useState(false)
@@ -66,17 +67,6 @@ function StatsCard({ onOpen }) {
   )
 }
 
-function StatsPlaceholder({ onBack }) {
-  return (
-    <div className="page search-page">
-      <SearchTopBar />
-      <main className="content search-content">
-        <button className="search-stats-back" onClick={onBack}>‹ Back</button>
-        <p className="search-stats-soon">Stats — coming soon</p>
-      </main>
-    </div>
-  )
-}
 
 export default function SearchView() {
   const [allRegs, setAllRegs] = useState([])
@@ -152,7 +142,7 @@ export default function SearchView() {
   }
 
   if (showStats) {
-    return <StatsPlaceholder onBack={() => setShowStats(false)} />
+    return <StatsView onBack={() => setShowStats(false)} />
   }
 
   return (
