@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import TypeaheadPicker from './TypeaheadPicker'
 
@@ -138,8 +138,27 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [remark, setRemark] = useState(existingReg?.remark ?? '')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
+  const [existingMatch, setExistingMatch] = useState(null)
+  const dupTimerRef = useRef(null)
 
   const showLiveryName = statusSpecialLivery || statusRetro
+
+  useEffect(() => {
+    if (isEdit) return
+    const trimmed = regNumber.trim().toUpperCase()
+    clearTimeout(dupTimerRef.current)
+    if (!trimmed) { setExistingMatch(null); return }
+    dupTimerRef.current = setTimeout(async () => {
+      if (!supabase) return
+      const { data } = await supabase
+        .from('registrations')
+        .select('id, registration')
+        .eq('registration', trimmed)
+        .maybeSingle()
+      setExistingMatch(data ?? null)
+    }, 400)
+    return () => clearTimeout(dupTimerRef.current)
+  }, [regNumber])
 
   function handleManufacturerSelect(mfr) {
     setManufacturer(mfr)
@@ -150,6 +169,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     if (!supabase) { setSaveError('Supabase is not configured.'); return }
     const trimmed = regNumber.trim().toUpperCase()
     if (!trimmed) { setSaveError('Registration number is required.'); return }
+    if (!isEdit && existingMatch) { setSaveError('This registration already exists.'); return }
 
     setSaving(true)
     setSaveError(null)
@@ -243,6 +263,9 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 maxLength={10}
               />
             </div>
+            {!isEdit && existingMatch && (
+              <p className="reg-exists-banner">This registration is already logged.</p>
+            )}
             <div className="form-group">
               <label className="form-label">Airline</label>
               <TypeaheadPicker
@@ -368,7 +391,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
             type="button"
             className="btn-primary"
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || (!isEdit && Boolean(existingMatch))}
           >
             {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Save'}
           </button>
