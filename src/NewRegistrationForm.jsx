@@ -308,9 +308,6 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     const { error: regErr } = await supabase
       .from('registrations')
       .update({
-        registration: regNumber.trim().toUpperCase(),
-        airline_id: airline?.id ?? null,
-        aircraft_type_id: type?.id ?? null,
         remark: newRemark.trim() || null,
         statuses: Object.keys(statuses).length > 0 ? statuses : null,
       })
