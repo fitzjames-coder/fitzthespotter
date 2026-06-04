@@ -165,10 +165,35 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       if (!supabase) return
       const { data } = await supabase
         .from('registrations')
-        .select('id, registration')
+        .select('id, registration, statuses, remark')
         .eq('registration', trimmed)
         .maybeSingle()
       setExistingMatch(data ?? null)
+      if (data) {
+        const ms = data.statuses ?? {}
+        setStatusSpecialLivery(Boolean(ms.special_livery))
+        setStatusRetro(Boolean(ms.retro))
+        setStatusAlliance(Boolean(ms.alliance))
+        setLiveryName(ms.livery_name ?? '')
+        setAllianceName(ms.alliance_name ?? '')
+        setRemark(data.remark ?? '')
+        origLivery.current = {
+          wasSpecial: Boolean(ms.special_livery),
+          wasRetro: Boolean(ms.retro),
+          wasAlliance: Boolean(ms.alliance),
+          liveryName: ms.livery_name ?? '',
+          allianceName: ms.alliance_name ?? '',
+        }
+      } else {
+        setStatusSpecialLivery(false)
+        setStatusRetro(false)
+        setStatusAlliance(false)
+        setLiveryName('')
+        setAllianceName('')
+        setRemark('')
+        setSightingOpen(false)
+        origLivery.current = { wasSpecial: false, wasRetro: false, wasAlliance: false, liveryName: '', allianceName: '' }
+      }
     }, 400)
     return () => clearTimeout(dupTimerRef.current)
   }, [regNumber])
@@ -251,6 +276,8 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
 
   async function handleLogSighting() {
     if (!supabase) { setSaveError('Supabase is not configured.'); return }
+    const targetId = existingReg?.id ?? existingMatch?.id
+    if (!targetId) { setSaveError('No registration to log sighting against.'); return }
     setSightingSaving(true)
     setSaveError(null)
 
@@ -281,13 +308,10 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     const { error: regErr } = await supabase
       .from('registrations')
       .update({
-        registration: regNumber.trim().toUpperCase(),
-        airline_id: airline?.id ?? null,
-        aircraft_type_id: type?.id ?? null,
         remark: newRemark.trim() || null,
         statuses: Object.keys(statuses).length > 0 ? statuses : null,
       })
-      .eq('id', existingReg.id)
+      .eq('id', targetId)
 
     if (regErr) {
       setSightingSaving(false)
@@ -296,7 +320,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     }
 
     const { error: sErr } = await supabase.from('sightings').insert({
-      registration_id: existingReg.id,
+      registration_id: targetId,
       spotted_on: sightingDate || null,
       airport: sightingAirport.trim().toUpperCase() || null,
       special_livery: statusSpecialLivery,
@@ -355,7 +379,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
             </div>
           </div>
 
-          {isEdit && (
+          {(isEdit || existingMatch) && (
             <div className="new-sighting-panel">
               <button
                 type="button"
@@ -498,6 +522,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
             </div>
           )}
 
+          {(isEdit || !existingMatch) && (
           <div className="form-section">
             <p className="form-section__label">Status</p>
             {!isEdit && (
@@ -539,6 +564,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
             )}
             <StatusSwitch label="Flown in" checked={statusFlownIn} onChange={setStatusFlownIn} />
           </div>
+          )}
 
           <div className="form-section">
             <p className="form-section__label">Notes</p>
