@@ -71,11 +71,14 @@ function GalleryPlaceholder() {
   )
 }
 
-function InfoSection({ reg }) {
+function InfoSection({ reg, lastSighting }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
   const model = reg.aircraft_types?.name
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
   const airports = Array.isArray(reg.airports) ? reg.airports : []
+  const firstAirport = airports[0] ?? null
+  const lastDate = lastSighting?.spotted_on ?? null
+  const lastAirport = lastDate ? (lastSighting?.airport ?? null) : null
 
   return (
     <div className="info-card">
@@ -89,16 +92,35 @@ function InfoSection({ reg }) {
         <div className="info-row info-row--airports">
           <span className="info-row__label">Airports</span>
           <div className="info-row__pills">
-            {airports.map((code) => (
-              <span key={code} className="airport-pill">{code}</span>
-            ))}
+            {airports.map((code) => {
+              const isFirst = code === firstAirport
+              const isLast = Boolean(lastAirport && code === lastAirport)
+              let pillClass = 'airport-pill'
+              if (isFirst && isLast) pillClass = 'airport-pill airport-pill--first'
+              else if (isFirst) pillClass = 'airport-pill airport-pill--first'
+              else if (isLast) pillClass = 'airport-pill airport-pill--last'
+              return (
+                <span key={code} className={pillClass}>
+                  {code}
+                  {isFirst && isLast && lastDate && (
+                    <span className="airport-pill__recent">{lastDate}</span>
+                  )}
+                </span>
+              )
+            })}
           </div>
         </div>
       )}
       {reg.first_spotted && (
         <div className="info-row">
           <span className="info-row__label">First spotted</span>
-          <span className="info-row__value">{reg.first_spotted}</span>
+          <span className="info-row__value info-date--first">{reg.first_spotted}</span>
+        </div>
+      )}
+      {lastDate && (
+        <div className="info-row">
+          <span className="info-row__label">Last spotted</span>
+          <span className="info-row__value"><span className="info-date--last">{lastDate}</span></span>
         </div>
       )}
     </div>
@@ -127,6 +149,7 @@ function DeleteConfirmSheet({ regId, onConfirm, onCancel, deleting }) {
 
 export default function RegistrationProfileView({ regId, airline, onBack, onChanged }) {
   const [reg, setReg] = useState(null)
+  const [lastSighting, setLastSighting] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showEdit, setShowEdit] = useState(false)
@@ -134,13 +157,13 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(null)
 
-  function loadReg() {
+  async function loadReg() {
     if (!supabase) {
       setError('Supabase is not configured.')
       setLoading(false)
       return
     }
-    supabase
+    const { data, error: fetchError } = await supabase
       .from('registrations')
       .select(`
         id,
@@ -160,14 +183,25 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
       `)
       .eq('id', regId)
       .single()
-      .then(({ data, error: fetchError }) => {
-        if (fetchError) {
-          setError(fetchError.message)
-        } else {
-          setReg(data)
-        }
-        setLoading(false)
-      })
+
+    if (fetchError) {
+      setError(fetchError.message)
+      setLoading(false)
+      return
+    }
+
+    setReg(data)
+
+    const { data: ls } = await supabase
+      .from('sightings')
+      .select('airport, spotted_on')
+      .eq('registration_id', regId)
+      .order('spotted_on', { ascending: false, nullsFirst: false })
+      .limit(1)
+      .maybeSingle()
+
+    setLastSighting(ls ?? null)
+    setLoading(false)
   }
 
   useEffect(() => {
@@ -215,7 +249,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           <p className="section-label">
             {airline?.name ?? ''}
           </p>
-          <InfoSection reg={reg} />
+          <InfoSection reg={reg} lastSighting={lastSighting} />
           {deleteError && <p className="form-error" style={{ marginTop: '1rem' }}>{deleteError}</p>}
           <button
             className="btn-delete-reg"

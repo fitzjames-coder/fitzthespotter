@@ -2140,3 +2140,40 @@
 .btn-log-sighting:disabled {
   opacity: 0.6;
 }
+
+/* ── First / Last spotted date badges ───────────────────────────── */
+.info-date--first {
+  color: #005281;
+  font-weight: 600;
+}
+
+.info-date--last {
+  background: rgba(251, 173, 25, 0.18);
+  color: #16203B;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 10px;
+}
+
+/* ── Airport pill colour modifiers ──────────────────────────────── */
+.airport-pill--first {
+  background: rgba(0, 82, 129, 0.12);
+  border: 1px solid #005281;
+  color: #005281;
+}
+
+.airport-pill--last {
+  background: rgba(251, 173, 25, 0.18);
+  border: 1px solid #FBAD19;
+  color: #16203B;
+}
+
+.airport-pill__recent {
+  background: #FBAD19;
+  color: #16203B;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 0 5px;
+  border-radius: 8px;
+  margin-left: 5px;
+}
