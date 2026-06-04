@@ -169,19 +169,47 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       registration: trimmed,
       airline_id: airline?.id ?? null,
       aircraft_type_id: type?.id ?? null,
-      airports: airports.length > 0 ? airports : null,
-      first_spotted: firstSpotted || null,
       remark: remark.trim() || null,
       statuses: Object.keys(statuses).length > 0 ? statuses : null,
     }
 
-    const { error: err } = isEdit
-      ? await supabase.from('registrations').update(payload).eq('id', existingReg.id)
-      : await supabase.from('registrations').insert(payload)
+    if (isEdit) {
+      const { error: err } = await supabase
+        .from('registrations')
+        .update(payload)
+        .eq('id', existingReg.id)
+      setSaving(false)
+      if (err) { setSaveError(err.message) } else { onSaved?.(); onClose() }
+      return
+    }
 
+    const { data: newReg, error: regErr } = await supabase
+      .from('registrations')
+      .insert(payload)
+      .select('id')
+      .single()
+
+    if (regErr) {
+      setSaving(false)
+      setSaveError(regErr.message)
+      return
+    }
+
+    const codes = airports.length > 0 ? airports : [null]
+    const sightingRows = codes.map((code) => ({
+      registration_id: newReg.id,
+      spotted_on: firstSpotted || null,
+      airport: code,
+      special_livery: statusSpecialLivery,
+      retro: statusRetro,
+      alliance: statusAlliance,
+      livery_name: (showLiveryName && liveryName.trim()) ? liveryName.trim() : null,
+    }))
+
+    const { error: sErr } = await supabase.from('sightings').insert(sightingRows)
     setSaving(false)
-    if (err) {
-      setSaveError(err.message)
+    if (sErr) {
+      setSaveError(sErr.message)
     } else {
       onSaved?.()
       onClose()
@@ -252,24 +280,26 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
             </div>
           </div>
 
-          <div className="form-section">
-            <p className="form-section__label">Sighting</p>
-            <div className="form-group">
-              <label className="form-label" htmlFor="first-spotted-input">First spotted</label>
-              <input
-                id="first-spotted-input"
-                className="form-input"
-                type="date"
-                value={firstSpotted}
-                onChange={(e) => setFirstSpotted(e.target.value)}
-              />
+          {!isEdit && (
+            <div className="form-section">
+              <p className="form-section__label">Sighting</p>
+              <div className="form-group">
+                <label className="form-label" htmlFor="first-spotted-input">First spotted</label>
+                <input
+                  id="first-spotted-input"
+                  className="form-input"
+                  type="date"
+                  value={firstSpotted}
+                  onChange={(e) => setFirstSpotted(e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Airports spotted at</label>
+                <AirportTagsInput codes={airports} onChange={setAirports} />
+                <p className="form-hint">Space or comma to confirm each code</p>
+              </div>
             </div>
-            <div className="form-group">
-              <label className="form-label">Airports spotted at</label>
-              <AirportTagsInput codes={airports} onChange={setAirports} />
-              <p className="form-hint">Space or comma to confirm each code</p>
-            </div>
-          </div>
+          )}
 
           <div className="form-section">
             <p className="form-section__label">Status</p>
