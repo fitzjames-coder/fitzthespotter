@@ -7,8 +7,10 @@ function computeStats(regs) {
       total: 0,
       airlines: 0, manufacturers: 0, types: 0, airports: 0, countries: 0,
       topAirline: null, topType: null, topAirport: null,
+      top3Airlines: [], top3Types: [], top3Airports: [],
       specialLivery: 0, retro: 0, alliance: 0, flownIn: 0, remarks: 0,
       firstSpot: null, latestSpot: null, totalDays: 0,
+      airlinesSpotted: [], manufacturerBreakdown: [],
     }
   }
 
@@ -22,6 +24,9 @@ function computeStats(regs) {
   const typeCounts = {}
   const airportCounts = {}
 
+  const airlineMap = new Map()
+  const mfrMap = new Map()
+
   let specialLivery = 0, retro = 0, alliance = 0, flownIn = 0, remarks = 0
 
   const spotDates = new Set()
@@ -29,16 +34,25 @@ function computeStats(regs) {
 
   for (const reg of regs) {
     if (reg.airlines?.id) {
-      airlineIds.add(reg.airlines.id)
-      const aid = reg.airlines.id
+      const aid = String(reg.airlines.id)
+      airlineIds.add(aid)
       airlineCounts[aid] = (airlineCounts[aid] ?? 0) + 1
+      if (!airlineMap.has(aid)) {
+        airlineMap.set(aid, { id: reg.airlines.id, name: reg.airlines.name, logo_url: reg.airlines.logo_url ?? null })
+      }
     }
-    if (reg.aircraft_types?.manufacturers?.id) {
-      mfrIds.add(reg.aircraft_types.manufacturers.id)
+    const mfr = reg.aircraft_types?.manufacturers
+    if (mfr?.id) {
+      const mid = String(mfr.id)
+      mfrIds.add(mid)
+      if (!mfrMap.has(mid)) {
+        mfrMap.set(mid, { id: mfr.id, name: mfr.name, logo_url: mfr.logo_url ?? null, count: 0 })
+      }
+      mfrMap.get(mid).count++
     }
     if (reg.aircraft_types?.id) {
-      typeIds.add(reg.aircraft_types.id)
-      const tid = reg.aircraft_types.id
+      typeIds.add(String(reg.aircraft_types.id))
+      const tid = String(reg.aircraft_types.id)
       typeCounts[tid] = (typeCounts[tid] ?? 0) + 1
     }
     const aps = Array.isArray(reg.airports) ? reg.airports : []
@@ -62,28 +76,26 @@ function computeStats(regs) {
     }
   }
 
-  function topKey(counts) {
-    let best = null, bestVal = 0
-    for (const [k, v] of Object.entries(counts)) {
-      if (v > bestVal) { best = k; bestVal = v }
-    }
-    return best ? { key: best, count: bestVal } : null
-  }
+  const airlinesSpotted = Array.from(airlineMap.values())
+    .sort((a, b) => a.name.localeCompare(b.name))
 
-  const topAirlineEntry = topKey(airlineCounts)
-  const topAirline = topAirlineEntry
-    ? { name: regs.find((r) => String(r.airlines?.id) === String(topAirlineEntry.key))?.airlines?.name ?? '—', count: topAirlineEntry.count }
-    : null
+  const manufacturerBreakdown = Array.from(mfrMap.values())
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name))
 
-  const topTypeEntry = topKey(typeCounts)
-  const topType = topTypeEntry
-    ? { name: regs.find((r) => String(r.aircraft_types?.id) === String(topTypeEntry.key))?.aircraft_types?.name ?? '—', count: topTypeEntry.count }
-    : null
+  const sortedAirlines = Object.entries(airlineCounts)
+    .map(([id, count]) => ({ name: airlineMap.get(id)?.name ?? '—', count }))
+    .sort((a, b) => b.count - a.count)
 
-  const topAirportEntry = topKey(airportCounts)
-  const topAirport = topAirportEntry
-    ? { name: topAirportEntry.key, count: topAirportEntry.count }
-    : null
+  const sortedTypes = Object.entries(typeCounts)
+    .map(([id, count]) => {
+      const name = regs.find((r) => String(r.aircraft_types?.id) === id)?.aircraft_types?.name ?? '—'
+      return { name, count }
+    })
+    .sort((a, b) => b.count - a.count)
+
+  const sortedAirports = Object.entries(airportCounts)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
 
   return {
     total: regs.length,
@@ -92,12 +104,32 @@ function computeStats(regs) {
     types: typeIds.size,
     airports: airportCodes.size,
     countries: countryNames.size,
-    topAirline, topType, topAirport,
+    topAirline: sortedAirlines[0] ?? null,
+    topType: sortedTypes[0] ?? null,
+    topAirport: sortedAirports[0] ?? null,
+    top3Airlines: sortedAirlines.slice(0, 3),
+    top3Types: sortedTypes.slice(0, 3),
+    top3Airports: sortedAirports.slice(0, 3),
     specialLivery, retro, alliance, flownIn, remarks,
     firstSpot: firstSpotReg ? { date: firstSpotReg.first_spotted, reg: firstSpotReg.registration } : null,
     latestSpot: latestSpotReg ? { date: latestSpotReg.first_spotted, reg: latestSpotReg.registration } : null,
     totalDays: spotDates.size,
+    airlinesSpotted,
+    manufacturerBreakdown,
   }
+}
+
+function LogoTile({ name, logoUrl, small }) {
+  const initials = name.trim().split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 2)
+  const cls = `stat-logo-tile${small ? ' stat-logo-tile--sm' : ''}`
+  return (
+    <div className={cls} title={name}>
+      {logoUrl
+        ? <img className="stat-logo-tile__img" src={logoUrl} alt={name} />
+        : <div className="stat-logo-tile__initials"><span>{initials}</span></div>
+      }
+    </div>
+  )
 }
 
 function StatCard({ title, children }) {
@@ -118,12 +150,35 @@ function MiniTile({ label, value }) {
   )
 }
 
-function MostRow({ label, name, count }) {
+function MostRow({ label, top1, top3 }) {
+  const [expanded, setExpanded] = useState(false)
+  const hasMore = top3.length > 1
   return (
     <div className="stat-most-row">
-      <span className="stat-most-row__label">{label}</span>
-      <span className="stat-most-row__name">{name ?? '—'}</span>
-      {count != null && <span className="stat-most-row__count">{count}</span>}
+      <button
+        className="stat-most-row__header"
+        onClick={() => hasMore && setExpanded((e) => !e)}
+        aria-expanded={expanded}
+        style={{ cursor: hasMore ? 'pointer' : 'default' }}
+      >
+        <span className="stat-most-row__label">{label}</span>
+        <span className="stat-most-row__name">{top1?.name ?? '—'}</span>
+        <span className="stat-most-row__count">{top1?.count ?? ''}</span>
+        {hasMore && (
+          <span className={`stat-most-row__chevron${expanded ? ' stat-most-row__chevron--open' : ''}`} aria-hidden="true">›</span>
+        )}
+      </button>
+      {expanded && (
+        <div className="stat-most-row__list">
+          {top3.map((item, i) => (
+            <div key={item.name} className="stat-most-row__item">
+              <span className="stat-most-row__rank">{i + 1}.</span>
+              <span className="stat-most-row__item-name">{item.name}</span>
+              <span className="stat-most-row__item-count">{item.count}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -164,8 +219,8 @@ export default function StatsView({ onBack }) {
       .from('registrations')
       .select(`
         id, registration, first_spotted, airports, statuses,
-        airlines ( id, name, country ),
-        aircraft_types ( id, name, manufacturers ( id, name ) )
+        airlines ( id, name, country, logo_url ),
+        aircraft_types ( id, name, manufacturers ( id, name, logo_url ) )
       `)
       .then(({ data, error: err }) => {
         if (err) setError(err.message)
@@ -195,21 +250,43 @@ export default function StatsView({ onBack }) {
               <span className="stats-headline__label">Total Unique Registrations</span>
             </div>
 
+            {stats.airlinesSpotted.length > 0 && (
+              <StatCard title="Airlines spotted">
+                <div className="stat-logo-grid">
+                  {stats.airlinesSpotted.map((airline) => (
+                    <LogoTile key={airline.id} name={airline.name} logoUrl={airline.logo_url} />
+                  ))}
+                </div>
+              </StatCard>
+            )}
+
             <StatCard title="Counts">
               <div className="stat-mini-tiles">
                 <MiniTile label="Airlines"      value={stats.airlines}      />
                 <MiniTile label="Manufacturers" value={stats.manufacturers} />
                 <MiniTile label="Types"         value={stats.types}         />
                 <MiniTile label="Airports"      value={stats.airports}      />
-                <MiniTile label="Countries"     value={stats.countries}     />
+                <MiniTile label="Airline countries" value={stats.countries} />
               </div>
             </StatCard>
 
             <StatCard title="Most-spotted">
-              <MostRow label="Airline" name={stats.topAirline?.name}  count={stats.topAirline?.count}  />
-              <MostRow label="Type"    name={stats.topType?.name}     count={stats.topType?.count}     />
-              <MostRow label="Airport" name={stats.topAirport?.name}  count={stats.topAirport?.count}  />
+              <MostRow label="Airline" top1={stats.topAirline} top3={stats.top3Airlines} />
+              <MostRow label="Type"    top1={stats.topType}    top3={stats.top3Types}    />
+              <MostRow label="Airport" top1={stats.topAirport} top3={stats.top3Airports} />
             </StatCard>
+
+            {stats.manufacturerBreakdown.length > 0 && (
+              <StatCard title="Manufacturers">
+                {stats.manufacturerBreakdown.map((mfr) => (
+                  <div key={mfr.id} className="stat-mfr-row">
+                    <LogoTile name={mfr.name} logoUrl={mfr.logo_url} small />
+                    <span className="stat-mfr-row__name">{mfr.name}</span>
+                    <span className="stat-most-row__count">{mfr.count}</span>
+                  </div>
+                ))}
+              </StatCard>
+            )}
 
             <StatCard title="Special status">
               <StatusTally label="Special livery" count={stats.specialLivery} />
