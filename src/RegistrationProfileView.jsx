@@ -103,7 +103,7 @@ function InfoSection({ reg, lastSighting }) {
                 <span key={code} className={pillClass}>
                   {code}
                   {isFirst && isLast && lastDate && (
-                    <span className="airport-pill__recent">{lastDate}</span>
+                    <span className="airport-pill__recent" aria-label="most recent sighting"></span>
                   )}
                 </span>
               )

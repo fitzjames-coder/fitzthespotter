@@ -2169,11 +2169,11 @@
 }
 
 .airport-pill__recent {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
   background: #FBAD19;
-  color: #16203B;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 0 5px;
-  border-radius: 8px;
-  margin-left: 5px;
+  margin-left: 6px;
+  vertical-align: middle;
 }
