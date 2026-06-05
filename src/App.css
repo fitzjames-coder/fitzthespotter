@@ -2303,3 +2303,62 @@
   font-size: 0.82rem;
   color: rgba(246, 239, 220, 0.6);
 }
+
+/* ── Dates card ──────────────────────────────────────────────────── */
+.stat-graph-label {
+  font-size: 0.72rem;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(246, 239, 220, 0.45);
+  margin: 0 0 0.55rem;
+}
+
+.stat-year-graph {
+  display: block;
+  width: 100%;
+  margin-bottom: 1rem;
+  overflow: visible;
+}
+
+.stat-date-readout {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.4rem 0;
+  border-top: 1px solid rgba(246, 239, 220, 0.07);
+}
+
+.stat-date-readout:first-of-type {
+  margin-top: 0.25rem;
+}
+
+.stat-date-readout__label {
+  font-size: 0.72rem;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(246, 239, 220, 0.5);
+  min-width: 7rem;
+  flex-shrink: 0;
+}
+
+.stat-date-readout__right {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-date-readout__value {
+  font-size: 0.9rem;
+  color: var(--color-cream);
+  font-weight: 600;
+}
+
+.stat-date-readout__sub {
+  font-size: 0.78rem;
+  color: var(--color-amber);
+  flex-shrink: 0;
+}
