@@ -249,69 +249,23 @@ function MilestoneRow({ label, date, reg }) {
   )
 }
 
-const BAR_STEP = 28
-const GRAPH_H = 96
-const LABEL_H = 18
-
 function SightingsBarGraph({ perYear }) {
   if (!perYear.length) return null
   const maxCount = Math.max(...perYear.map((y) => y.count), 1)
-  const n = perYear.length
-  const viewW = n * BAR_STEP
-  const viewH = GRAPH_H + LABEL_H
-  const barW = BAR_STEP * 0.52
-  const showEvery = n > 10 ? 2 : 1
-
   return (
-    <svg
-      className="stat-year-graph"
-      viewBox={`0 0 ${viewW} ${viewH}`}
-      width="100%"
-      height={viewH}
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <line x1="0" y1={GRAPH_H} x2={viewW} y2={GRAPH_H} stroke="#005281" strokeWidth="1.5" />
-      {perYear.map(({ year, count }, i) => {
-        const cx = i * BAR_STEP + BAR_STEP / 2
-        const barH = count > 0 ? Math.max(3, (count / maxCount) * (GRAPH_H - 8)) : 0
-        const showLabel = i % showEvery === 0
+    <div className="stat-laneshell" aria-hidden="true">
+      {perYear.map(({ year, count }) => {
+        const pct = count > 0 ? Math.max(6, (count / maxCount) * 100) : 0
         return (
-          <g key={year}>
-            {count > 0 ? (
-              <rect
-                x={cx - barW / 2}
-                y={GRAPH_H - barH}
-                width={barW}
-                height={barH}
-                fill="#FBAD19"
-                rx="2"
-              />
-            ) : (
-              <rect
-                x={cx - 1}
-                y={GRAPH_H - 4}
-                width={2}
-                height={4}
-                fill="#005281"
-                opacity="0.7"
-              />
+          <div key={year} className="stat-lane">
+            {pct > 0 && (
+              <div className="stat-lane__fill" style={{ height: `${pct}%` }} />
             )}
-            {showLabel && (
-              <text
-                x={cx}
-                y={viewH - 1}
-                textAnchor="middle"
-                fontSize="9"
-                fill="rgba(246,239,220,0.5)"
-              >
-                {year}
-              </text>
-            )}
-          </g>
+            <span className="stat-lane__year">{year}</span>
+          </div>
         )
       })}
-    </svg>
+    </div>
   )
 }
 

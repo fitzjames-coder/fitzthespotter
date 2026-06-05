@@ -2314,11 +2314,51 @@
   margin: 0 0 0.55rem;
 }
 
-.stat-year-graph {
-  display: block;
-  width: 100%;
+.stat-laneshell {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 4px;
+  height: 130px;
+  padding: 6px 4px 0;
   margin-bottom: 1rem;
-  overflow: visible;
+}
+
+.stat-lane {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 82, 129, 0.35);
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.stat-lane__fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(251, 173, 25, 0.55);
+  border: 1px solid #FBAD19;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+}
+
+.stat-lane__year {
+  position: relative;
+  z-index: 1;
+  font-size: 0.6rem;
+  font-weight: bold;
+  color: rgba(246, 239, 220, 0.65);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
 }
 
 .stat-date-readout {
