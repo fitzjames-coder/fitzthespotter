@@ -119,6 +119,51 @@ function computeStats(regs) {
   }
 }
 
+function computeDateStats(sightings) {
+  const dated = sightings.filter((s) => s.spotted_on)
+  if (!dated.length) return { perYear: [], busiestEver: null, busiestThisYear: null }
+
+  const thisYear = new Date().getFullYear()
+  const dayCounts = {}
+  let minYear = Infinity, maxYear = -Infinity
+
+  for (const s of dated) {
+    const d = s.spotted_on
+    dayCounts[d] = (dayCounts[d] ?? 0) + 1
+    const yr = parseInt(d.slice(0, 4), 10)
+    if (yr < minYear) minYear = yr
+    if (yr > maxYear) maxYear = yr
+  }
+
+  const yearCounts = {}
+  for (const [d, count] of Object.entries(dayCounts)) {
+    const yr = parseInt(d.slice(0, 4), 10)
+    yearCounts[yr] = (yearCounts[yr] ?? 0) + count
+  }
+
+  const perYear = []
+  for (let y = minYear; y <= maxYear; y++) {
+    perYear.push({ year: y, count: yearCounts[y] ?? 0 })
+  }
+
+  let busiestEver = null
+  for (const [date, count] of Object.entries(dayCounts)) {
+    if (!busiestEver || count > busiestEver.count || (count === busiestEver.count && date < busiestEver.date)) {
+      busiestEver = { date, count }
+    }
+  }
+
+  let busiestThisYear = null
+  for (const [date, count] of Object.entries(dayCounts)) {
+    if (parseInt(date.slice(0, 4), 10) !== thisYear) continue
+    if (!busiestThisYear || count > busiestThisYear.count || (count === busiestThisYear.count && date < busiestThisYear.date)) {
+      busiestThisYear = { date, count }
+    }
+  }
+
+  return { perYear, busiestEver, busiestThisYear }
+}
+
 function LogoTile({ name, logoUrl, small }) {
   const initials = name.trim().split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 2)
   const cls = `stat-logo-tile${small ? ' stat-logo-tile--sm' : ''}`
@@ -204,8 +249,87 @@ function MilestoneRow({ label, date, reg }) {
   )
 }
 
+const BAR_STEP = 28
+const GRAPH_H = 96
+const LABEL_H = 18
+
+function SightingsBarGraph({ perYear }) {
+  if (!perYear.length) return null
+  const maxCount = Math.max(...perYear.map((y) => y.count), 1)
+  const n = perYear.length
+  const viewW = n * BAR_STEP
+  const viewH = GRAPH_H + LABEL_H
+  const barW = BAR_STEP * 0.52
+  const showEvery = n > 10 ? 2 : 1
+
+  return (
+    <svg
+      className="stat-year-graph"
+      viewBox={`0 0 ${viewW} ${viewH}`}
+      width="100%"
+      height={viewH}
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <line x1="0" y1={GRAPH_H} x2={viewW} y2={GRAPH_H} stroke="#005281" strokeWidth="1.5" />
+      {perYear.map(({ year, count }, i) => {
+        const cx = i * BAR_STEP + BAR_STEP / 2
+        const barH = count > 0 ? Math.max(3, (count / maxCount) * (GRAPH_H - 8)) : 0
+        const showLabel = i % showEvery === 0
+        return (
+          <g key={year}>
+            {count > 0 ? (
+              <rect
+                x={cx - barW / 2}
+                y={GRAPH_H - barH}
+                width={barW}
+                height={barH}
+                fill="#FBAD19"
+                rx="2"
+              />
+            ) : (
+              <rect
+                x={cx - 1}
+                y={GRAPH_H - 4}
+                width={2}
+                height={4}
+                fill="#005281"
+                opacity="0.7"
+              />
+            )}
+            {showLabel && (
+              <text
+                x={cx}
+                y={viewH - 1}
+                textAnchor="middle"
+                fontSize="9"
+                fill="rgba(246,239,220,0.5)"
+              >
+                {year}
+              </text>
+            )}
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
+function DateReadout({ label, primary, secondary }) {
+  return (
+    <div className="stat-date-readout">
+      <span className="stat-date-readout__label">{label}</span>
+      <div className="stat-date-readout__right">
+        <span className="stat-date-readout__value">{primary}</span>
+        {secondary && <span className="stat-date-readout__sub">{secondary}</span>}
+      </div>
+    </div>
+  )
+}
+
 export default function StatsView({ onBack }) {
   const [regs, setRegs] = useState([])
+  const [sightings, setSightings] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -215,21 +339,27 @@ export default function StatsView({ onBack }) {
       setLoading(false)
       return
     }
-    supabase
-      .from('registrations')
-      .select(`
-        id, registration, first_spotted, airports, statuses,
-        airlines ( id, name, country, logo_url ),
-        aircraft_types ( id, name, manufacturers ( id, name, logo_url ) )
-      `)
-      .then(({ data, error: err }) => {
-        if (err) setError(err.message)
-        else setRegs(data ?? [])
-        setLoading(false)
-      })
+    Promise.all([
+      supabase
+        .from('registrations')
+        .select(`
+          id, registration, first_spotted, airports, statuses,
+          airlines ( id, name, country, logo_url ),
+          aircraft_types ( id, name, manufacturers ( id, name, logo_url ) )
+        `),
+      supabase
+        .from('sightings')
+        .select('spotted_on'),
+    ]).then(([{ data: regData, error: regErr }, { data: sightData }]) => {
+      if (regErr) setError(regErr.message)
+      else setRegs(regData ?? [])
+      setSightings(sightData ?? [])
+      setLoading(false)
+    })
   }, [])
 
   const stats = useMemo(() => computeStats(regs), [regs])
+  const dateStats = useMemo(() => computeDateStats(sightings), [sightings])
 
   return (
     <div className="page search-page">
@@ -306,6 +436,21 @@ export default function StatsView({ onBack }) {
                   <span className="stat-milestone-row__reg">unique days</span>
                 </div>
               </div>
+            </StatCard>
+
+            <StatCard title="Dates">
+              <p className="stat-graph-label">Sightings per year</p>
+              <SightingsBarGraph perYear={dateStats.perYear} />
+              <DateReadout
+                label="Busiest day ever"
+                primary={dateStats.busiestEver?.date ?? '—'}
+                secondary={dateStats.busiestEver ? `${dateStats.busiestEver.count} sightings` : null}
+              />
+              <DateReadout
+                label="Busiest this year"
+                primary={dateStats.busiestThisYear?.date ?? '—'}
+                secondary={dateStats.busiestThisYear ? `${dateStats.busiestThisYear.count} sightings` : 'none yet'}
+              />
             </StatCard>
           </>
         )}
