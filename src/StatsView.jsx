@@ -220,7 +220,7 @@ export default function StatsView({ onBack }) {
       .select(`
         id, registration, first_spotted, airports, statuses,
         airlines ( id, name, country, logo_url ),
-        aircraft_types ( id, name, logo_url, manufacturers ( id, name, logo_url ) )
+        aircraft_types ( id, name, manufacturers ( id, name, logo_url ) )
       `)
       .then(({ data, error: err }) => {
         if (err) setError(err.message)
