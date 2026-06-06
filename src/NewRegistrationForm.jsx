@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import TypeaheadPicker from './TypeaheadPicker'
 import AirlineForm from './AirlineForm'
+import AirportForm from './AirportForm'
 
-function AirportTagsInput({ codes, onChange }) {
+function AirportTagsInput({ codes, onChange, onCommitCode }) {
   const [draft, setDraft] = useState('')
   const inputRef = useRef(null)
 
@@ -11,6 +12,7 @@ function AirportTagsInput({ codes, onChange }) {
     const token = draft.trim().toUpperCase()
     if (token && !codes.includes(token)) {
       onChange([...codes, token])
+      onCommitCode?.(token)
     }
     setDraft('')
   }
@@ -157,8 +159,25 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
 
   const [airlineFormOpen, setAirlineFormOpen] = useState(false)
   const [airlineFormName, setAirlineFormName] = useState('')
+  const [airportFormCode, setAirportFormCode] = useState(null)
 
   const showLiveryName = statusSpecialLivery || statusRetro
+
+  async function checkAirportExists(code) {
+    if (!supabase) return true
+    const { data } = await supabase
+      .from('airports')
+      .select('iata')
+      .eq('iata', code)
+      .maybeSingle()
+    return Boolean(data)
+  }
+
+  async function ensureAirport(code) {
+    if (!code) return
+    const exists = await checkAirportExists(code)
+    if (!exists) setAirportFormCode(code)
+  }
 
   useEffect(() => {
     if (isEdit) return
@@ -356,6 +375,16 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     )
   }
 
+  if (airportFormCode !== null) {
+    return (
+      <AirportForm
+        initialCode={airportFormCode}
+        onCancel={() => setAirportFormCode(null)}
+        onCreated={() => setAirportFormCode(null)}
+      />
+    )
+  }
+
   return (
     <div className="entry-modal-backdrop" onClick={onClose}>
       <div className="entry-modal" onClick={(e) => e.stopPropagation()}>
@@ -432,6 +461,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                       type="text"
                       value={sightingAirport}
                       onChange={(e) => setSightingAirport(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                      onBlur={() => ensureAirport(sightingAirport.trim().toUpperCase())}
                       placeholder="EGLL"
                       maxLength={6}
                       autoComplete="off"
@@ -536,7 +566,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               </div>
               <div className="form-group">
                 <label className="form-label">Airports spotted at</label>
-                <AirportTagsInput codes={airports} onChange={setAirports} />
+                <AirportTagsInput codes={airports} onChange={setAirports} onCommitCode={ensureAirport} />
                 <p className="form-hint">Space or comma to confirm each code</p>
               </div>
             </div>

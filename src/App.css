@@ -2707,3 +2707,8 @@
   font-size: 1rem;
   flex-shrink: 0;
 }
+
+/* ── AirportForm modal ───────────────────────────────────────────── */
+.airport-form-modal {
+  max-height: 90vh;
+}
