@@ -4,13 +4,17 @@ import TypeaheadPicker from './TypeaheadPicker'
 import AirlineForm from './AirlineForm'
 import AirportForm from './AirportForm'
 
-function AirportTagsInput({ codes, onChange, onCommitCode, max }) {
+function AirportTagsInput({ codes, onChange, onCommitCode, onMaxReached, max }) {
   const [draft, setDraft] = useState('')
   const inputRef = useRef(null)
 
   function commit() {
     const token = draft.trim().toUpperCase()
-    if (max && codes.length >= max) { setDraft(''); return }
+    if (max && codes.length >= max) {
+      if (token) onMaxReached?.()
+      setDraft('')
+      return
+    }
     if (token && !codes.includes(token)) {
       onChange([...codes, token])
       onCommitCode?.(token)
@@ -166,6 +170,10 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [airlineFormOpen, setAirlineFormOpen] = useState(false)
   const [airlineFormName, setAirlineFormName] = useState('')
   const [airportFormCode, setAirportFormCode] = useState(null)
+  const [showAirportHint, setShowAirportHint] = useState(false)
+  const airportHintTimer = useRef(null)
+
+  useEffect(() => () => clearTimeout(airportHintTimer.current), [])
 
   const showLiveryName = statusSpecialLivery || statusRetro
 
@@ -583,9 +591,27 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Airports spotted at</label>
-                <AirportTagsInput codes={airports} onChange={setAirports} onCommitCode={ensureAirport} />
-                <p className="form-hint">Space or comma to confirm each code</p>
+                <label className="form-label">Airport spotted at</label>
+                <AirportTagsInput
+                  codes={airports}
+                  onChange={(arr) => {
+                    setAirports(arr)
+                    if (arr.length === 1) {
+                      setShowAirportHint(true)
+                      clearTimeout(airportHintTimer.current)
+                      airportHintTimer.current = setTimeout(() => setShowAirportHint(false), 6000)
+                    } else {
+                      setShowAirportHint(false)
+                      clearTimeout(airportHintTimer.current)
+                    }
+                  }}
+                  onCommitCode={ensureAirport}
+                  max={1}
+                />
+                {showAirportHint
+                  ? <p className="field-hint field-hint--fade">To add another airport, log it as a New Sighting.</p>
+                  : airports.length === 0 && <p className="form-hint">Space or comma to confirm</p>
+                }
               </div>
             </div>
           )}
