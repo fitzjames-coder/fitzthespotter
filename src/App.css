@@ -2712,3 +2712,9 @@
 .airport-form-modal {
   max-height: 90vh;
 }
+
+.sighting-airport-hint {
+  color: var(--color-coral);
+  font-size: 0.78rem;
+  margin-top: 0.3rem;
+}
