@@ -2636,3 +2636,74 @@
   display: block;
   margin-bottom: 1rem;
 }
+
+/* ── TypeaheadPicker "add new" row ───────────────────────────────── */
+.typeahead__add-new {
+  padding: 0.6rem 0.85rem;
+  font-size: 0.88rem;
+  color: var(--color-amber);
+  font-weight: 600;
+  cursor: pointer;
+  border-top: 1px solid rgba(44, 66, 123, 0.12);
+}
+
+.typeahead__add-new:hover {
+  background: rgba(251, 173, 25, 0.08);
+}
+
+/* ── AirlineForm / country picker ────────────────────────────────── */
+.airline-form-modal {
+  max-height: 85vh;
+}
+
+.country-picker {
+  position: relative;
+}
+
+.country-picker__input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.country-picker__input-row .fi {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.country-picker__input {
+  flex: 1;
+}
+
+.country-picker__dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid rgba(44, 66, 123, 0.2);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(44, 66, 123, 0.15);
+  max-height: 220px;
+  overflow-y: auto;
+  z-index: 50;
+}
+
+.country-picker__option {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.88rem;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+.country-picker__option:hover {
+  background: rgba(44, 66, 123, 0.06);
+}
+
+.country-picker__option .fi {
+  font-size: 1rem;
+  flex-shrink: 0;
+}

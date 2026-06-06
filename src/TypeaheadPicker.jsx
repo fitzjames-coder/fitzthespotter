@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOptions, disabled }) {
+export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOptions, disabled, onAddNew, addNewLabel }) {
   const [query, setQuery] = useState('')
   const [options, setOptions] = useState([])
   const [open, setOpen] = useState(false)
@@ -91,7 +91,17 @@ export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOpt
       {open && (
         <div className="typeahead__dropdown">
           {options.length === 0 ? (
-            <div className="typeahead__empty">No results</div>
+            <>
+              <div className="typeahead__empty">No results</div>
+              {onAddNew && query.trim() && (
+                <div
+                  className="typeahead__add-new"
+                  onMouseDown={() => { setOpen(false); onAddNew(query.trim()) }}
+                >
+                  + {addNewLabel ?? 'Add new'} &ldquo;{query.trim()}&rdquo;
+                </div>
+              )}
+            </>
           ) : (
             options.map((opt) => (
               <div
