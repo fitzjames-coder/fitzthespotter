@@ -191,6 +191,15 @@
   font-weight: 500;
 }
 
+@keyframes fieldHintFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.field-hint--fade {
+  animation: fieldHintFadeIn 0.3s ease both;
+}
+
 /* ── Airport tag input ───────────────────────────────────────────── */
 .airport-tags-input {
   display: flex;

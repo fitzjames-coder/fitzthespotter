@@ -170,7 +170,10 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [airlineFormOpen, setAirlineFormOpen] = useState(false)
   const [airlineFormName, setAirlineFormName] = useState('')
   const [airportFormCode, setAirportFormCode] = useState(null)
-  const [airportCapHint, setAirportCapHint] = useState(false)
+  const [showAirportHint, setShowAirportHint] = useState(false)
+  const airportHintTimer = useRef(null)
+
+  useEffect(() => () => clearTimeout(airportHintTimer.current), [])
 
   const showLiveryName = statusSpecialLivery || statusRetro
 
@@ -591,14 +594,23 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 <label className="form-label">Airport spotted at</label>
                 <AirportTagsInput
                   codes={airports}
-                  onChange={(arr) => { setAirports(arr); if (arr.length === 0) setAirportCapHint(false) }}
+                  onChange={(arr) => {
+                    setAirports(arr)
+                    if (arr.length === 1) {
+                      setShowAirportHint(true)
+                      clearTimeout(airportHintTimer.current)
+                      airportHintTimer.current = setTimeout(() => setShowAirportHint(false), 6000)
+                    } else {
+                      setShowAirportHint(false)
+                      clearTimeout(airportHintTimer.current)
+                    }
+                  }}
                   onCommitCode={ensureAirport}
-                  onMaxReached={() => setAirportCapHint(true)}
                   max={1}
                 />
-                {airportCapHint
-                  ? <p className="field-hint">One airport per registration — use New Sighting to log another catch.</p>
-                  : <p className="form-hint">Space or comma to confirm</p>
+                {showAirportHint
+                  ? <p className="field-hint field-hint--fade">To add another airport, log it as a New Sighting.</p>
+                  : airports.length === 0 && <p className="form-hint">Space or comma to confirm</p>
                 }
               </div>
             </div>
