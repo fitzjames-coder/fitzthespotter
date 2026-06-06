@@ -2419,3 +2419,220 @@
   color: var(--color-amber);
   flex-shrink: 0;
 }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Airports tab + Airport detail page ─────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+/* ── Airport list ────────────────────────────────────────────────── */
+.airport-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.airport-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  background: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 1px 3px rgba(44, 66, 123, 0.1);
+}
+
+.airport-row__iata {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--color-deep-blue);
+  min-width: 3rem;
+  letter-spacing: 0.02em;
+}
+
+.airport-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.airport-row__name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.airport-row__country {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: rgba(22, 32, 59, 0.55);
+}
+
+.airport-row__chevron {
+  color: rgba(44, 66, 123, 0.4);
+  font-size: 1.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ── Deep-blue page shell (airport detail) ───────────────────────── */
+.page--deep-blue {
+  background: linear-gradient(to bottom, #004875, #00305a);
+}
+
+.page--deep-blue .state-message {
+  color: rgba(246, 239, 220, 0.65);
+}
+
+/* ── Airport detail top bar ──────────────────────────────────────── */
+.ap-top-bar {
+  background: rgba(0, 48, 90, 0.6);
+  border-bottom: 3px solid var(--color-amber);
+  padding: 0.65rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.ap-top-bar__back {
+  background: none;
+  border: none;
+  color: var(--color-amber);
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  align-self: flex-start;
+}
+
+.ap-top-bar__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ap-top-bar__name {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--color-cream);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.ap-top-bar__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.ap-top-bar__codes {
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  color: var(--color-amber);
+}
+
+.ap-top-bar__country {
+  font-size: 0.78rem;
+  color: rgba(246, 239, 220, 0.7);
+}
+
+/* ── Airport detail content ──────────────────────────────────────── */
+.ap-content {
+  padding-top: 1.15rem;
+}
+
+/* ── Stat row ────────────────────────────────────────────────────── */
+.ap-stat-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.ap-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.ap-stat__value {
+  font-size: 0.95rem;
+  font-weight: bold;
+  color: var(--color-cream);
+  line-height: 1;
+}
+
+.ap-stat__label {
+  font-size: 0.62rem;
+  font-weight: bold;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(246, 239, 220, 0.5);
+}
+
+/* ── Date colour classes ─────────────────────────────────────────── */
+.airport-date--first {
+  color: var(--color-cream) !important;
+  font-weight: 700;
+}
+
+.airport-date--last {
+  color: var(--color-amber) !important;
+  font-weight: 700;
+}
+
+/* ── Airline gallery ─────────────────────────────────────────────── */
+.ap-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+  padding: 0.2rem 0;
+}
+
+.ap-logo-tile {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Remarks block ───────────────────────────────────────────────── */
+.ap-remarks {
+  font-size: 0.85rem;
+  color: rgba(246, 239, 220, 0.75);
+  line-height: 1.5;
+  background: rgba(255, 255, 255, 0.06);
+  border-left: 3px solid var(--color-amber);
+  border-radius: 0 6px 6px 0;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ── Runway image ────────────────────────────────────────────────── */
+.ap-runway-img {
+  width: 100%;
+  border-radius: 10px;
+  display: block;
+  margin-bottom: 1rem;
+}

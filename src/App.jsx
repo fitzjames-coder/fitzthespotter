@@ -3,6 +3,8 @@ import './App.css'
 import { supabase } from './lib/supabaseClient'
 import AirlineDetailView from './AirlineDetailView'
 import ManufacturerDetailView from './ManufacturerDetailView'
+import AirportsTab from './AirportsTab'
+import AirportDetailView from './AirportDetailView'
 import BottomNav from './BottomNav'
 import PlaceholderScreen from './PlaceholderScreen'
 import NewRegistrationForm from './NewRegistrationForm'
@@ -17,7 +19,7 @@ function compareAirlineNames(a, b) {
   return an.localeCompare(bn, 'en', { numeric: true, sensitivity: 'base' })
 }
 
-function TopBar() {
+export function TopBar() {
   const [showForm, setShowForm] = useState(false)
   return (
     <>
@@ -183,9 +185,11 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('airlines')
   const [navOpen, setNavOpen] = useState(false)
   const [navNonce, setNavNonce] = useState(0)
+  const [selectedAirport, setSelectedAirport] = useState(null)
 
   function handleTabChange(tab) {
     setActiveTab(tab)
+    setSelectedAirport(null)
     setNavOpen(false)
     setNavNonce((n) => n + 1)
   }
@@ -193,7 +197,12 @@ export default function App() {
   return (
     <>
       {activeTab === 'airlines' && <AirlinesTab key={navNonce} />}
-      {activeTab === 'airports' && <PlaceholderScreen key={navNonce} name="Airports" />}
+      {activeTab === 'airports' && !selectedAirport && (
+        <AirportsTab key={navNonce} onSelectAirport={setSelectedAirport} />
+      )}
+      {activeTab === 'airports' && selectedAirport && (
+        <AirportDetailView airport={selectedAirport} onBack={() => setSelectedAirport(null)} />
+      )}
       {activeTab === 'search'   && <SearchView key={navNonce} />}
 
       <BottomNav
