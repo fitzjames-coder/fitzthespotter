@@ -4,13 +4,17 @@ import TypeaheadPicker from './TypeaheadPicker'
 import AirlineForm from './AirlineForm'
 import AirportForm from './AirportForm'
 
-function AirportTagsInput({ codes, onChange, onCommitCode, max }) {
+function AirportTagsInput({ codes, onChange, onCommitCode, onMaxReached, max }) {
   const [draft, setDraft] = useState('')
   const inputRef = useRef(null)
 
   function commit() {
     const token = draft.trim().toUpperCase()
-    if (max && codes.length >= max) { setDraft(''); return }
+    if (max && codes.length >= max) {
+      if (token) onMaxReached?.()
+      setDraft('')
+      return
+    }
     if (token && !codes.includes(token)) {
       onChange([...codes, token])
       onCommitCode?.(token)
@@ -166,6 +170,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [airlineFormOpen, setAirlineFormOpen] = useState(false)
   const [airlineFormName, setAirlineFormName] = useState('')
   const [airportFormCode, setAirportFormCode] = useState(null)
+  const [airportCapHint, setAirportCapHint] = useState(false)
 
   const showLiveryName = statusSpecialLivery || statusRetro
 
@@ -583,9 +588,18 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Airports spotted at</label>
-                <AirportTagsInput codes={airports} onChange={setAirports} onCommitCode={ensureAirport} />
-                <p className="form-hint">Space or comma to confirm each code</p>
+                <label className="form-label">Airport spotted at</label>
+                <AirportTagsInput
+                  codes={airports}
+                  onChange={(arr) => { setAirports(arr); if (arr.length === 0) setAirportCapHint(false) }}
+                  onCommitCode={ensureAirport}
+                  onMaxReached={() => setAirportCapHint(true)}
+                  max={1}
+                />
+                {airportCapHint
+                  ? <p className="field-hint">One airport per registration — use New Sighting to log another catch.</p>
+                  : <p className="form-hint">Space or comma to confirm</p>
+                }
               </div>
             </div>
           )}
