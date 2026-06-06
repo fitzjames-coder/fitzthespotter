@@ -2734,3 +2734,67 @@
   font-size: 0.78rem;
   margin-top: 0.3rem;
 }
+
+/* ── Manufacturers gallery ───────────────────────────────────────── */
+.mfr-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 1.1rem 0.6rem;
+  padding: 0.25rem 0 1rem;
+}
+
+.mfr-gallery-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 0.25rem;
+  border-radius: 14px;
+  transition: background 0.15s;
+  color: inherit;
+}
+
+.mfr-gallery-tile:hover {
+  background: rgba(246, 239, 220, 0.05);
+}
+
+.mfr-gallery-tile:active {
+  background: rgba(246, 239, 220, 0.1);
+}
+
+.mfr-gallery-tile__logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(0, 82, 129, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.mfr-gallery-tile__logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.mfr-gallery-tile__logo-initials {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--color-cream);
+  letter-spacing: 0.03em;
+}
+
+.mfr-gallery-tile__name {
+  font-size: 0.67rem;
+  color: rgba(246, 239, 220, 0.72);
+  text-align: center;
+  line-height: 1.25;
+  max-width: 72px;
+  word-break: break-word;
+}
