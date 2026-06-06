@@ -2,15 +2,18 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import TypeaheadPicker from './TypeaheadPicker'
 import AirlineForm from './AirlineForm'
+import AirportForm from './AirportForm'
 
-function AirportTagsInput({ codes, onChange }) {
+function AirportTagsInput({ codes, onChange, onCommitCode, max }) {
   const [draft, setDraft] = useState('')
   const inputRef = useRef(null)
 
   function commit() {
     const token = draft.trim().toUpperCase()
+    if (max && codes.length >= max) { setDraft(''); return }
     if (token && !codes.includes(token)) {
       onChange([...codes, token])
+      onCommitCode?.(token)
     }
     setDraft('')
   }
@@ -23,6 +26,8 @@ function AirportTagsInput({ codes, onChange }) {
       onChange(codes.slice(0, -1))
     }
   }
+
+  const inputHidden = max != null && codes.length >= max
 
   return (
     <div className="airport-tags-input" onClick={() => inputRef.current?.focus()}>
@@ -39,17 +44,19 @@ function AirportTagsInput({ codes, onChange }) {
           </button>
         </span>
       ))}
-      <input
-        ref={inputRef}
-        type="text"
-        value={draft}
-        onChange={(e) => setDraft(e.target.value.replace(/[\s,]/g, ''))}
-        onKeyDown={handleKeyDown}
-        onBlur={commit}
-        placeholder={codes.length === 0 ? 'EGLL LHR …' : ''}
-        maxLength={6}
-        aria-label="Add airport code"
-      />
+      {!inputHidden && (
+        <input
+          ref={inputRef}
+          type="text"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value.replace(/[\s,]/g, ''))}
+          onKeyDown={handleKeyDown}
+          onBlur={commit}
+          placeholder={codes.length === 0 ? 'EGLL LHR …' : ''}
+          maxLength={6}
+          aria-label="Add airport code"
+        />
+      )}
     </div>
   )
 }
@@ -153,12 +160,37 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [sightingOpen, setSightingOpen] = useState(false)
   const [sightingDate, setSightingDate] = useState('')
   const [sightingAirport, setSightingAirport] = useState('')
+  const [sightingAirportKnown, setSightingAirportKnown] = useState(false)
   const [sightingSaving, setSightingSaving] = useState(false)
 
   const [airlineFormOpen, setAirlineFormOpen] = useState(false)
   const [airlineFormName, setAirlineFormName] = useState('')
+  const [airportFormCode, setAirportFormCode] = useState(null)
 
   const showLiveryName = statusSpecialLivery || statusRetro
+
+  async function checkAirportExists(code) {
+    if (!supabase) return true
+    const { data } = await supabase
+      .from('airports')
+      .select('iata')
+      .eq('iata', code)
+      .maybeSingle()
+    return Boolean(data)
+  }
+
+  async function ensureAirport(code) {
+    if (!code) return
+    const exists = await checkAirportExists(code)
+    if (!exists) setAirportFormCode(code)
+  }
+
+  async function ensureAirportForSighting(code) {
+    if (!code) { setSightingAirportKnown(false); return }
+    const exists = await checkAirportExists(code)
+    setSightingAirportKnown(exists)
+    if (!exists) setAirportFormCode(code)
+  }
 
   useEffect(() => {
     if (isEdit) return
@@ -356,6 +388,19 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     )
   }
 
+  if (airportFormCode !== null) {
+    return (
+      <AirportForm
+        initialCode={airportFormCode}
+        onCancel={() => setAirportFormCode(null)}
+        onCreated={(ap) => {
+          if (ap?.iata === sightingAirport) setSightingAirportKnown(true)
+          setAirportFormCode(null)
+        }}
+      />
+    )
+  }
+
   return (
     <div className="entry-modal-backdrop" onClick={onClose}>
       <div className="entry-modal" onClick={(e) => e.stopPropagation()}>
@@ -425,17 +470,20 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label" htmlFor="sighting-airport-input">Airport</label>
-                    <input
-                      id="sighting-airport-input"
-                      className="form-input form-input--mono"
-                      type="text"
-                      value={sightingAirport}
-                      onChange={(e) => setSightingAirport(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
-                      placeholder="EGLL"
-                      maxLength={6}
-                      autoComplete="off"
+                    <label className="form-label">Airport *</label>
+                    <AirportTagsInput
+                      codes={sightingAirport ? [sightingAirport] : []}
+                      onChange={(arr) => {
+                        const code = arr[arr.length - 1] || ''
+                        setSightingAirport(code)
+                        if (!code) setSightingAirportKnown(false)
+                      }}
+                      onCommitCode={ensureAirportForSighting}
+                      max={1}
                     />
+                    {sightingAirport && !sightingAirportKnown && (
+                      <p className="form-hint sighting-airport-hint">Create this airport to log the sighting</p>
+                    )}
                   </div>
                   <StatusSwitch
                     label="Special livery"
@@ -486,7 +534,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                     type="button"
                     className="btn-log-sighting"
                     onClick={handleLogSighting}
-                    disabled={sightingSaving}
+                    disabled={sightingSaving || !sightingAirport || !sightingAirportKnown}
                   >
                     {sightingSaving ? 'Logging…' : 'Log sighting'}
                   </button>
@@ -536,7 +584,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               </div>
               <div className="form-group">
                 <label className="form-label">Airports spotted at</label>
-                <AirportTagsInput codes={airports} onChange={setAirports} />
+                <AirportTagsInput codes={airports} onChange={setAirports} onCommitCode={ensureAirport} />
                 <p className="form-hint">Space or comma to confirm each code</p>
               </div>
             </div>
