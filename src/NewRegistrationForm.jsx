@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import TypeaheadPicker from './TypeaheadPicker'
+import AirlineForm from './AirlineForm'
 
 function AirportTagsInput({ codes, onChange }) {
   const [draft, setDraft] = useState('')
@@ -154,6 +155,9 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [sightingAirport, setSightingAirport] = useState('')
   const [sightingSaving, setSightingSaving] = useState(false)
 
+  const [airlineFormOpen, setAirlineFormOpen] = useState(false)
+  const [airlineFormName, setAirlineFormName] = useState('')
+
   const showLiveryName = statusSpecialLivery || statusRetro
 
   useEffect(() => {
@@ -207,6 +211,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     if (!supabase) { setSaveError('Supabase is not configured.'); return }
     const trimmed = regNumber.trim().toUpperCase()
     if (!trimmed) { setSaveError('Registration number is required.'); return }
+    if (!airline) { setSaveError('Select or add an airline.'); return }
     if (!isEdit && existingMatch) { setSaveError('This registration already exists.'); return }
 
     setSaving(true)
@@ -338,6 +343,19 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     }
   }
 
+  if (airlineFormOpen) {
+    return (
+      <AirlineForm
+        initialName={airlineFormName}
+        onCancel={() => setAirlineFormOpen(false)}
+        onCreated={(a) => {
+          setAirline({ id: a.id, label: a.name })
+          setAirlineFormOpen(false)
+        }}
+      />
+    )
+  }
+
   return (
     <div className="entry-modal-backdrop" onClick={onClose}>
       <div className="entry-modal" onClick={(e) => e.stopPropagation()}>
@@ -369,12 +387,14 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               <p className="reg-exists-banner">This registration is already logged.</p>
             )}
             <div className="form-group">
-              <label className="form-label">Airline</label>
+              <label className="form-label">Airline *</label>
               <TypeaheadPicker
                 placeholder="Search airlines…"
                 value={airline}
                 onSelect={setAirline}
                 fetchOptions={fetchAirlines}
+                onAddNew={(q) => { setAirlineFormName(q); setAirlineFormOpen(true) }}
+                addNewLabel="Add new airline"
               />
             </div>
           </div>
