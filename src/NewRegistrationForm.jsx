@@ -718,6 +718,16 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
           {saveError && <p className="form-error">{saveError}</p>}
         </div>
 
+        <div className="form-add-row">
+          <span className="form-add-row__label">Add new:</span>
+          <button type="button" className="btn-add-chip"
+            onClick={() => { setAirlineFormName(''); setAirlineFormOpen(true) }}>Airline</button>
+          <button type="button" className="btn-add-chip"
+            onClick={() => setAirportFormCode('')}>Airport</button>
+          <button type="button" className="btn-add-chip"
+            onClick={() => { setMfrFormName(''); setMfrFormOpen(true) }}>Manufacturer</button>
+        </div>
+
         <div className="form-footer">
           <button type="button" className="btn-secondary" onClick={onClose}>
             Cancel
