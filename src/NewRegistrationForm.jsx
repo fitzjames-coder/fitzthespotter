@@ -3,6 +3,8 @@ import { supabase } from './lib/supabaseClient'
 import TypeaheadPicker from './TypeaheadPicker'
 import AirlineForm from './AirlineForm'
 import AirportForm from './AirportForm'
+import ManufacturerForm from './ManufacturerForm'
+import TypeForm from './TypeForm'
 
 function AirportTagsInput({ codes, onChange, onCommitCode, onMaxReached, max }) {
   const [draft, setDraft] = useState('')
@@ -169,6 +171,10 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
 
   const [airlineFormOpen, setAirlineFormOpen] = useState(false)
   const [airlineFormName, setAirlineFormName] = useState('')
+  const [mfrFormOpen, setMfrFormOpen] = useState(false)
+  const [mfrFormName, setMfrFormName] = useState('')
+  const [typeFormOpen, setTypeFormOpen] = useState(false)
+  const [typeFormName, setTypeFormName] = useState('')
   const [airportFormCode, setAirportFormCode] = useState(null)
   const [showAirportHint, setShowAirportHint] = useState(false)
   const airportHintTimer = useRef(null)
@@ -396,6 +402,33 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     )
   }
 
+  if (mfrFormOpen) {
+    return (
+      <ManufacturerForm
+        initialName={mfrFormName}
+        onCancel={() => setMfrFormOpen(false)}
+        onCreated={(m) => {
+          handleManufacturerSelect({ id: m.id, label: m.name })
+          setMfrFormOpen(false)
+        }}
+      />
+    )
+  }
+
+  if (typeFormOpen) {
+    return (
+      <TypeForm
+        initialName={typeFormName}
+        manufacturer={manufacturer}
+        onCancel={() => setTypeFormOpen(false)}
+        onCreated={(t) => {
+          setType({ id: t.id, label: t.name })
+          setTypeFormOpen(false)
+        }}
+      />
+    )
+  }
+
   if (airportFormCode !== null) {
     return (
       <AirportForm
@@ -560,6 +593,8 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 value={manufacturer}
                 onSelect={handleManufacturerSelect}
                 fetchOptions={fetchManufacturers}
+                onAddNew={(q) => { setMfrFormName(q); setMfrFormOpen(true) }}
+                addNewLabel="Add new manufacturer"
               />
             </div>
             <div className="form-group">
@@ -570,6 +605,8 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 onSelect={setType}
                 fetchOptions={makeFetchTypes(manufacturer?.id)}
                 disabled={!manufacturer}
+                onAddNew={manufacturer ? (q) => { setTypeFormName(q); setTypeFormOpen(true) } : undefined}
+                addNewLabel="Add new type"
               />
             </div>
             <div className="form-illustration-stub">

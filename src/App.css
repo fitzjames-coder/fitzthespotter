@@ -2890,3 +2890,41 @@
   line-height: 1.25;
   word-break: break-word;
 }
+
+/* ── ManufacturerForm / TypeForm modals ──────────────────────────── */
+.manufacturer-form-modal {
+  max-height: 92vh;
+}
+
+.type-form-modal {
+  max-height: 80vh;
+}
+
+.form-input--narrow {
+  max-width: 140px;
+}
+
+.type-form__mfr-context {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  margin-bottom: 0.75rem;
+  background: rgba(44, 66, 123, 0.08);
+  border-radius: 8px;
+  border: 1px solid rgba(44, 66, 123, 0.15);
+}
+
+.type-form__mfr-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(22, 32, 59, 0.5);
+  flex-shrink: 0;
+}
+
+.type-form__mfr-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
