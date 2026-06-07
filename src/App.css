@@ -2849,17 +2849,18 @@
   inset: 0;
   background: rgba(22, 32, 59, 0.45);
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-end;
 }
 
 .type-tile__count {
   font-family: Georgia, 'Times New Roman', Times, serif;
-  font-size: 2rem;
+  font-size: 0.95rem;
   font-weight: bold;
   color: var(--color-cream);
   line-height: 1;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  padding: 0.3rem 0.4rem;
 }
 
 .type-tile-wrap--zero .type-tile__overlay {
