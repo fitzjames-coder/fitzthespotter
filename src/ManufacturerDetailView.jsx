@@ -44,16 +44,23 @@ function HeroLogo({ manufacturer }) {
   )
 }
 
-function TypeCard({ type, count }) {
+function TypeTile({ type, count }) {
+  const isZero = count === 0
   return (
-    <div className="type-card">
-      <div className="type-card__thumb" aria-hidden="true">
-        <span className="type-card__thumb-text">{thumbAbbrev(type.name)}</span>
+    <div className={`type-tile-wrap${isZero ? ' type-tile-wrap--zero' : ''}`}>
+      <div className="type-tile">
+        {type.template_url ? (
+          <img className="type-tile__img" src={type.template_url} alt="" aria-hidden="true" />
+        ) : (
+          <div className="type-tile__placeholder" aria-hidden="true">
+            {thumbAbbrev(type.name)}
+          </div>
+        )}
+        <div className="type-tile__overlay">
+          <span className="type-tile__count">{count}</span>
+        </div>
       </div>
-      <span className="type-card__name">{type.name}</span>
-      <span className={`type-card__count${count === 0 ? ' type-card__count--zero' : ''}`}>
-        {count}
-      </span>
+      <span className="type-tile__name">{type.name}</span>
     </div>
   )
 }
@@ -80,7 +87,7 @@ export default function ManufacturerDetailView({ manufacturerId, onBack }) {
         .single(),
       supabase
         .from('aircraft_types')
-        .select('id, name')
+        .select('id, name, template_url')
         .eq('manufacturer_id', manufacturerId)
         .order('name', { ascending: true }),
     ]).then(async ([mfrResult, typesResult]) => {
@@ -151,13 +158,11 @@ export default function ManufacturerDetailView({ manufacturerId, onBack }) {
           <p className="state-message">No aircraft types yet.</p>
         )}
         {!loading && !error && types.length > 0 && (
-          <ul className="type-list">
+          <div className="type-gallery">
             {types.map((type) => (
-              <li key={type.id}>
-                <TypeCard type={type} count={regCounts[type.id] ?? 0} />
-              </li>
+              <TypeTile key={type.id} type={type} count={regCounts[type.id] ?? 0} />
             ))}
-          </ul>
+          </div>
         )}
       </main>
     </div>
