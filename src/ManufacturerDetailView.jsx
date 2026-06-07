@@ -65,7 +65,7 @@ function TypeTile({ type, count }) {
   )
 }
 
-export default function ManufacturerDetailView({ manufacturerId, onBack }) {
+export default function ManufacturerDetailView({ manufacturerId, airlineId = null, airlineName = null, onBack }) {
   const [manufacturer, setManufacturer] = useState(null)
   const [types, setTypes] = useState([])
   const [regCounts, setRegCounts] = useState({})
@@ -109,10 +109,12 @@ export default function ManufacturerDetailView({ manufacturerId, onBack }) {
 
       if (fetchedTypes.length > 0) {
         const typeIds = fetchedTypes.map((t) => t.id)
-        const { data: regsData } = await supabase
+        let regsQuery = supabase
           .from('registrations')
           .select('aircraft_type_id')
           .in('aircraft_type_id', typeIds)
+        if (airlineId) regsQuery = regsQuery.eq('airline_id', airlineId)
+        const { data: regsData } = await regsQuery
 
         if (regsData) {
           const counts = {}
@@ -125,7 +127,7 @@ export default function ManufacturerDetailView({ manufacturerId, onBack }) {
 
       setLoading(false)
     })
-  }, [manufacturerId])
+  }, [manufacturerId, airlineId])
 
   const totalRegs = Object.values(regCounts).reduce((sum, n) => sum + n, 0)
   const meta = manufacturer ? buildMeta(manufacturer) : ''
@@ -140,6 +142,9 @@ export default function ManufacturerDetailView({ manufacturerId, onBack }) {
           <div className="mfr-hero__body">
             <HeroLogo manufacturer={manufacturer} />
             <h1 className="mfr-hero__name">{manufacturer.name}</h1>
+            {airlineName && (
+              <p className="mfr-hero__filter-context">Filtered to {airlineName}</p>
+            )}
             {meta && <p className="mfr-hero__meta">{meta}</p>}
             {!loading && (
               <div className="mfr-hero__stats">

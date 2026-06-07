@@ -88,6 +88,7 @@ function AirlinesTab() {
   const [error, setError] = useState(null)
   const [selectedAirline, setSelectedAirline] = useState(null)
   const [selectedManufacturer, setSelectedManufacturer] = useState(null)
+  const [manufacturerAirline, setManufacturerAirline] = useState(null)
 
   useEffect(() => {
     if (!supabase) {
@@ -130,7 +131,9 @@ function AirlinesTab() {
     return (
       <ManufacturerDetailView
         manufacturerId={selectedManufacturer.id}
-        onBack={() => setSelectedManufacturer(null)}
+        airlineId={manufacturerAirline?.id ?? null}
+        airlineName={manufacturerAirline?.name ?? null}
+        onBack={() => { setSelectedManufacturer(null); setManufacturerAirline(null) }}
       />
     )
   }
@@ -140,7 +143,10 @@ function AirlinesTab() {
       <AirlineDetailView
         airline={selectedAirline}
         onBack={() => setSelectedAirline(null)}
-        onSelectManufacturer={setSelectedManufacturer}
+        onSelectManufacturer={(mfr) => {
+          setSelectedManufacturer(mfr)
+          setManufacturerAirline(selectedAirline ? { id: selectedAirline.id, name: selectedAirline.name } : null)
+        }}
       />
     )
   }
