@@ -33,10 +33,21 @@ export default function AirportForm({ initialCode, onCancel, onCreated }) {
     if (!supabase) { setSaveError('Supabase is not configured.'); return }
     setSaving(true)
     setSaveError(null)
+    const code = iata.trim().toUpperCase()
+    const { data: existing } = await supabase
+      .from('airports')
+      .select('iata')
+      .eq('iata', code)
+      .maybeSingle()
+    if (existing) {
+      setSaveError('An airport with this code already exists.')
+      setSaving(false)
+      return
+    }
     const { data, error: err } = await supabase
       .from('airports')
       .insert({
-        iata: iata.trim().toUpperCase(),
+        iata: code,
         icao: icao.trim().toUpperCase() || null,
         name: name.trim(),
         country: selectedCountry.name,
@@ -47,8 +58,7 @@ export default function AirportForm({ initialCode, onCancel, onCreated }) {
       .single()
     setSaving(false)
     if (err) {
-      // unique violation (23505) means it was created in the meantime — treat as success
-      if (err.code === '23505') { onCreated({ iata: iata.trim().toUpperCase() }); return }
+      if (err.code === '23505') { setSaveError('An airport with this code already exists.'); return }
       setSaveError(err.message)
       return
     }
