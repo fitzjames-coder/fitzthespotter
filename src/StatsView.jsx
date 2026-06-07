@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 
-function computeStats(regs) {
+function computeStats(regs, airportCountryByIata = {}) {
   if (!regs.length) {
     return {
       total: 0,
-      airlines: 0, manufacturers: 0, types: 0, airports: 0, countries: 0,
+      airlines: 0, manufacturers: 0, types: 0, airports: 0, countries: 0, airportCountries: 0,
       topAirline: null, topType: null, topAirport: null,
       top3Airlines: [], top3Types: [], top3Airports: [],
       specialLivery: 0, retro: 0, alliance: 0, flownIn: 0, remarks: 0,
@@ -19,6 +19,7 @@ function computeStats(regs) {
   const typeIds = new Set()
   const airportCodes = new Set()
   const countryNames = new Set()
+  const airportCountryNames = new Set()
 
   const airlineCounts = {}
   const typeCounts = {}
@@ -59,6 +60,8 @@ function computeStats(regs) {
     for (const code of aps) {
       airportCodes.add(code)
       airportCounts[code] = (airportCounts[code] ?? 0) + 1
+      const apCountry = airportCountryByIata[code]
+      if (apCountry) airportCountryNames.add(apCountry)
     }
     if (reg.airlines?.country) countryNames.add(reg.airlines.country)
 
@@ -104,6 +107,7 @@ function computeStats(regs) {
     types: typeIds.size,
     airports: airportCodes.size,
     countries: countryNames.size,
+    airportCountries: airportCountryNames.size,
     topAirline: sortedAirlines[0] ?? null,
     topType: sortedTypes[0] ?? null,
     topAirport: sortedAirports[0] ?? null,
@@ -284,6 +288,7 @@ function DateReadout({ label, primary, secondary }) {
 export default function StatsView({ onBack }) {
   const [regs, setRegs] = useState([])
   const [sightings, setSightings] = useState([])
+  const [airportCountryByIata, setAirportCountryByIata] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -304,15 +309,23 @@ export default function StatsView({ onBack }) {
       supabase
         .from('sightings')
         .select('spotted_on'),
-    ]).then(([{ data: regData, error: regErr }, { data: sightData }]) => {
+      supabase
+        .from('airports')
+        .select('iata, country'),
+    ]).then(([{ data: regData, error: regErr }, { data: sightData }, { data: apData }]) => {
       if (regErr) setError(regErr.message)
       else setRegs(regData ?? [])
       setSightings(sightData ?? [])
+      const byIata = {}
+      for (const ap of (apData ?? [])) {
+        if (ap.iata && ap.country) byIata[ap.iata] = ap.country
+      }
+      setAirportCountryByIata(byIata)
       setLoading(false)
     })
   }, [])
 
-  const stats = useMemo(() => computeStats(regs), [regs])
+  const stats = useMemo(() => computeStats(regs, airportCountryByIata), [regs, airportCountryByIata])
   const dateStats = useMemo(() => computeDateStats(sightings), [sightings])
 
   return (
@@ -351,6 +364,7 @@ export default function StatsView({ onBack }) {
                 <MiniTile label="Types"         value={stats.types}         />
                 <MiniTile label="Airports"      value={stats.airports}      />
                 <MiniTile label="Airline countries" value={stats.countries} />
+                <MiniTile label="Countries spotted in" value={stats.airportCountries} />
               </div>
             </StatCard>
 
