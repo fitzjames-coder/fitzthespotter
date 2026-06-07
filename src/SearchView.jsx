@@ -3,6 +3,7 @@ import { supabase } from './lib/supabaseClient'
 import NewRegistrationForm from './NewRegistrationForm'
 import RegistrationProfileView from './RegistrationProfileView'
 import StatsView from './StatsView'
+import ManufacturersView from './ManufacturersView'
 
 function SearchTopBar() {
   const [showForm, setShowForm] = useState(false)
@@ -67,6 +68,16 @@ function StatsCard({ onOpen }) {
   )
 }
 
+function ManufacturersCard({ onOpen }) {
+  return (
+    <button className="stats-card" onClick={onOpen}>
+      <span className="stats-card__title">Manufacturers</span>
+      <span className="stats-card__sub">Browse by maker</span>
+      <span className="stats-card__chevron" aria-hidden="true">›</span>
+    </button>
+  )
+}
+
 
 export default function SearchView() {
   const [allRegs, setAllRegs] = useState([])
@@ -76,6 +87,7 @@ export default function SearchView() {
   const [activeFilters, setActiveFilters] = useState(new Set())
   const [selectedReg, setSelectedReg] = useState(null)
   const [showStats, setShowStats] = useState(false)
+  const [showManufacturers, setShowManufacturers] = useState(false)
 
   function fetchAll() {
     if (!supabase) {
@@ -145,6 +157,10 @@ export default function SearchView() {
     return <StatsView onBack={() => setShowStats(false)} />
   }
 
+  if (showManufacturers) {
+    return <ManufacturersView onBack={() => setShowManufacturers(false)} />
+  }
+
   return (
     <div className="page search-page">
       <SearchTopBar />
@@ -210,6 +226,7 @@ export default function SearchView() {
         )}
 
         <StatsCard onOpen={() => setShowStats(true)} />
+        <ManufacturersCard onOpen={() => setShowManufacturers(true)} />
       </main>
     </div>
   )
