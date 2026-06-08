@@ -193,7 +193,7 @@ function RegistrationCard({ reg, onSelect }) {
         <span className="reg-card__reg">{reg.registration}</span>
         {typeName && <span className="reg-card__type">{typeName}</span>}
       </div>
-      <StatusMarks statuses={reg.statuses} size={20} />
+      <StatusMarks statuses={reg.statuses} size={22} />
     </button>
   )
 }

@@ -612,7 +612,7 @@
 .top-bar__detail-info {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -842,6 +842,7 @@
   gap: 0.85rem;
   width: 100%;
   text-align: left;
+  position: relative;
 }
 
 .reg-card__thumb {
@@ -3028,8 +3029,23 @@
   flex-shrink: 0;
 }
 
-/* Reg-card marks: push to the right edge */
+/* Reg-card marks: anchor slot-1 at the card's horizontal centre */
 .reg-card .status-marks {
-  margin-left: auto;
-  padding-left: 0.5rem;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Prevent body text from running under the absolute marks */
+.reg-card .reg-card__body {
+  max-width: calc(50% - 4.5rem);
+  overflow: hidden;
+}
+
+.reg-card .reg-card__reg,
+.reg-card .reg-card__type {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
