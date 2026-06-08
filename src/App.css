@@ -3023,16 +3023,17 @@
   font-size: 16px !important;
 }
 
-/* Reg-card marks: block-level flex from centre to right padding, overrides base inline-flex */
+/* Reg-card marks: right-anchored flex pinned to the right padding, grows leftward
+   so the rightmost slot (Flown-in) can never clip. Overrides base inline-flex. */
 .reg-card .status-marks {
   position: absolute;
-  left: 50%;
+  left: auto;
   right: 0.9rem;
   top: 50%;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: flex-end;
   gap: 6px;
   flex-wrap: nowrap;
 }
