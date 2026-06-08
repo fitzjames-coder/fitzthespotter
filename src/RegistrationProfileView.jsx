@@ -3,7 +3,15 @@ import { supabase } from './lib/supabaseClient'
 import NewRegistrationForm from './NewRegistrationForm'
 import StatusMarks from './StatusMarks'
 
-function SpotlightOverlay({ remark, onClose }) {
+function formatFlownInDate(iso) {
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  if (!y || !m || !d) return iso
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `${parseInt(d, 10)} ${months[parseInt(m, 10) - 1]} ${y}`
+}
+
+function SpotlightOverlay({ label = 'REMARK', remark, onClose }) {
   return (
     <div
       className="spotlight-backdrop"
@@ -16,7 +24,7 @@ function SpotlightOverlay({ remark, onClose }) {
         className="spotlight-card"
         onClick={(e) => e.stopPropagation()}
       >
-        <p className="spotlight-label">REMARK</p>
+        <p className="spotlight-label">{label}</p>
         <p className="spotlight-text">{remark}</p>
         <button className="spotlight-close" onClick={onClose}>
           Close
@@ -27,7 +35,7 @@ function SpotlightOverlay({ remark, onClose }) {
 }
 
 function RegTopBar({ reg, onBack, onEdit }) {
-  const [showSpotlight, setShowSpotlight] = useState(false)
+  const [spotlight, setSpotlight] = useState(null)
   const hasRemark = Boolean(reg.remark && reg.remark.trim())
 
   return (
@@ -42,7 +50,11 @@ function RegTopBar({ reg, onBack, onEdit }) {
             <StatusMarks
               statuses={reg.statuses}
               size={28}
-              onRemarkClick={hasRemark ? () => setShowSpotlight(true) : undefined}
+              onRemarkClick={hasRemark ? () => setSpotlight({ label: 'REMARK', text: reg.remark }) : undefined}
+              onFlownInClick={reg.statuses?.flown_in ? () => {
+                const dateStr = formatFlownInDate(reg.statuses?.flown_in_date)
+                setSpotlight({ label: 'FLOWN IN', text: dateStr || '—' })
+              } : undefined}
             />
           </div>
           <button className="top-bar__edit" onClick={onEdit} aria-label="Edit registration">
@@ -50,10 +62,11 @@ function RegTopBar({ reg, onBack, onEdit }) {
           </button>
         </div>
       </header>
-      {showSpotlight && (
+      {spotlight !== null && (
         <SpotlightOverlay
-          remark={reg.remark}
-          onClose={() => setShowSpotlight(false)}
+          label={spotlight.label}
+          remark={spotlight.text}
+          onClose={() => setSpotlight(null)}
         />
       )}
     </>

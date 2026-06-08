@@ -164,6 +164,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [statusAlliance, setStatusAlliance] = useState(Boolean(s.alliance))
   const [allianceName, setAllianceName] = useState(s.alliance_name ?? '')
   const [statusFlownIn, setStatusFlownIn] = useState(Boolean(s.flown_in))
+  const [flownInDate, setFlownInDate] = useState(s.flown_in_date ?? '')
   const [remark, setRemark] = useState(existingReg?.remark ?? '')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
@@ -279,7 +280,10 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       if (allianceName) statuses.alliance_name = allianceName
     }
     if (remark.trim()) statuses.remarks = true
-    if (statusFlownIn) statuses.flown_in = true
+    if (statusFlownIn) {
+      statuses.flown_in = true
+      if (flownInDate) statuses.flown_in_date = flownInDate
+    }
 
     const payload = {
       registration: trimmed,
@@ -361,7 +365,10 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       if (allianceName) statuses.alliance_name = allianceName
     }
     if (newRemark.trim()) statuses.remarks = true
-    if (statusFlownIn) statuses.flown_in = true
+    if (statusFlownIn) {
+      statuses.flown_in = true
+      if (flownInDate) statuses.flown_in_date = flownInDate
+    }
 
     const { error: regErr } = await supabase
       .from('registrations')
@@ -703,7 +710,24 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 )}
               </>
             )}
-            <StatusSwitch label="Flown in" checked={statusFlownIn} onChange={setStatusFlownIn} markEl={<img src={markFlownInAsset} width={24} height={24} alt="" className="status-switch__mark-img" />} />
+            <StatusSwitch
+              label="Flown in"
+              checked={statusFlownIn}
+              onChange={(v) => { setStatusFlownIn(v); if (!v) setFlownInDate('') }}
+              markEl={<img src={markFlownInAsset} width={24} height={24} alt="" className="status-switch__mark-img" />}
+            />
+            {statusFlownIn && (
+              <div className="form-group status-revealed-field">
+                <label className="form-label" htmlFor="flown-in-date-input">Date flown in</label>
+                <input
+                  id="flown-in-date-input"
+                  className="form-input"
+                  type="date"
+                  value={flownInDate}
+                  onChange={(e) => setFlownInDate(e.target.value)}
+                />
+              </div>
+            )}
           </div>
           )}
 

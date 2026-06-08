@@ -37,7 +37,7 @@ const ALTS = {
 
 const SLOT_KEYS = ['remarks', 'special_livery', 'retro', 'alliance', 'flown_in']
 
-export default function StatusMarks({ statuses, size = 22, onRemarkClick }) {
+export default function StatusMarks({ statuses, size = 22, onRemarkClick, onFlownInClick }) {
   if (!statuses) return null
 
   const active = {
@@ -75,6 +75,20 @@ export default function StatusMarks({ statuses, size = 22, onRemarkClick }) {
               className="status-marks__btn"
               onClick={onRemarkClick}
               aria-label="View remark"
+            >
+              <img src={SRCS[key]} alt={ALTS[key]} width={size} height={size} className="status-marks__img" />
+            </button>
+          )
+        }
+
+        if (key === 'flown_in' && onFlownInClick) {
+          return (
+            <button
+              key={key}
+              type="button"
+              className="status-marks__btn"
+              onClick={onFlownInClick}
+              aria-label="View flown-in date"
             >
               <img src={SRCS[key]} alt={ALTS[key]} width={size} height={size} className="status-marks__img" />
             </button>
