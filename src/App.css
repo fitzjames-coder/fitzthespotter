@@ -2985,16 +2985,16 @@
   display: inline-block;
   visibility: hidden;
   flex-shrink: 0;
-  width: 1.5em;
-  height: 1.5em;
+  width: 1.16em;
+  height: 1.16em;
 }
 
 .status-marks__img {
   display: block;
   object-fit: contain;
   flex-shrink: 0;
-  width: 1.5em;
-  height: 1.5em;
+  width: 1.16em;
+  height: 1.16em;
 }
 
 .status-marks__btn {
@@ -3016,10 +3016,11 @@
   color: var(--color-cream);
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-weight: bold;
+  font-size: 0.5em;
   line-height: 1;
   flex-shrink: 0;
-  width: 1.5em;
-  height: 1.5em;
+  width: 1.16em;
+  height: 1.16em;
 }
 
 /* Marks scale with reg text: matches .top-bar__detail-name (1.3rem) */
@@ -3040,13 +3041,13 @@
   flex-shrink: 0;
 }
 
-/* Reg-card marks: anchor slot-1 at the card's horizontal centre; matches .reg-card__reg (1.05rem) */
+/* Reg-card marks: anchor slot-1 at the card's horizontal centre; 1em inherits reg-card base size */
 .reg-card .status-marks {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 1.05rem;
+  font-size: 1em;
 }
 
 /* Prevent body text from running under the absolute marks */
