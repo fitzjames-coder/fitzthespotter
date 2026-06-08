@@ -3023,12 +3023,15 @@
   font-size: 16px !important;
 }
 
-/* Reg-card marks: anchor slot-1 at the card's horizontal centre */
+/* Reg-card marks: anchor slot-1 at the card's horizontal centre, bounded by card's right padding */
 .reg-card .status-marks {
   position: absolute;
   left: 50%;
+  right: 0.9rem;
   top: 50%;
   transform: translateY(-50%);
+  justify-content: flex-start;
+  overflow: hidden;
 }
 
 /* Profile header marks — slightly larger than cards */
