@@ -612,7 +612,7 @@
 .top-bar__detail-info {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -842,6 +842,7 @@
   gap: 0.85rem;
   width: 100%;
   text-align: left;
+  position: relative;
 }
 
 .reg-card__thumb {
@@ -2969,4 +2970,113 @@
 
 .btn-add-chip:active {
   background: rgba(44, 66, 123, 0.14);
+}
+
+/* ── StatusMarks row ─────────────────────────────────────────────── */
+.status-marks {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.status-marks__spacer {
+  display: inline-block;
+  visibility: hidden;
+  flex-shrink: 0;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.status-marks__img {
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+  width: 40px !important;
+  height: 40px !important;
+}
+
+.status-marks__btn {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.status-marks__alliance {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-deep-blue);
+  color: var(--color-cream);
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: bold;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 40px !important;
+  height: 40px !important;
+  font-size: 16px !important;
+}
+
+/* Reg-card marks: right-anchored flex pinned to the right padding, grows leftward
+   so the rightmost slot (Flown-in) can never clip. Overrides base inline-flex. */
+.reg-card .status-marks {
+  position: absolute;
+  left: auto;
+  right: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+/* Profile header marks — slightly larger than cards */
+.top-bar__detail-info .status-marks {
+  font-size: initial;
+}
+
+.top-bar__detail-info .status-marks__img,
+.top-bar__detail-info .status-marks__spacer {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+.top-bar__detail-info .status-marks__alliance {
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 17px !important;
+}
+
+/* ── StatusSwitch with mark preview ─────────────────────────────── */
+.status-switch__left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-switch__mark-img {
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Prevent body text from running under the absolute marks */
+.reg-card .reg-card__body {
+  max-width: calc(50% - 4.5rem);
+  overflow: hidden;
+}
+
+.reg-card .reg-card__reg,
+.reg-card .reg-card__type {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
