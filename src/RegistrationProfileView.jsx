@@ -41,7 +41,7 @@ function RegTopBar({ reg, onBack, onEdit }) {
             <h1 className="top-bar__detail-name">{reg.registration}</h1>
             <StatusMarks
               statuses={reg.statuses}
-              size={22}
+              size={28}
               onRemarkClick={hasRemark ? () => setShowSpotlight(true) : undefined}
             />
           </div>
