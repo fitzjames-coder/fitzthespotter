@@ -2985,16 +2985,16 @@
   display: inline-block;
   visibility: hidden;
   flex-shrink: 0;
-  width: 1em;
-  height: 1em;
+  width: 1.5em;
+  height: 1.5em;
 }
 
 .status-marks__img {
   display: block;
   object-fit: contain;
   flex-shrink: 0;
-  width: 1em;
-  height: 1em;
+  width: 1.5em;
+  height: 1.5em;
 }
 
 .status-marks__btn {
@@ -3018,11 +3018,13 @@
   font-weight: bold;
   line-height: 1;
   flex-shrink: 0;
+  width: 1.5em;
+  height: 1.5em;
 }
 
-/* Marks scale with reg text: ~cap-height of .top-bar__detail-name (1.3rem) */
+/* Marks scale with reg text: matches .top-bar__detail-name (1.3rem) */
 .top-bar__detail-info .status-marks {
-  font-size: 1.15rem;
+  font-size: 1.3rem;
 }
 
 /* ── StatusSwitch with mark preview ─────────────────────────────── */
@@ -3038,13 +3040,13 @@
   flex-shrink: 0;
 }
 
-/* Reg-card marks: anchor slot-1 at the card's horizontal centre; scale with reg text (~cap-height of 1.05rem) */
+/* Reg-card marks: anchor slot-1 at the card's horizontal centre; matches .reg-card__reg (1.05rem) */
 .reg-card .status-marks {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.95rem;
+  font-size: 1.05rem;
 }
 
 /* Prevent body text from running under the absolute marks */

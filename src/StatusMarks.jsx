@@ -13,7 +13,7 @@ function allianceLetters(name) {
 export function AllianceBadge({ name, size }) {
   const style = size
     ? { width: size, height: size, fontSize: Math.round(size * 0.38) }
-    : { width: '2.5em', height: '2.5em', fontSize: '0.4em' }
+    : { width: '2.73em', height: '2.73em', fontSize: '0.55em' }
   return (
     <span
       className="status-marks__alliance"
