@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import NewRegistrationForm from './NewRegistrationForm'
+import StatusMarks from './StatusMarks'
 
 function SpotlightOverlay({ remark, onClose }) {
   return (
@@ -38,15 +39,11 @@ function RegTopBar({ reg, onBack, onEdit }) {
         <div className="top-bar__detail-row">
           <div className="top-bar__detail-info">
             <h1 className="top-bar__detail-name">{reg.registration}</h1>
-            {hasRemark && (
-              <button
-                className="remark-star"
-                onClick={() => setShowSpotlight(true)}
-                aria-label="View remark"
-              >
-                ✷
-              </button>
-            )}
+            <StatusMarks
+              statuses={reg.statuses}
+              size={22}
+              onRemarkClick={hasRemark ? () => setShowSpotlight(true) : undefined}
+            />
           </div>
           <button className="top-bar__edit" onClick={onEdit} aria-label="Edit registration">
             Edit

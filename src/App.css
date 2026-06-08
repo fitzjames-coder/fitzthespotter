@@ -2970,3 +2970,66 @@
 .btn-add-chip:active {
   background: rgba(44, 66, 123, 0.14);
 }
+
+/* ── StatusMarks row ─────────────────────────────────────────────── */
+.status-marks {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.status-marks__spacer {
+  display: inline-block;
+  visibility: hidden;
+  flex-shrink: 0;
+}
+
+.status-marks__img {
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.status-marks__btn {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.status-marks__alliance {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-deep-blue);
+  color: var(--color-cream);
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: bold;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ── StatusSwitch with mark preview ─────────────────────────────── */
+.status-switch__left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.status-switch__mark-img {
+  display: block;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Reg-card marks: push to the right edge */
+.reg-card .status-marks {
+  margin-left: auto;
+  padding-left: 0.5rem;
+}

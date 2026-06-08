@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import RegistrationProfileView from './RegistrationProfileView'
+import StatusMarks from './StatusMarks'
 
 function heroInitials(name) {
   return name.split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 3)
@@ -192,6 +193,7 @@ function RegistrationCard({ reg, onSelect }) {
         <span className="reg-card__reg">{reg.registration}</span>
         {typeName && <span className="reg-card__type">{typeName}</span>}
       </div>
+      <StatusMarks statuses={reg.statuses} size={20} />
     </button>
   )
 }
@@ -215,6 +217,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
         id,
         registration,
         first_spotted,
+        statuses,
         aircraft_types (
           id,
           name,
