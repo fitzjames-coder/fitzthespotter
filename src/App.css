@@ -2985,16 +2985,16 @@
   display: inline-block;
   visibility: hidden;
   flex-shrink: 0;
-  width: 1.16em;
-  height: 1.16em;
+  width: 40px !important;
+  height: 40px !important;
 }
 
 .status-marks__img {
   display: block;
   object-fit: contain;
   flex-shrink: 0;
-  width: 1.16em;
-  height: 1.16em;
+  width: 40px !important;
+  height: 40px !important;
 }
 
 .status-marks__btn {
@@ -3016,16 +3016,36 @@
   color: var(--color-cream);
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-weight: bold;
-  font-size: 0.5em;
   line-height: 1;
   flex-shrink: 0;
-  width: 1.16em;
-  height: 1.16em;
+  width: 40px !important;
+  height: 40px !important;
+  font-size: 16px !important;
 }
 
-/* Marks scale with reg text: matches .top-bar__detail-name (1.3rem) */
+/* Reg-card marks: anchor slot-1 at the card's horizontal centre */
+.reg-card .status-marks {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Profile header marks — slightly larger than cards */
 .top-bar__detail-info .status-marks {
-  font-size: 1.3rem;
+  font-size: initial;
+}
+
+.top-bar__detail-info .status-marks__img,
+.top-bar__detail-info .status-marks__spacer {
+  width: 44px !important;
+  height: 44px !important;
+}
+
+.top-bar__detail-info .status-marks__alliance {
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 17px !important;
 }
 
 /* ── StatusSwitch with mark preview ─────────────────────────────── */
@@ -3039,15 +3059,6 @@
   display: block;
   object-fit: contain;
   flex-shrink: 0;
-}
-
-/* Reg-card marks: anchor slot-1 at the card's horizontal centre; 1em inherits reg-card base size */
-.reg-card .status-marks {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1em;
 }
 
 /* Prevent body text from running under the absolute marks */
