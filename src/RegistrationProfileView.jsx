@@ -49,7 +49,6 @@ function RegTopBar({ reg, onBack, onEdit }) {
             <h1 className="top-bar__detail-name">{reg.registration}</h1>
             <StatusMarks
               statuses={reg.statuses}
-              size={28}
               onRemarkClick={hasRemark ? () => setSpotlight({ label: 'REMARK', text: reg.remark }) : undefined}
               onFlownInClick={reg.statuses?.flown_in ? () => {
                 const dateStr = formatFlownInDate(reg.statuses?.flown_in_date)

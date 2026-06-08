@@ -11,10 +11,13 @@ function allianceLetters(name) {
 }
 
 export function AllianceBadge({ name, size }) {
+  const style = size
+    ? { width: size, height: size, fontSize: Math.round(size * 0.38) }
+    : { width: '2.5em', height: '2.5em', fontSize: '0.4em' }
   return (
     <span
       className="status-marks__alliance"
-      style={{ width: size, height: size, fontSize: Math.round(size * 0.38) }}
+      style={style}
     >
       {allianceLetters(name)}
     </span>
@@ -54,17 +57,11 @@ export default function StatusMarks({ statuses, size = 22, onRemarkClick, onFlow
     <span className="status-marks">
       {SLOT_KEYS.map((key) => {
         if (!active[key]) {
-          return (
-            <span
-              key={key}
-              className="status-marks__spacer"
-              style={{ width: size, height: size }}
-            />
-          )
+          return <span key={key} className="status-marks__spacer" />
         }
 
         if (key === 'alliance') {
-          return <AllianceBadge key={key} name={statuses.alliance_name} size={size} />
+          return <AllianceBadge key={key} name={statuses.alliance_name} />
         }
 
         if (key === 'remarks' && onRemarkClick) {
@@ -76,7 +73,7 @@ export default function StatusMarks({ statuses, size = 22, onRemarkClick, onFlow
               onClick={onRemarkClick}
               aria-label="View remark"
             >
-              <img src={SRCS[key]} alt={ALTS[key]} width={size} height={size} className="status-marks__img" />
+              <img src={SRCS[key]} alt={ALTS[key]} className="status-marks__img" />
             </button>
           )
         }
@@ -90,7 +87,7 @@ export default function StatusMarks({ statuses, size = 22, onRemarkClick, onFlow
               onClick={onFlownInClick}
               aria-label="View flown-in date"
             >
-              <img src={SRCS[key]} alt={ALTS[key]} width={size} height={size} className="status-marks__img" />
+              <img src={SRCS[key]} alt={ALTS[key]} className="status-marks__img" />
             </button>
           )
         }
@@ -100,8 +97,6 @@ export default function StatusMarks({ statuses, size = 22, onRemarkClick, onFlow
             key={key}
             src={SRCS[key]}
             alt={ALTS[key]}
-            width={size}
-            height={size}
             className="status-marks__img"
           />
         )
