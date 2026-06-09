@@ -3,6 +3,7 @@ import { supabase } from './lib/supabaseClient'
 import NewRegistrationForm from './NewRegistrationForm'
 import StatusMarks from './StatusMarks'
 import cameraIcon from './assets/marks/mark-camera.png'
+import cameraOffIcon from './assets/marks/mark-camera-off.png'
 
 function formatFlownInDate(iso) {
   if (!iso) return ''
@@ -278,10 +279,10 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
               aria-label="Toggle photo flag"
             >
               <img
-                src={cameraIcon}
+                src={flagged ? cameraIcon : cameraOffIcon}
                 alt=""
                 aria-hidden="true"
-                className={`camera-flag__img${flagged ? '' : ' camera-flag--off'}`}
+                className="camera-flag__img"
               />
             </button>
           </div>

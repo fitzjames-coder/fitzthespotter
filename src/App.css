@@ -491,13 +491,6 @@
   object-fit: contain;
 }
 
-/* Flag OFF: desaturate the amber lens while leaving the coral body in colour.
-   A hue-rotate + partial desaturation greys the warm-amber tones without
-   washing out the coral. Tune values here if the assets change. */
-.camera-flag--off {
-  filter: saturate(0.15) brightness(1.1);
-}
-
 /* ── Airline list ───────────────────────────────────────────────── */
 .airline-list {
   list-style: none;
