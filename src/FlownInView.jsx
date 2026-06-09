@@ -1,0 +1,145 @@
+import { useEffect, useState } from 'react'
+import { supabase } from './lib/supabaseClient'
+import StatusMarks from './StatusMarks'
+import RegistrationProfileView from './RegistrationProfileView'
+import markFlownIn from './assets/marks/mark-flown-in.png'
+
+const CARD_PALETTE = [
+  { bg: '#2C427B', dark: true  },
+  { bg: '#005281', dark: true  },
+  { bg: '#E8607A', dark: true  },
+  { bg: '#FBAD19', dark: false },
+  { bg: '#F6EFDC', dark: false },
+  { bg: '#16203B', dark: true  },
+]
+
+function thumbAbbrev(model) {
+  const seg = model.split(/[-\s]/)[0]
+  return seg.length <= 5 ? seg : seg.slice(0, 4)
+}
+
+function FlownInCard({ reg, index, onSelect }) {
+  const palette = CARD_PALETTE[index % 6]
+  const textColor   = palette.dark ? '#F6EFDC' : '#16203B'
+  const subColor    = palette.dark ? 'rgba(246,239,220,0.62)' : 'rgba(22,32,59,0.55)'
+  const badgeBg     = palette.dark ? 'rgba(246,239,220,0.14)' : 'rgba(22,32,59,0.10)'
+  const typeName    = reg.aircraft_types?.name ?? null
+  const abbrev      = typeName ? thumbAbbrev(typeName) : ''
+
+  return (
+    <button
+      className="fi-card"
+      style={{ background: palette.bg }}
+      onClick={() => onSelect(reg)}
+    >
+      <div className="fi-card__thumb" style={{ background: badgeBg }}>
+        <span className="fi-card__thumb-text" style={{ color: subColor }}>{abbrev}</span>
+      </div>
+      <div className="fi-card__body">
+        <span className="fi-card__reg" style={{ color: textColor }}>{reg.registration}</span>
+        {typeName && (
+          <span className="fi-card__type" style={{ color: subColor }}>{typeName}</span>
+        )}
+      </div>
+      <StatusMarks statuses={reg.statuses} />
+    </button>
+  )
+}
+
+export default function FlownInView({ onBack, onSelectReg }) {
+  const [regs, setRegs] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [selectedReg, setSelectedReg] = useState(null)
+
+  useEffect(() => {
+    if (!supabase) {
+      setError('Supabase is not configured.')
+      setLoading(false)
+      return
+    }
+    supabase
+      .from('registrations')
+      .select(`
+        id, registration, first_spotted, statuses,
+        aircraft_types ( id, name ),
+        airlines ( id, name )
+      `)
+      .then(({ data, error: err }) => {
+        if (err) {
+          setError(err.message)
+        } else {
+          const flownIn = (data ?? [])
+            .filter((r) => r.statuses?.flown_in === true)
+            .sort((a, b) => {
+              if (a.first_spotted && b.first_spotted)
+                return a.first_spotted.localeCompare(b.first_spotted)
+              if (a.first_spotted) return -1
+              if (b.first_spotted) return 1
+              return a.registration.localeCompare(b.registration)
+            })
+          setRegs(flownIn)
+        }
+        setLoading(false)
+      })
+  }, [])
+
+  function handleSelect(reg) {
+    if (onSelectReg) {
+      onSelectReg(reg)
+    } else {
+      setSelectedReg(reg)
+    }
+  }
+
+  if (selectedReg) {
+    return (
+      <RegistrationProfileView
+        regId={selectedReg.id}
+        airline={selectedReg.airlines}
+        onBack={() => setSelectedReg(null)}
+        onChanged={() => {}}
+      />
+    )
+  }
+
+  return (
+    <div className="page fi-page">
+      <button className="top-bar__back fi-back" onClick={onBack} aria-label="Back to stats">
+        ‹ Back
+      </button>
+
+      <div className="fi-hero">
+        <div className="fi-hero__badge">
+          <img src={markFlownIn} alt="" aria-hidden="true" className="fi-hero__mark" />
+        </div>
+        <div className="fi-hero__text">
+          <p className="fi-hero__eyebrow">Aboard the aircraft</p>
+          <h1 className="fi-hero__title">Flown-in</h1>
+          <span className="fi-hero__count-pill">{regs.length} flown aboard</span>
+        </div>
+      </div>
+
+      <main className="content fi-content">
+        {loading && <p className="state-message">Loading…</p>}
+        {error  && <p className="state-message state-message--error">{error}</p>}
+        {!loading && !error && (
+          <>
+            <p className="section-label">Registrations</p>
+            {regs.length === 0 ? (
+              <p className="fi-empty">No flown-in registrations yet.</p>
+            ) : (
+              <ul className="fi-list">
+                {regs.map((reg, i) => (
+                  <li key={reg.id}>
+                    <FlownInCard reg={reg} index={i} onSelect={handleSelect} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+      </main>
+    </div>
+  )
+}

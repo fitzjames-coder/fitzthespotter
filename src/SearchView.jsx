@@ -4,6 +4,7 @@ import NewRegistrationForm from './NewRegistrationForm'
 import RegistrationProfileView from './RegistrationProfileView'
 import StatsView from './StatsView'
 import ManufacturersView from './ManufacturersView'
+import FlownInView from './FlownInView'
 
 function SearchTopBar() {
   const [showForm, setShowForm] = useState(false)
@@ -89,6 +90,7 @@ export default function SearchView() {
   const [selectedReg, setSelectedReg] = useState(null)
   const [showStats, setShowStats] = useState(false)
   const [showManufacturers, setShowManufacturers] = useState(false)
+  const [showFlownIn, setShowFlownIn] = useState(false)
 
   function fetchAll() {
     if (!supabase) {
@@ -123,6 +125,8 @@ export default function SearchView() {
       return next
     })
   }
+
+  const flownInCount = allRegs.filter((r) => r.statuses?.flown_in === true).length
 
   const q = query.trim().toLowerCase()
   const hasInput = q !== '' || activeFilters.size > 0
@@ -161,6 +165,15 @@ export default function SearchView() {
 
   if (showManufacturers) {
     return <ManufacturersView onBack={() => setShowManufacturers(false)} />
+  }
+
+  if (showFlownIn) {
+    return (
+      <FlownInView
+        onBack={() => setShowFlownIn(false)}
+        onSelectReg={setSelectedReg}
+      />
+    )
   }
 
   return (
@@ -227,6 +240,17 @@ export default function SearchView() {
           </div>
         )}
 
+        <button
+          className="stats-flownin-card"
+          onClick={() => setShowFlownIn(true)}
+        >
+          <span className="stats-flownin-card__count">{flownInCount}</span>
+          <span className="stats-flownin-card__text">
+            <span className="stats-flownin-card__label">Flown-in</span>
+            <span className="stats-flownin-card__sub">View all aboard</span>
+          </span>
+          <span className="stats-flownin-card__chevron" aria-hidden="true">›</span>
+        </button>
         <StatsCard onOpen={() => setShowStats(true)} />
         <ManufacturersCard onOpen={() => setShowManufacturers(true)} />
       </main>
