@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
-import FlownInView from './FlownInView'
-import RegistrationProfileView from './RegistrationProfileView'
 
 function computeStats(regs, airportCountryByIata = {}) {
   if (!regs.length) {
@@ -293,8 +291,6 @@ export default function StatsView({ onBack }) {
   const [airportCountryByIata, setAirportCountryByIata] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [showFlownIn, setShowFlownIn] = useState(false)
-  const [selectedReg, setSelectedReg] = useState(null)
 
   useEffect(() => {
     if (!supabase) {
@@ -331,26 +327,6 @@ export default function StatsView({ onBack }) {
 
   const stats = useMemo(() => computeStats(regs, airportCountryByIata), [regs, airportCountryByIata])
   const dateStats = useMemo(() => computeDateStats(sightings), [sightings])
-
-  if (selectedReg) {
-    return (
-      <RegistrationProfileView
-        regId={selectedReg.id}
-        airline={selectedReg.airlines}
-        onBack={() => setSelectedReg(null)}
-        onChanged={() => {}}
-      />
-    )
-  }
-
-  if (showFlownIn) {
-    return (
-      <FlownInView
-        onBack={() => setShowFlownIn(false)}
-        onSelectReg={setSelectedReg}
-      />
-    )
-  }
 
   return (
     <div className="page search-page">
@@ -417,18 +393,6 @@ export default function StatsView({ onBack }) {
               <StatusTally label="Flown-in"        count={stats.flownIn}       />
               <StatusTally label="Remarks"         count={stats.remarks}       />
             </StatCard>
-
-            <button
-              className="stats-flownin-card"
-              onClick={() => setShowFlownIn(true)}
-            >
-              <span className="stats-flownin-card__count">{stats.flownIn}</span>
-              <span className="stats-flownin-card__text">
-                <span className="stats-flownin-card__label">Flown-in</span>
-                <span className="stats-flownin-card__sub">View all aboard</span>
-              </span>
-              <span className="stats-flownin-card__chevron" aria-hidden="true">›</span>
-            </button>
 
             <StatCard title="Milestones">
               <MilestoneRow label="First spot"   date={stats.firstSpot?.date}  reg={stats.firstSpot?.reg}  />
