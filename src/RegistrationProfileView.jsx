@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import NewRegistrationForm from './NewRegistrationForm'
 import StatusMarks from './StatusMarks'
+import cameraIcon from './assets/marks/mark-camera.png'
 
 function formatFlownInDate(iso) {
   if (!iso) return ''
@@ -165,6 +166,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(null)
+  const [flagged, setFlagged] = useState(false)
 
   async function loadReg() {
     if (!supabase) {
@@ -181,6 +183,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
         airports,
         remark,
         statuses,
+        flagged,
         aircraft_types (
           id,
           name,
@@ -200,6 +203,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     }
 
     setReg(data)
+    setFlagged(Boolean(data.flagged))
 
     const { data: ls } = await supabase
       .from('sightings')
@@ -216,6 +220,14 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   useEffect(() => {
     loadReg()
   }, [regId])
+
+  async function handleToggleFlag() {
+    const next = !flagged
+    setFlagged(next)
+    if (supabase) {
+      await supabase.from('registrations').update({ flagged: next }).eq('id', regId)
+    }
+  }
 
   async function handleDelete() {
     setDeleting(true)
@@ -255,9 +267,24 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
         <RegTopBar reg={reg} onBack={onBack} onEdit={() => setShowEdit(true)} />
         <GalleryPlaceholder />
         <main className="content">
-          <p className="section-label">
-            {airline?.name ?? ''}
-          </p>
+          <div className="section-label-row">
+            <p className="section-label">
+              {airline?.name ?? ''}
+            </p>
+            <button
+              type="button"
+              className="camera-flag-btn"
+              onClick={handleToggleFlag}
+              aria-label="Toggle photo flag"
+            >
+              <img
+                src={cameraIcon}
+                alt=""
+                aria-hidden="true"
+                className={`camera-flag__img${flagged ? '' : ' camera-flag--off'}`}
+              />
+            </button>
+          </div>
           <InfoSection reg={reg} lastSighting={lastSighting} />
           {deleteError && <p className="form-error" style={{ marginTop: '1rem' }}>{deleteError}</p>}
           <button
