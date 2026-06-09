@@ -4,14 +4,18 @@ export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOpt
   const [query, setQuery] = useState('')
   const [options, setOptions] = useState([])
   const [open, setOpen] = useState(false)
+  const [highlight, setHighlight] = useState(-1)
   const containerRef = useRef(null)
   const inputRef = useRef(null)
   const timerRef = useRef(null)
+
+  const isDesktop = () => !!containerRef.current?.closest('.desktop-mode')
 
   useEffect(() => {
     function onOutsideClick(e) {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
         setOpen(false)
+        setHighlight(-1)
       }
     }
     document.addEventListener('mousedown', onOutsideClick)
@@ -38,13 +42,40 @@ export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOpt
     if (!q.trim()) {
       setOptions([])
       setOpen(false)
+      setHighlight(-1)
       return
     }
     timerRef.current = setTimeout(async () => {
       const results = await fetchOptions(q.trim())
       setOptions(results)
       setOpen(true)
+      setHighlight(isDesktop() && results.length > 0 ? 0 : -1)
     }, 220)
+  }
+
+  function handleKeyDown(e) {
+    if (!isDesktop() || !open || options.length === 0) return
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setHighlight((h) => Math.min(h + 1, options.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlight((h) => Math.max(h - 1, 0))
+    } else if (e.key === 'Enter') {
+      if (highlight >= 0) {
+        e.preventDefault()
+        pick(options[highlight])
+      }
+    } else if (e.key === 'Tab') {
+      if (highlight >= 0) {
+        pick(options[highlight])
+        // no preventDefault — let Tab move focus naturally
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault()
+      setOpen(false)
+      setHighlight(-1)
+    }
   }
 
   function pick(option) {
@@ -52,6 +83,7 @@ export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOpt
     setQuery(option.label)
     setOpen(false)
     setOptions([])
+    setHighlight(-1)
   }
 
   function clear(e) {
@@ -60,6 +92,7 @@ export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOpt
     setQuery('')
     setOptions([])
     setOpen(false)
+    setHighlight(-1)
     inputRef.current?.focus()
   }
 
@@ -74,6 +107,7 @@ export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOpt
           value={displayValue}
           onChange={handleChange}
           onFocus={handleFocus}
+          onKeyDown={handleKeyDown}
           disabled={disabled}
           autoComplete="off"
         />
@@ -103,10 +137,10 @@ export default function TypeaheadPicker({ placeholder, value, onSelect, fetchOpt
               )}
             </>
           ) : (
-            options.map((opt) => (
+            options.map((opt, i) => (
               <div
                 key={opt.id}
-                className="typeahead__option"
+                className={`typeahead__option${i === highlight ? ' is-highlighted' : ''}`}
                 onMouseDown={() => pick(opt)}
               >
                 {opt.label}

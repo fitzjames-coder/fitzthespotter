@@ -315,6 +315,11 @@
   background: rgba(44, 66, 123, 0.06);
 }
 
+.typeahead__option.is-highlighted {
+  background: #2C427B;
+  color: #F6EFDC;
+}
+
 .typeahead__empty {
   padding: 0.6rem 0.75rem;
   font-size: 0.85rem;
