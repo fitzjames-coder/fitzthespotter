@@ -3336,3 +3336,101 @@
   font-size: 1.3rem;
   flex-shrink: 0;
 }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Desktop mode (scoped — mobile untouched) ───────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+/* Root wrapper fills the viewport */
+.app-root {
+  min-height: 100vh;
+}
+
+/* ── Sidebar layout ─────────────────────────────────────────────── */
+.desktop-mode .nav-backdrop {
+  display: none;
+}
+
+.desktop-mode .nav-drawer {
+  /* Override the slide-up drawer: become a fixed left sidebar */
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: auto;
+  width: 210px;
+  height: 100vh;
+  transform: none;
+  transition: none;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The bar becomes the sidebar header */
+.desktop-mode .nav-bar {
+  height: auto;
+  padding: 1.2rem 0 1rem;
+  border-top: none;
+  border-bottom: 3px solid var(--color-amber);
+  display: flex;
+  justify-content: center;
+}
+
+/* Logo sits in the header, not cresting — revert absolute positioning */
+.desktop-mode .nav-logo {
+  position: static;
+  transform: none;
+  width: 80px;
+  height: 80px;
+  cursor: default;
+  pointer-events: none;
+  transition: none;
+}
+
+/* Tabs stack vertically */
+.desktop-mode .nav-tabs {
+  flex-direction: column;
+  height: auto;
+  flex: 1;
+  align-items: stretch;
+  padding: 0.5rem 0;
+}
+
+.desktop-mode .nav-tab {
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1.1rem;
+  border-radius: 0;
+}
+
+.desktop-mode .nav-tab__icon {
+  width: 32px;
+  height: 32px;
+}
+
+.desktop-mode .nav-tab__label {
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+}
+
+/* Desktop toggle button: show active state when desktop mode is on */
+.desktop-mode .nav-tab--desktop-on .nav-tab__icon {
+  filter: brightness(1.08) saturate(1.25);
+}
+
+.desktop-mode .nav-tab--desktop-on .nav-tab__label {
+  color: var(--color-amber);
+  opacity: 1;
+}
+
+/* ── Content area shifts right to clear the sidebar ─────────────── */
+.desktop-mode .page {
+  padding-left: 210px;
+  padding-bottom: 0;
+}
+
+/* Widen and centre content within the remaining space */
+.desktop-mode .content {
+  max-width: 1100px;
+}

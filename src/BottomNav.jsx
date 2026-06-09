@@ -4,7 +4,7 @@ const TABS = [
   { id: 'search',   label: 'Search',   icon: '/search.PNG'   },
 ]
 
-export default function BottomNav({ activeTab, navOpen, onLogoTap, onTabChange }) {
+export default function BottomNav({ activeTab, navOpen, onLogoTap, onTabChange, desktopMode, onToggleDesktop }) {
   return (
     <>
       <div
@@ -37,6 +37,19 @@ export default function BottomNav({ activeTab, navOpen, onLogoTap, onTabChange }
               <span className="nav-tab__label">{tab.label}</span>
             </button>
           ))}
+          <button
+            className={`nav-tab nav-tab--desktop-toggle${desktopMode ? ' nav-tab--desktop-on' : ''}`}
+            onClick={onToggleDesktop}
+            aria-label={desktopMode ? 'Switch to mobile layout' : 'Switch to desktop layout'}
+          >
+            <img
+              className="nav-tab__icon"
+              src="/mark-desktop.png"
+              alt=""
+              aria-hidden="true"
+            />
+            <span className="nav-tab__label">Desktop</span>
+          </button>
         </div>
       </div>
     </>

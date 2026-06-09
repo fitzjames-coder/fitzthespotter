@@ -192,6 +192,19 @@ export default function App() {
   const [navOpen, setNavOpen] = useState(false)
   const [navNonce, setNavNonce] = useState(0)
   const [selectedAirport, setSelectedAirport] = useState(null)
+  const [desktopMode, setDesktopMode] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth >= 1024
+  )
+  const [userToggled, setUserToggled] = useState(false)
+
+  useEffect(() => {
+    if (userToggled) return
+    function handleResize() {
+      if (!userToggled) setDesktopMode(window.innerWidth >= 1024)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [userToggled])
 
   function handleTabChange(tab) {
     setActiveTab(tab)
@@ -200,8 +213,13 @@ export default function App() {
     setNavNonce((n) => n + 1)
   }
 
+  function handleToggleDesktop() {
+    setUserToggled(true)
+    setDesktopMode((v) => !v)
+  }
+
   return (
-    <>
+    <div className={`app-root${desktopMode ? ' desktop-mode' : ''}`}>
       {activeTab === 'airlines' && <AirlinesTab key={navNonce} />}
       {activeTab === 'airports' && !selectedAirport && (
         <AirportsTab key={navNonce} onSelectAirport={setSelectedAirport} />
@@ -216,7 +234,9 @@ export default function App() {
         navOpen={navOpen}
         onLogoTap={() => setNavOpen((o) => !o)}
         onTabChange={handleTabChange}
+        desktopMode={desktopMode}
+        onToggleDesktop={handleToggleDesktop}
       />
-    </>
+    </div>
   )
 }
