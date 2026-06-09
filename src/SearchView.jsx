@@ -37,6 +37,7 @@ const QUICK_FILTERS = [
   { id: 'alliance',       label: 'Alliance'       },
   { id: 'remarks',        label: 'Remarks'        },
   { id: 'flown_in',       label: 'Flown-in'       },
+  { id: 'flagged',        label: 'Flagged'        },
 ]
 
 function ResultCard({ reg, onSelect }) {
@@ -98,7 +99,7 @@ export default function SearchView() {
     supabase
       .from('registrations')
       .select(`
-        id, registration, airports, remark, statuses,
+        id, registration, airports, remark, statuses, flagged,
         airlines ( id, name, country, country_flag ),
         aircraft_types ( id, name, manufacturers ( id, name ) )
       `)
@@ -129,6 +130,7 @@ export default function SearchView() {
   const results = hasInput
     ? allRegs.filter((reg) => {
         for (const fid of activeFilters) {
+          if (fid === 'flagged') { if (!reg.flagged) return false; continue }
           if (!reg.statuses?.[fid]) return false
         }
         if (q === '') return true
