@@ -3540,3 +3540,27 @@
   background: rgba(22, 32, 59, 0.82);
   border-color: rgba(246, 239, 220, 0.22);
 }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Airlines tab background ────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+.airlines-page {
+  position: relative;
+}
+
+/* Fixed wallpaper anchored bottom-right; mounts/unmounts with the Airlines tab.
+   position:fixed used instead of background-attachment:fixed (iOS Safari ignores
+   the latter on scrollable elements). */
+.airlines-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: url('/working-bg.PNG') bottom right / cover no-repeat;
+}
+
+.airlines-page > * {
+  position: relative;
+  z-index: 1;
+}
