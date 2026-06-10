@@ -123,6 +123,39 @@
   margin-bottom: 0.75rem;
 }
 
+.form-section__label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-section__label-row .form-section__label {
+  margin-bottom: 0;
+}
+
+.radar-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 0.15s;
+}
+
+.radar-link img {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  display: block;
+}
+
+.radar-link:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
 .form-group {
   margin-bottom: 0.9rem;
 }

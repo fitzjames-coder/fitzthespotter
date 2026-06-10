@@ -468,7 +468,22 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
 
         <div className="form-body">
           <div className="form-section">
-            <p className="form-section__label">Registration</p>
+            <div className="form-section__label-row">
+              <p className="form-section__label">Registration</p>
+              <button
+                type="button"
+                className="radar-link"
+                disabled={!regNumber.trim()}
+                aria-label="Look up this registration on a flight tracker (opens in a new tab)"
+                title="Look up this registration on a flight tracker (opens in a new tab)"
+                onClick={() => {
+                  const tail = regNumber.trim().toLowerCase()
+                  window.open(`https://www.flightradar24.com/data/aircraft/${tail}`, '_blank', 'noopener')
+                }}
+              >
+                <img src="/mark-radar.png" alt="" />
+              </button>
+            </div>
             <div className="form-group">
               <label className="form-label" htmlFor="reg-number-input">Reg number *</label>
               <input
