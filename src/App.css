@@ -3570,3 +3570,30 @@
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Airports tab background ────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+.airports-page {
+  position: relative;
+}
+
+.airports-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: url('/airport-bg.PNG') bottom center / cover no-repeat;
+}
+
+.airports-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+.airports-page .airport-row {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
