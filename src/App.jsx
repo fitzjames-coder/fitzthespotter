@@ -177,7 +177,7 @@ function AirlinesTab() {
   }
 
   return (
-    <div className="page">
+    <div className="page airlines-page">
       <TopBar />
       <main className="content">
         <p className="section-label">Airlines Spotted</p>
