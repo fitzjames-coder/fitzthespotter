@@ -3502,3 +3502,41 @@
 .desktop-mode .search-results > * {
   width: 100%;
 }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Search tab celebratory background ─────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+/* Establish stacking context so ::before sits below content */
+.search-page {
+  position: relative;
+}
+
+/* Fixed wallpaper — mounts/unmounts with .search-page (Search tab only).
+   position:fixed gives a stationary image as content scrolls.
+   iOS Safari ignores background-attachment:fixed, so we use ::before instead. */
+.search-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: url('/celebration-bg.PNG') center center / cover no-repeat;
+}
+
+/* Lift all direct children above the background layer */
+.search-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Search bar wrapper — solidify so it reads clearly over the image */
+.search-page .search-bar-wrap {
+  background: rgba(22, 32, 59, 0.88);
+  border-color: rgba(246, 239, 220, 0.20);
+}
+
+/* Filter pills — solidify so they read clearly over the image */
+.search-page .search-filter-pill {
+  background: rgba(22, 32, 59, 0.82);
+  border-color: rgba(246, 239, 220, 0.22);
+}
