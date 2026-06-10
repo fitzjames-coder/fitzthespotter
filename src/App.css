@@ -3492,14 +3492,13 @@
   margin: 0;
 }
 
-/* Desktop: search results multi-column grid (flex-wrap) */
+/* Desktop: search results single column, full width of the content column */
 .desktop-mode .search-results {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 0.75rem;
 }
 
 .desktop-mode .search-results > * {
-  flex: 1 1 30%;
-  min-width: 260px;
+  width: 100%;
 }
