@@ -25,7 +25,7 @@ export default function AirportsTab({ onSelectAirport }) {
   }, [])
 
   return (
-    <div className="page">
+    <div className="page airports-page">
       <header className="top-bar">
         <span className="top-bar__wordmark" style={{ cursor: 'default' }}>
           <span className="top-bar__title--cream">Airports</span>
