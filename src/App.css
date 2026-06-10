@@ -3597,3 +3597,48 @@
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Airline detail page background ─────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+.airline-detail-page {
+  position: relative;
+}
+
+/* Make the navy gradient transparent so the illustration shows through */
+.airline-detail-page.page--navy {
+  background: transparent;
+}
+
+.airline-detail-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: url('/airline-profile-bg.PNG') bottom right / cover no-repeat;
+}
+
+.airline-detail-page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Navy glass so cream text stays readable over the light illustration */
+.airline-detail-page .reg-card {
+  background: rgba(22, 32, 59, 0.66);
+  border-color: rgba(246, 239, 220, 0.20);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.airline-detail-page .breakdown-card {
+  background: rgba(22, 32, 59, 0.66);
+  border-color: rgba(246, 239, 220, 0.20);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.airline-detail-page .section-label {
+  color: rgba(246, 239, 220, 0.92);
+}
