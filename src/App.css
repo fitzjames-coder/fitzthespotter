@@ -3472,3 +3472,33 @@
 .desktop-mode .content {
   max-width: 1100px;
 }
+
+/* ── Search home cards wrapper ──────────────────────────────────── */
+/* Mobile: display:contents makes the wrapper invisible to the flex  */
+/* layout — cards behave exactly as direct .search-content children. */
+.search-cards {
+  display: contents;
+}
+
+/* Desktop: horizontal equal-width row */
+.desktop-mode .search-cards {
+  display: flex;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.desktop-mode .search-cards > * {
+  flex: 1;
+  margin: 0;
+}
+
+/* Desktop: search results single column, full width of the content column */
+.desktop-mode .search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.desktop-mode .search-results > * {
+  width: 100%;
+}

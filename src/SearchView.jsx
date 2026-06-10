@@ -240,19 +240,21 @@ export default function SearchView() {
           </div>
         )}
 
-        <button
-          className="stats-flownin-card"
-          onClick={() => setShowFlownIn(true)}
-        >
-          <span className="stats-flownin-card__count">{flownInCount}</span>
-          <span className="stats-flownin-card__text">
-            <span className="stats-flownin-card__label">Flown-in</span>
-            <span className="stats-flownin-card__sub">View all aboard</span>
-          </span>
-          <span className="stats-flownin-card__chevron" aria-hidden="true">›</span>
-        </button>
-        <StatsCard onOpen={() => setShowStats(true)} />
-        <ManufacturersCard onOpen={() => setShowManufacturers(true)} />
+        <div className="search-cards">
+          <button
+            className="stats-flownin-card"
+            onClick={() => setShowFlownIn(true)}
+          >
+            <span className="stats-flownin-card__count">{flownInCount}</span>
+            <span className="stats-flownin-card__text">
+              <span className="stats-flownin-card__label">Flown-in</span>
+              <span className="stats-flownin-card__sub">View all aboard</span>
+            </span>
+            <span className="stats-flownin-card__chevron" aria-hidden="true">›</span>
+          </button>
+          <StatsCard onOpen={() => setShowStats(true)} />
+          <ManufacturersCard onOpen={() => setShowManufacturers(true)} />
+        </div>
       </main>
     </div>
   )
