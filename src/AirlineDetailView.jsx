@@ -284,7 +284,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   }
 
   return (
-    <div className="page page--navy">
+    <div className="page page--navy airline-detail-page">
       <AirlineHero
         airline={airline}
         regCount={regCount}
