@@ -3564,3 +3564,9 @@
   position: relative;
   z-index: 1;
 }
+
+.airlines-page .airline-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
