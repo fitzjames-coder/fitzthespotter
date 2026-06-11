@@ -3722,24 +3722,28 @@
 /* ── Airport diagram (Stage B) ───────────────────────────────────── */
 /* ════════════════════════════════════════════════════════════════ */
 
-/* Diagram layer sits absolutely behind all page content */
-.ap-diagram {
-  position: absolute;
-  inset: 0;
+/* Diagram layer fixed to viewport — stays still while content scrolls.
+   Scoped to .page--deep-blue so it never bleeds into other pages. */
+.page--deep-blue .ap-diagram {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
   opacity: 0.85;
 }
 
-.ap-diagram__svg {
+.page--deep-blue .ap-diagram__svg {
   width: 100%;
   height: 100%;
   display: block;
 }
 
 /* Radial vignette over the diagram to fade edges */
-.ap-diagram::after {
+.page--deep-blue .ap-diagram::after {
   content: '';
   position: absolute;
   inset: 0;
