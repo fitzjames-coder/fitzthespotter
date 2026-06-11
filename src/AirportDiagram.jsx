@@ -83,7 +83,7 @@ export default function AirportDiagram({ airport }) {
           <polyline
             key={i}
             points={toPoints(w.geometry)}
-            stroke="#8fa0c8"
+            stroke="rgba(251,173,25,0.50)"
             strokeWidth="1.5"
             fill="none"
             strokeLinecap="round"
