@@ -3717,3 +3717,43 @@
 .reg-profile-page .section-label {
   text-shadow: 0 1px 3px rgba(255, 255, 255, 0.6);
 }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Airport diagram (Stage B) ───────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+/* Diagram layer sits absolutely behind all page content */
+.ap-diagram {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.ap-diagram__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Radial vignette over the diagram to fade edges */
+.ap-diagram::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 55%, rgba(0,32,58,0.40) 100%);
+  pointer-events: none;
+}
+
+/* Establish positioning context so ap-diagram fills the page */
+.page--deep-blue {
+  position: relative;
+}
+
+/* Content sits above the diagram layer */
+.ap-content {
+  position: relative;
+  z-index: 1;
+}
