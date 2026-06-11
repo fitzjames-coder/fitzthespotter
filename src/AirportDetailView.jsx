@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { getAirportDiagram } from './lib/airportDiagram'
 import { FlagIcon } from './App'
 import AirportDiagram from './AirportDiagram'
 
@@ -22,6 +23,18 @@ export default function AirportDetailView({ airport, onBack }) {
   const [sightingCount, setSightingCount] = useState(0)
   const [firstHere, setFirstHere] = useState(null)
   const [recentHere, setRecentHere] = useState(null)
+
+  const [diagramGeometry, setDiagramGeometry] = useState(null)
+  const [diagramStatus, setDiagramStatus] = useState('loading')
+
+  useEffect(() => {
+    setDiagramStatus('loading')
+    setDiagramGeometry(null)
+    getAirportDiagram(airport).then(({ status, geometry }) => {
+      setDiagramStatus(status)
+      setDiagramGeometry(status === 'ok' ? geometry : null)
+    })
+  }, [airport.iata])
 
   useEffect(() => {
     if (!supabase) {
@@ -62,9 +75,14 @@ export default function AirportDetailView({ airport, onBack }) {
 
   const codes = [airport.icao, airport.iata].filter(Boolean).join(' / ')
 
+  const runwayRefs = (diagramGeometry ?? [])
+    .filter((w) => w.aeroway === 'runway' && w.ref)
+    .map((w) => w.ref)
+  const uniqueRefs = [...new Set(runwayRefs)]
+
   return (
     <div className="page page--deep-blue">
-      <AirportDiagram airport={airport} />
+      <AirportDiagram geometry={diagramGeometry} status={diagramStatus} />
       <header className="ap-top-bar">
         <button className="ap-top-bar__back" onClick={onBack} aria-label="Back to airports">
           ‹ Back
@@ -76,6 +94,11 @@ export default function AirportDetailView({ airport, onBack }) {
             <FlagIcon countryCode={airport.country_flag} />
             <span className="ap-top-bar__country">{airport.country}</span>
           </div>
+          {uniqueRefs.length > 0 && (
+            <div className="ap-top-bar__runways" style={{ fontSize: '0.72rem', color: 'rgba(246,239,220,0.7)', marginTop: '0.15rem', letterSpacing: '0.3px' }}>
+              Runways · {uniqueRefs.join(' · ')}
+            </div>
+          )}
         </div>
       </header>
 
