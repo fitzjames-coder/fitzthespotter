@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
-import { getAirportDiagram } from './lib/airportDiagram'
 import { FlagIcon } from './App'
+import AirportDiagram from './AirportDiagram'
 
 function LogoTile({ name, logoUrl }) {
   const initials = name.trim().split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 2)
@@ -22,29 +22,6 @@ export default function AirportDetailView({ airport, onBack }) {
   const [sightingCount, setSightingCount] = useState(0)
   const [firstHere, setFirstHere] = useState(null)
   const [recentHere, setRecentHere] = useState(null)
-
-  // TEMP: remove in Stage B ─────────────────────────────────────────
-  const [diagramStatus, setDiagramStatus] = useState('loading')
-  const [diagramCounts, setDiagramCounts] = useState(null)
-  const [diagramCached, setDiagramCached] = useState(false)
-  const [diagramDetail, setDiagramDetail] = useState(null)
-  useEffect(() => {
-    setDiagramStatus('loading')
-    setDiagramCounts(null)
-    setDiagramCached(false)
-    setDiagramDetail(null)
-    getAirportDiagram(airport).then(({ status, geometry, cached, detail }) => {
-      setDiagramStatus(status)
-      setDiagramCached(cached)
-      setDiagramDetail(detail ?? null)
-      if (status === 'ok' && Array.isArray(geometry)) {
-        setDiagramCounts(
-          geometry.reduce((acc, w) => { acc[w.aeroway] = (acc[w.aeroway] ?? 0) + 1; return acc }, {})
-        )
-      }
-    })
-  }, [airport.iata])
-  // ─────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (!supabase) {
@@ -87,6 +64,7 @@ export default function AirportDetailView({ airport, onBack }) {
 
   return (
     <div className="page page--deep-blue">
+      <AirportDiagram airport={airport} />
       <header className="ap-top-bar">
         <button className="ap-top-bar__back" onClick={onBack} aria-label="Back to airports">
           ‹ Back
@@ -103,25 +81,6 @@ export default function AirportDetailView({ airport, onBack }) {
 
       {loading && <p className="state-message">Loading…</p>}
       {error && <p className="state-message state-message--error">{error}</p>}
-
-      {/* TEMP: remove in Stage B */}
-      <p style={{ fontSize: '0.75rem', opacity: 0.55, padding: '0.25rem 1rem 0' }}>
-        {diagramStatus === 'loading' && 'diagram: loading…'}
-        {diagramStatus === 'unavailable' && 'diagram: unavailable'}
-        {diagramStatus === 'error' && (
-          <>
-            diagram: fetch error (will retry)
-            {diagramDetail && <><br /><span style={{ fontSize: '0.7rem' }}>{diagramDetail}</span></>}
-          </>
-        )}
-        {diagramStatus === 'ok' && (
-          <>
-            {`diagram: ok (${diagramCounts?.runway ?? 0} runways, ${diagramCounts?.taxiway ?? 0} taxiways, ${diagramCounts?.apron ?? 0} aprons)`}
-            {diagramCached ? ', from cache' : ''}
-          </>
-        )}
-      </p>
-      {/* END TEMP */}
 
       {!loading && !error && (
         <main className="content ap-content">
