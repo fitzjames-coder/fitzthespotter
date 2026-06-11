@@ -2594,7 +2594,7 @@
 
 /* ── Airport detail top bar ──────────────────────────────────────── */
 .ap-top-bar {
-  background: rgba(0, 48, 90, 0.6);
+  background: #00305a;
   border-bottom: 3px solid var(--color-amber);
   padding: 0.65rem 1rem 1rem;
   display: flex;
