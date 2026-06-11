@@ -264,10 +264,10 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
 
   return (
     <>
-      <div className="page">
+      <div className="page reg-profile-page">
         <RegTopBar reg={reg} onBack={onBack} onEdit={() => setShowEdit(true)} />
         <GalleryPlaceholder />
-        <main className="content">
+        <main className="content reg-info-area">
           <div className="section-label-row">
             <p className="section-label">
               {airline?.name ?? ''}
