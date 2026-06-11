@@ -3663,3 +3663,57 @@
   position: relative;
   z-index: 1;
 }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Registration profile page background ───────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+/* Background lives on the info area ONLY — not the full page,
+   so it never bleeds up behind the photo slot. */
+.reg-info-area {
+  position: relative;
+  overflow: hidden;
+}
+
+.reg-info-area::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url('/reg-profile-bg.PNG');
+  background-size: cover;
+  background-position: center;
+}
+
+.reg-info-area::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(246, 239, 220, 0.30);
+}
+
+.reg-info-area > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* White-glass details card — keep existing border-radius/padding */
+.reg-profile-page .info-card {
+  background: rgba(255, 255, 255, 0.80);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+  box-shadow: 0 4px 16px rgba(22, 32, 59, 0.12);
+}
+
+/* White-glass delete button — coral border and text unchanged */
+.reg-profile-page .btn-delete-reg {
+  background: rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Airline label readable over the light image */
+.reg-profile-page .section-label {
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.6);
+}
