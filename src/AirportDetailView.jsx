@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { getAirportDiagram } from './lib/airportDiagram'
 import { FlagIcon } from './App'
 
 function LogoTile({ name, logoUrl }) {
@@ -21,6 +22,27 @@ export default function AirportDetailView({ airport, onBack }) {
   const [sightingCount, setSightingCount] = useState(0)
   const [firstHere, setFirstHere] = useState(null)
   const [recentHere, setRecentHere] = useState(null)
+
+  // TEMP: remove in Stage B ─────────────────────────────────────────
+  const [diagramStatus, setDiagramStatus] = useState('loading')
+  const [diagramMeta, setDiagramMeta] = useState(null)
+  useEffect(() => {
+    setDiagramStatus('loading')
+    setDiagramMeta(null)
+    getAirportDiagram(airport).then(({ status, geometry, cached }) => {
+      setDiagramStatus(status)
+      if (status === 'ok' && Array.isArray(geometry)) {
+        const counts = geometry.reduce((acc, w) => {
+          acc[w.aeroway] = (acc[w.aeroway] ?? 0) + 1
+          return acc
+        }, {})
+        setDiagramMeta({ counts, cached })
+      } else {
+        setDiagramMeta({ cached })
+      }
+    })
+  }, [airport.iata])
+  // ─────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     if (!supabase) {
@@ -79,6 +101,22 @@ export default function AirportDetailView({ airport, onBack }) {
 
       {loading && <p className="state-message">Loading…</p>}
       {error && <p className="state-message state-message--error">{error}</p>}
+
+      {/* TEMP: remove in Stage B */}
+      <p style={{ fontSize: '0.75rem', opacity: 0.6, padding: '0.25rem 1rem 0' }}>
+        {diagramStatus === 'loading' && 'diagram: loading…'}
+        {diagramStatus === 'unavailable' && 'diagram: unavailable'}
+        {diagramStatus === 'error' && 'diagram: fetch error (will retry)'}
+        {diagramStatus === 'ok' && diagramMeta && (
+          <>
+            diagram: ok ({diagramMeta.counts?.runway ?? 0} runways,{' '}
+            {diagramMeta.counts?.taxiway ?? 0} taxiways,{' '}
+            {diagramMeta.counts?.apron ?? 0} aprons)
+            {diagramMeta.cached ? ', from cache' : ''}
+          </>
+        )}
+      </p>
+      {/* END TEMP */}
 
       {!loading && !error && (
         <main className="content ap-content">
