@@ -3642,3 +3642,24 @@
 .airline-detail-page .section-label {
   color: rgba(246, 239, 220, 0.92);
 }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Flown-in page background ───────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+.fi-page {
+  position: relative;
+}
+
+.fi-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: url('/celebration-bg.PNG') center center / cover no-repeat;
+}
+
+.fi-page > * {
+  position: relative;
+  z-index: 1;
+}
