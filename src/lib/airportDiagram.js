@@ -84,6 +84,7 @@ out geom;`
       .filter((w) => Array.isArray(w.geometry) && w.geometry.length > 1)
       .map((w) => ({
         aeroway: w.tags.aeroway,
+        ref: w.tags.ref ?? null,
         geometry: w.geometry.map((p) => ({ lat: p.lat, lon: p.lon })),
       }))
 

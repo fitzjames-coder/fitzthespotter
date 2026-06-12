@@ -1,20 +1,7 @@
-import { useEffect, useState } from 'react'
-import { getAirportDiagram } from './lib/airportDiagram'
+export default function AirportDiagram({ geometry, status }) {
+  if (status !== 'ok' || !Array.isArray(geometry) || geometry.length === 0) return null
 
-export default function AirportDiagram({ airport }) {
-  const [status, setStatus] = useState('loading')
-  const [ways, setWays] = useState(null)
-
-  useEffect(() => {
-    setStatus('loading')
-    setWays(null)
-    getAirportDiagram(airport).then(({ status: s, geometry }) => {
-      setStatus(s)
-      setWays(s === 'ok' && Array.isArray(geometry) && geometry.length > 0 ? geometry : null)
-    })
-  }, [airport.iata])
-
-  if (status !== 'ok' || !ways) return null
+  const ways = geometry
 
   // Equirectangular projection corrected for latitude
   const allPts = ways.flatMap((w) => w.geometry)
@@ -91,13 +78,21 @@ export default function AirportDiagram({ airport }) {
           />
         ))}
 
-        {/* Runways on top with dashed centreline */}
+        {/* Runways: dark casing → cream body → dashed centreline */}
         {runways.map((w, i) => (
           <g key={i}>
             <polyline
               points={toPoints(w.geometry)}
+              stroke="rgba(22,32,59,0.85)"
+              strokeWidth="13"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <polyline
+              points={toPoints(w.geometry)}
               stroke="#F6EFDC"
-              strokeWidth="8"
+              strokeWidth="10"
               fill="none"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -114,6 +109,25 @@ export default function AirportDiagram({ airport }) {
           </g>
         ))}
       </svg>
+
+      {/* North arrow — positioned top-right, clears the sticky header */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: '130px',
+          right: '22px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          opacity: 0.7,
+        }}
+      >
+        <svg width="20" height="26" viewBox="0 0 20 26">
+          <polygon points="10,0 16,16 10,12 4,16" fill="#F6EFDC" />
+        </svg>
+        <span style={{ fontFamily: 'Georgia, serif', fontSize: '0.7rem', color: '#F6EFDC', marginTop: '1px' }}>N</span>
+      </div>
     </div>
   )
 }
