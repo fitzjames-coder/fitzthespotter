@@ -249,10 +249,6 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
       })
   }, [reg?.airline_id])
 
-  useEffect(() => {
-    if (reg) window.scrollTo(0, 0)
-  }, [reg?.id])
-
   const index = siblingIds.indexOf(currentRegId)
   const hasPrev = index > 0
   const hasNext = index >= 0 && index < siblingIds.length - 1
