@@ -170,62 +170,71 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [deleteError, setDeleteError] = useState(null)
   const [flagged, setFlagged] = useState(false)
   const [siblingIds, setSiblingIds] = useState([])
+  // incremented by onSaved so the effect re-runs without changing currentRegId
+  const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => { setCurrentRegId(regId) }, [regId])
 
-  async function loadReg() {
-    if (!supabase) {
-      setError('Supabase is not configured.')
-      setLoading(false)
-      return
-    }
-    const { data, error: fetchError } = await supabase
-      .from('registrations')
-      .select(`
-        id,
-        registration,
-        airline_id,
-        first_spotted,
-        airports,
-        remark,
-        statuses,
-        flagged,
-        aircraft_types (
-          id,
-          name,
-          manufacturers (
-            id,
-            name
-          )
-        )
-      `)
-      .eq('id', currentRegId)
-      .single()
-
-    if (fetchError) {
-      setError(fetchError.message)
-      setLoading(false)
-      return
-    }
-
-    setReg(data)
-    setFlagged(Boolean(data.flagged))
-
-    const { data: ls } = await supabase
-      .from('sightings')
-      .select('airport, spotted_on')
-      .eq('registration_id', currentRegId)
-      .order('spotted_on', { ascending: false, nullsFirst: false })
-      .limit(1)
-      .maybeSingle()
-
-    setLastSighting(ls ?? null)
-    setLoading(false)
-  }
-
   useEffect(() => {
+    let active = true
+    async function loadReg() {
+      setLoading(true)
+      setError(null)
+      if (!supabase) {
+        setError('Supabase is not configured.')
+        setLoading(false)
+        return
+      }
+      const { data, error: fetchError } = await supabase
+        .from('registrations')
+        .select(`
+          id,
+          registration,
+          airline_id,
+          first_spotted,
+          airports,
+          remark,
+          statuses,
+          flagged,
+          aircraft_types (
+            id,
+            name,
+            manufacturers (
+              id,
+              name
+            )
+          )
+        `)
+        .eq('id', currentRegId)
+        .single()
+
+      if (!active) return
+
+      if (fetchError) {
+        setError(fetchError.message)
+        setLoading(false)
+        return
+      }
+
+      setReg(data)
+      setFlagged(Boolean(data.flagged))
+
+      const { data: ls } = await supabase
+        .from('sightings')
+        .select('airport, spotted_on')
+        .eq('registration_id', currentRegId)
+        .order('spotted_on', { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (!active) return
+
+      setLastSighting(ls ?? null)
+      setLoading(false)
+    }
     loadReg()
-  }, [currentRegId])
+    return () => { active = false }
+  }, [currentRegId, reloadKey])
 
   useEffect(() => {
     if (!supabase || !reg?.airline_id) return
@@ -245,14 +254,16 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const hasNext = index >= 0 && index < siblingIds.length - 1
 
   const goPrev = () => {
-    if (hasPrev) {
-      setCurrentRegId(siblingIds[index - 1])
+    const i = siblingIds.indexOf(currentRegId)
+    if (i > 0) {
+      setCurrentRegId(siblingIds[i - 1])
       window.scrollTo({ top: 0 })
     }
   }
   const goNext = () => {
-    if (hasNext) {
-      setCurrentRegId(siblingIds[index + 1])
+    const i = siblingIds.indexOf(currentRegId)
+    if (i >= 0 && i < siblingIds.length - 1) {
+      setCurrentRegId(siblingIds[i + 1])
       window.scrollTo({ top: 0 })
     }
   }
@@ -349,7 +360,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           initialAirline={airline}
           onClose={() => setShowEdit(false)}
           onSaved={() => {
-            loadReg()
+            setReloadKey((k) => k + 1)
             onChanged?.()
           }}
         />
