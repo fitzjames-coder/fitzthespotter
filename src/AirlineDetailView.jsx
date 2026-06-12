@@ -248,10 +248,12 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   if (selectedReg) {
     return (
       <RegistrationProfileView
+        key={selectedReg.id}
         regId={selectedReg.id}
         airline={airline}
         onBack={() => setSelectedReg(null)}
         onChanged={loadRegistrations}
+        onNavigate={(nextId) => setSelectedReg(prev => ({ ...prev, id: nextId }))}
       />
     )
   }

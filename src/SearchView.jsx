@@ -151,10 +151,12 @@ export default function SearchView() {
   if (selectedReg) {
     return (
       <RegistrationProfileView
+        key={selectedReg.id}
         regId={selectedReg.id}
         airline={selectedReg.airlines}
         onBack={() => setSelectedReg(null)}
         onChanged={fetchAll}
+        onNavigate={(nextId) => setSelectedReg(prev => ({ ...prev, id: nextId }))}
       />
     )
   }

@@ -94,10 +94,12 @@ export default function FlownInView({ onBack, onSelectReg }) {
   if (selectedReg) {
     return (
       <RegistrationProfileView
+        key={selectedReg.id}
         regId={selectedReg.id}
         airline={selectedReg.airlines}
         onBack={() => setSelectedReg(null)}
         onChanged={() => {}}
+        onNavigate={(nextId) => setSelectedReg(prev => ({ ...prev, id: nextId }))}
       />
     )
   }
