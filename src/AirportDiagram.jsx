@@ -115,8 +115,8 @@ export default function AirportDiagram({ geometry, status }) {
         aria-hidden="true"
         style={{
           position: 'absolute',
-          top: '88px',
-          right: '14px',
+          top: '130px',
+          right: '22px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
