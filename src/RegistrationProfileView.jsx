@@ -170,62 +170,71 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [deleteError, setDeleteError] = useState(null)
   const [flagged, setFlagged] = useState(false)
   const [siblingIds, setSiblingIds] = useState([])
+  // incremented by onSaved so the effect re-runs without changing currentRegId
+  const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => { setCurrentRegId(regId) }, [regId])
 
-  async function loadReg() {
-    if (!supabase) {
-      setError('Supabase is not configured.')
-      setLoading(false)
-      return
-    }
-    const { data, error: fetchError } = await supabase
-      .from('registrations')
-      .select(`
-        id,
-        registration,
-        airline_id,
-        first_spotted,
-        airports,
-        remark,
-        statuses,
-        flagged,
-        aircraft_types (
-          id,
-          name,
-          manufacturers (
-            id,
-            name
-          )
-        )
-      `)
-      .eq('id', currentRegId)
-      .single()
-
-    if (fetchError) {
-      setError(fetchError.message)
-      setLoading(false)
-      return
-    }
-
-    setReg(data)
-    setFlagged(Boolean(data.flagged))
-
-    const { data: ls } = await supabase
-      .from('sightings')
-      .select('airport, spotted_on')
-      .eq('registration_id', currentRegId)
-      .order('spotted_on', { ascending: false, nullsFirst: false })
-      .limit(1)
-      .maybeSingle()
-
-    setLastSighting(ls ?? null)
-    setLoading(false)
-  }
-
   useEffect(() => {
+    let active = true
+    async function loadReg() {
+      setLoading(true)
+      setError(null)
+      if (!supabase) {
+        setError('Supabase is not configured.')
+        setLoading(false)
+        return
+      }
+      const { data, error: fetchError } = await supabase
+        .from('registrations')
+        .select(`
+          id,
+          registration,
+          airline_id,
+          first_spotted,
+          airports,
+          remark,
+          statuses,
+          flagged,
+          aircraft_types (
+            id,
+            name,
+            manufacturers (
+              id,
+              name
+            )
+          )
+        `)
+        .eq('id', currentRegId)
+        .single()
+
+      if (!active) return
+
+      if (fetchError) {
+        setError(fetchError.message)
+        setLoading(false)
+        return
+      }
+
+      setReg(data)
+      setFlagged(Boolean(data.flagged))
+
+      const { data: ls } = await supabase
+        .from('sightings')
+        .select('airport, spotted_on')
+        .eq('registration_id', currentRegId)
+        .order('spotted_on', { ascending: false, nullsFirst: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (!active) return
+
+      setLastSighting(ls ?? null)
+      setLoading(false)
+    }
     loadReg()
-  }, [currentRegId])
+    return () => { active = false }
+  }, [currentRegId, reloadKey])
 
   useEffect(() => {
     if (!supabase || !reg?.airline_id) return
@@ -240,20 +249,24 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
       })
   }, [reg?.airline_id])
 
+  useEffect(() => {
+    if (reg) window.scrollTo(0, 0)
+  }, [reg?.id])
+
   const index = siblingIds.indexOf(currentRegId)
   const hasPrev = index > 0
   const hasNext = index >= 0 && index < siblingIds.length - 1
 
   const goPrev = () => {
-    if (hasPrev) {
-      setCurrentRegId(siblingIds[index - 1])
-      window.scrollTo({ top: 0 })
+    const i = siblingIds.indexOf(currentRegId)
+    if (i > 0) {
+      setCurrentRegId(siblingIds[i - 1])
     }
   }
   const goNext = () => {
-    if (hasNext) {
-      setCurrentRegId(siblingIds[index + 1])
-      window.scrollTo({ top: 0 })
+    const i = siblingIds.indexOf(currentRegId)
+    if (i >= 0 && i < siblingIds.length - 1) {
+      setCurrentRegId(siblingIds[i + 1])
     }
   }
 
@@ -278,7 +291,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     }
   }
 
-  if (loading) {
+  if (loading && !reg) {
     return (
       <div className="page">
         <p className="state-message">Loading…</p>
@@ -286,23 +299,25 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     )
   }
 
-  if (error || !reg) {
+  if (error) {
     return (
       <div className="page">
         <button className="top-bar__back" style={{ padding: '1rem' }} onClick={onBack}>
           ‹ Back
         </button>
-        <p className="state-message state-message--error">{error ?? 'Not found.'}</p>
+        <p className="state-message state-message--error">{error}</p>
       </div>
     )
   }
+
+  if (!reg) return null
 
   return (
     <>
       <div className="page reg-profile-page">
         <RegTopBar reg={reg} onBack={onBack} onEdit={() => setShowEdit(true)} />
         <GalleryPlaceholder />
-        <main className="content reg-info-area">
+        <main className="content reg-info-area" style={{ opacity: loading ? 0.6 : 1 }}>
           <div className="section-label-row">
             <p className="section-label">
               {airline?.name ?? ''}
@@ -331,16 +346,24 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           </button>
         </main>
 
-        {hasPrev && (
-          <button className="reg-nav reg-nav--prev" onClick={goPrev} aria-label="Previous registration">
-            <img src="/arrow-takeoff-prev.PNG" alt="" />
-          </button>
-        )}
-        {hasNext && (
-          <button className="reg-nav reg-nav--next" onClick={goNext} aria-label="Next registration">
-            <img src="/arrow-takeoff-next.PNG" alt="" />
-          </button>
-        )}
+        <button
+          className="reg-nav reg-nav--prev"
+          onClick={goPrev}
+          disabled={!hasPrev || loading}
+          style={{ visibility: hasPrev ? 'visible' : 'hidden' }}
+          aria-label="Previous registration"
+        >
+          <img src="/arrow-takeoff-prev.PNG" alt="" />
+        </button>
+        <button
+          className="reg-nav reg-nav--next"
+          onClick={goNext}
+          disabled={!hasNext || loading}
+          style={{ visibility: hasNext ? 'visible' : 'hidden' }}
+          aria-label="Next registration"
+        >
+          <img src="/arrow-takeoff-next.PNG" alt="" />
+        </button>
       </div>
 
       {showEdit && (
@@ -349,7 +372,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           initialAirline={airline}
           onClose={() => setShowEdit(false)}
           onSaved={() => {
-            loadReg()
+            setReloadKey((k) => k + 1)
             onChanged?.()
           }}
         />
