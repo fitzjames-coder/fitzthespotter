@@ -2331,7 +2331,7 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  padding: 0.45rem 0;
+  padding: 0.6rem 1rem;
   border-bottom: 1px solid rgba(246, 239, 220, 0.08);
 }
 
