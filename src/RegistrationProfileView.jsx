@@ -250,14 +250,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   }, [reg?.airline_id])
 
   useEffect(() => {
-    if (!reg) return
-    const id = requestAnimationFrame(() => {
-      window.scrollTo(0, 0)
-      // tiny nudge to force iOS Safari to repaint / re-hit-test after the content swap
-      window.scrollBy(0, 1)
-      window.scrollBy(0, -1)
-    })
-    return () => cancelAnimationFrame(id)
+    if (reg) window.scrollTo(0, 0)
   }, [reg?.id])
 
   const index = siblingIds.indexOf(currentRegId)
@@ -319,7 +312,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
 
   return (
     <>
-      <div className="page reg-profile-page">
+      <div className="page reg-profile-page" key={currentRegId}>
         <RegTopBar reg={reg} onBack={onBack} onEdit={() => setShowEdit(true)} />
         <GalleryPlaceholder />
         <main className="content reg-info-area">
