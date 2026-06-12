@@ -249,6 +249,17 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
       })
   }, [reg?.airline_id])
 
+  useEffect(() => {
+    if (!reg) return
+    const id = requestAnimationFrame(() => {
+      window.scrollTo(0, 0)
+      // tiny nudge to force iOS Safari to repaint / re-hit-test after the content swap
+      window.scrollBy(0, 1)
+      window.scrollBy(0, -1)
+    })
+    return () => cancelAnimationFrame(id)
+  }, [reg?.id])
+
   const index = siblingIds.indexOf(currentRegId)
   const hasPrev = index > 0
   const hasNext = index >= 0 && index < siblingIds.length - 1
@@ -257,14 +268,12 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     const i = siblingIds.indexOf(currentRegId)
     if (i > 0) {
       setCurrentRegId(siblingIds[i - 1])
-      window.scrollTo({ top: 0 })
     }
   }
   const goNext = () => {
     const i = siblingIds.indexOf(currentRegId)
     if (i >= 0 && i < siblingIds.length - 1) {
       setCurrentRegId(siblingIds[i + 1])
-      window.scrollTo({ top: 0 })
     }
   }
 
@@ -289,16 +298,9 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     }
   }
 
-  // TEMP: debug readout — remove after diagnosing nav stall
-  const _dbg = `id=${String(currentRegId).slice(-6)} idx=${siblingIds.indexOf(currentRegId)}/${siblingIds.length} load=${loading} err=${error ? 'Y' : 'n'} reg=${reg?.registration ?? '-'}` // TEMP
-  const DebugBar = () => ( // TEMP: remove after debugging
-    <div style={{ position:'fixed', top:0, left:0, right:0, zIndex:9999, background:'#16203B', color:'#FBAD19', fontSize:'11px', fontFamily:'monospace', padding:'2px 6px', pointerEvents:'none' }}>{_dbg}</div>
-  ) // TEMP
-
   if (loading) {
     return (
       <div className="page">
-        <DebugBar />{/* TEMP */}
         <p className="state-message">Loading…</p>
       </div>
     )
@@ -307,7 +309,6 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   if (error || !reg) {
     return (
       <div className="page">
-        <DebugBar />{/* TEMP */}
         <button className="top-bar__back" style={{ padding: '1rem' }} onClick={onBack}>
           ‹ Back
         </button>
@@ -319,7 +320,6 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   return (
     <>
       <div className="page reg-profile-page">
-        <DebugBar />{/* TEMP */}
         <RegTopBar reg={reg} onBack={onBack} onEdit={() => setShowEdit(true)} />
         <GalleryPlaceholder />
         <main className="content reg-info-area">
