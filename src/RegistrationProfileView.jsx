@@ -253,6 +253,19 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     if (reg) window.scrollTo(0, 0)
   }, [reg?.id])
 
+  const [tapLog, setTapLog] = useState('tap-log: (none yet)') // TEMP
+  useEffect(() => { // TEMP diagnostic — remove later
+    const onTouch = (e) => {
+      const t = e.target
+      const label = t.className && typeof t.className === 'string'
+        ? t.className
+        : (t.tagName || 'unknown')
+      setTapLog('tap: ' + String(label).slice(0, 40) + ' @' + Date.now() % 100000)
+    }
+    document.addEventListener('touchstart', onTouch, { capture: true })
+    return () => document.removeEventListener('touchstart', onTouch, { capture: true })
+  }, []) // TEMP
+
   const index = siblingIds.indexOf(currentRegId)
   const hasPrev = index > 0
   const hasNext = index >= 0 && index < siblingIds.length - 1
@@ -291,9 +304,13 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     }
   }
 
+  // TEMP: shared tap-log bar — remove after debugging
+  const TapLogBar = () => <div style={{ position:'fixed', bottom:0, left:0, right:0, zIndex:99999, background:'#16203B', color:'#FBAD19', fontSize:'11px', fontFamily:'monospace', padding:'3px 6px', pointerEvents:'none' }}>{tapLog}</div> // TEMP
+
   if (loading && !reg) {
     return (
       <div className="page">
+        <TapLogBar />{/* TEMP */}
         <p className="state-message">Loading…</p>
       </div>
     )
@@ -302,6 +319,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   if (error) {
     return (
       <div className="page">
+        <TapLogBar />{/* TEMP */}
         <button className="top-bar__back" style={{ padding: '1rem' }} onClick={onBack}>
           ‹ Back
         </button>
@@ -315,6 +333,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   return (
     <>
       <div className="page reg-profile-page">
+        <TapLogBar />{/* TEMP */}
         <RegTopBar reg={reg} onBack={onBack} onEdit={() => setShowEdit(true)} />
         <GalleryPlaceholder />
         <main className="content reg-info-area" style={{ opacity: loading ? 0.6 : 1 }}>
