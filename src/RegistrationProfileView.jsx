@@ -250,7 +250,21 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   }, [reg?.airline_id])
 
   useEffect(() => {
-    if (reg) window.scrollTo(0, 0)
+    if (!reg) return
+    window.scrollTo(0, 0)
+    const el = document.querySelector('.reg-profile-page')
+    if (!el) return
+    const raf1 = requestAnimationFrame(() => {
+      el.style.transform = 'translateZ(0)'
+      const raf2 = requestAnimationFrame(() => {
+        el.style.transform = ''
+      })
+      el._raf2 = raf2
+    })
+    return () => {
+      cancelAnimationFrame(raf1)
+      if (el._raf2) cancelAnimationFrame(el._raf2)
+    }
   }, [reg?.id])
 
   const index = siblingIds.indexOf(currentRegId)
