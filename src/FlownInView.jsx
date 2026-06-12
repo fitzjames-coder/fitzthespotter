@@ -5,12 +5,12 @@ import RegistrationProfileView from './RegistrationProfileView'
 import markFlownIn from './assets/marks/mark-flown-in.png'
 
 const CARD_PALETTE = [
-  { bg: '#2C427B', dark: true  },
-  { bg: '#005281', dark: true  },
-  { bg: '#E8607A', dark: true  },
-  { bg: '#FBAD19', dark: false },
-  { bg: '#F6EFDC', dark: false },
-  { bg: '#16203B', dark: true  },
+  { tint: 'rgba(44,66,123,0.34)',   thumb: 'rgba(44,66,123,0.60)'   },
+  { tint: 'rgba(0,82,129,0.34)',    thumb: 'rgba(0,82,129,0.60)'    },
+  { tint: 'rgba(232,96,122,0.34)',  thumb: 'rgba(232,96,122,0.60)'  },
+  { tint: 'rgba(251,173,25,0.30)',  thumb: 'rgba(251,173,25,0.55)'  },
+  { tint: 'rgba(246,239,220,0.22)', thumb: 'rgba(246,239,220,0.42)' },
+  { tint: 'rgba(22,32,59,0.50)',    thumb: 'rgba(22,32,59,0.70)'    },
 ]
 
 function thumbAbbrev(model) {
@@ -19,20 +19,19 @@ function thumbAbbrev(model) {
 }
 
 function FlownInCard({ reg, index, onSelect }) {
-  const palette = CARD_PALETTE[index % 6]
-  const textColor   = palette.dark ? '#F6EFDC' : '#16203B'
-  const subColor    = palette.dark ? 'rgba(246,239,220,0.62)' : 'rgba(22,32,59,0.55)'
-  const badgeBg     = palette.dark ? 'rgba(246,239,220,0.14)' : 'rgba(22,32,59,0.10)'
-  const typeName    = reg.aircraft_types?.name ?? null
-  const abbrev      = typeName ? thumbAbbrev(typeName) : ''
+  const palette   = CARD_PALETTE[index % 6]
+  const textColor = '#F6EFDC'
+  const subColor  = 'rgba(246,239,220,0.66)'
+  const typeName  = reg.aircraft_types?.name ?? null
+  const abbrev    = typeName ? thumbAbbrev(typeName) : ''
 
   return (
     <button
       className="fi-card"
-      style={{ background: palette.bg }}
+      style={{ background: palette.tint }}
       onClick={() => onSelect(reg)}
     >
-      <div className="fi-card__thumb" style={{ background: badgeBg }}>
+      <div className="fi-card__thumb" style={{ background: palette.thumb }}>
         <span className="fi-card__thumb-text" style={{ color: subColor }}>{abbrev}</span>
       </div>
       <div className="fi-card__body">
