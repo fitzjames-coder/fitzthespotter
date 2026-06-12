@@ -3763,3 +3763,29 @@
   position: relative;
   z-index: 1;
 }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Reg-to-reg navigation arrows ───────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+.reg-profile-page { position: relative; }
+
+.reg-nav {
+  position: absolute;
+  bottom: 84px;
+  width: 54px;
+  height: auto;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  z-index: 6;
+  opacity: 0.95;
+}
+
+.reg-nav:active { transform: scale(0.94); }
+
+.reg-nav img { width: 100%; height: auto; display: block; }
+
+.reg-nav--prev { left: 14px; }
+.reg-nav--next { right: 14px; }
