@@ -159,6 +159,7 @@ function DeleteConfirmSheet({ regId, onConfirm, onCancel, deleting }) {
 }
 
 export default function RegistrationProfileView({ regId, airline, onBack, onChanged }) {
+  const [currentRegId, setCurrentRegId] = useState(regId)
   const [reg, setReg] = useState(null)
   const [lastSighting, setLastSighting] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -168,6 +169,9 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(null)
   const [flagged, setFlagged] = useState(false)
+  const [siblingIds, setSiblingIds] = useState([])
+
+  useEffect(() => { setCurrentRegId(regId) }, [regId])
 
   async function loadReg() {
     if (!supabase) {
@@ -180,6 +184,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
       .select(`
         id,
         registration,
+        airline_id,
         first_spotted,
         airports,
         remark,
@@ -194,7 +199,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           )
         )
       `)
-      .eq('id', regId)
+      .eq('id', currentRegId)
       .single()
 
     if (fetchError) {
@@ -209,7 +214,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     const { data: ls } = await supabase
       .from('sightings')
       .select('airport, spotted_on')
-      .eq('registration_id', regId)
+      .eq('registration_id', currentRegId)
       .order('spotted_on', { ascending: false, nullsFirst: false })
       .limit(1)
       .maybeSingle()
@@ -220,20 +225,50 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
 
   useEffect(() => {
     loadReg()
-  }, [regId])
+  }, [currentRegId])
+
+  useEffect(() => {
+    if (!supabase || !reg?.airline_id) return
+    supabase
+      .from('registrations')
+      .select('id')
+      .eq('airline_id', reg.airline_id)
+      .order('first_spotted', { ascending: true, nullsFirst: false })
+      .order('registration', { ascending: true })
+      .then(({ data }) => {
+        setSiblingIds((data ?? []).map((r) => r.id))
+      })
+  }, [reg?.airline_id])
+
+  const index = siblingIds.indexOf(currentRegId)
+  const hasPrev = index > 0
+  const hasNext = index >= 0 && index < siblingIds.length - 1
+
+  const goPrev = () => {
+    if (hasPrev) {
+      setCurrentRegId(siblingIds[index - 1])
+      window.scrollTo({ top: 0 })
+    }
+  }
+  const goNext = () => {
+    if (hasNext) {
+      setCurrentRegId(siblingIds[index + 1])
+      window.scrollTo({ top: 0 })
+    }
+  }
 
   async function handleToggleFlag() {
     const next = !flagged
     setFlagged(next)
     if (supabase) {
-      await supabase.from('registrations').update({ flagged: next }).eq('id', regId)
+      await supabase.from('registrations').update({ flagged: next }).eq('id', currentRegId)
     }
   }
 
   async function handleDelete() {
     setDeleting(true)
     setDeleteError(null)
-    const { error: err } = await supabase.from('registrations').delete().eq('id', regId)
+    const { error: err } = await supabase.from('registrations').delete().eq('id', currentRegId)
     setDeleting(false)
     if (err) {
       setDeleteError(err.message)
@@ -295,6 +330,17 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
             Delete registration
           </button>
         </main>
+
+        {hasPrev && (
+          <button className="reg-nav reg-nav--prev" onClick={goPrev} aria-label="Previous registration">
+            <img src="/arrow-takeoff-prev.PNG" alt="" />
+          </button>
+        )}
+        {hasNext && (
+          <button className="reg-nav reg-nav--next" onClick={goNext} aria-label="Next registration">
+            <img src="/arrow-takeoff-next.PNG" alt="" />
+          </button>
+        )}
       </div>
 
       {showEdit && (
@@ -311,7 +357,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
 
       {showDeleteConfirm && (
         <DeleteConfirmSheet
-          regId={regId}
+          regId={currentRegId}
           onConfirm={handleDelete}
           onCancel={() => setShowDeleteConfirm(false)}
           deleting={deleting}
