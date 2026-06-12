@@ -3153,7 +3153,7 @@
 /* ════════════════════════════════════════════════════════════════ */
 
 .fi-page {
-  background: var(--color-ink);
+  background: linear-gradient(155deg, #243a6b 0%, #16203B 30%, #14465c 58%, #5a2f3b 80%, #16203B 100%);
 }
 
 .fi-page .section-label {
@@ -3251,7 +3251,7 @@
 /* Per-card base — dynamic bg/text colours come from JSX inline styles */
 .fi-card {
   width: 100%;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 12px;
   padding: 0.65rem 0.9rem;
   display: flex;
@@ -3261,7 +3261,9 @@
   text-align: left;
   cursor: pointer;
   position: relative;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
 }
 
 .fi-card__thumb {
