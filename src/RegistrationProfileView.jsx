@@ -291,7 +291,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     }
   }
 
-  if (loading) {
+  if (loading && !reg) {
     return (
       <div className="page">
         <p className="state-message">Loading…</p>
@@ -299,23 +299,25 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     )
   }
 
-  if (error || !reg) {
+  if (error) {
     return (
       <div className="page">
         <button className="top-bar__back" style={{ padding: '1rem' }} onClick={onBack}>
           ‹ Back
         </button>
-        <p className="state-message state-message--error">{error ?? 'Not found.'}</p>
+        <p className="state-message state-message--error">{error}</p>
       </div>
     )
   }
 
+  if (!reg) return null
+
   return (
     <>
-      <div className="page reg-profile-page" key={currentRegId}>
+      <div className="page reg-profile-page">
         <RegTopBar reg={reg} onBack={onBack} onEdit={() => setShowEdit(true)} />
         <GalleryPlaceholder />
-        <main className="content reg-info-area">
+        <main className="content reg-info-area" style={{ opacity: loading ? 0.6 : 1 }}>
           <div className="section-label-row">
             <p className="section-label">
               {airline?.name ?? ''}
@@ -344,16 +346,24 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           </button>
         </main>
 
-        {hasPrev && (
-          <button className="reg-nav reg-nav--prev" onClick={goPrev} aria-label="Previous registration">
-            <img src="/arrow-takeoff-prev.PNG" alt="" />
-          </button>
-        )}
-        {hasNext && (
-          <button className="reg-nav reg-nav--next" onClick={goNext} aria-label="Next registration">
-            <img src="/arrow-takeoff-next.PNG" alt="" />
-          </button>
-        )}
+        <button
+          className="reg-nav reg-nav--prev"
+          onClick={goPrev}
+          disabled={!hasPrev || loading}
+          style={{ visibility: hasPrev ? 'visible' : 'hidden' }}
+          aria-label="Previous registration"
+        >
+          <img src="/arrow-takeoff-prev.PNG" alt="" />
+        </button>
+        <button
+          className="reg-nav reg-nav--next"
+          onClick={goNext}
+          disabled={!hasNext || loading}
+          style={{ visibility: hasNext ? 'visible' : 'hidden' }}
+          aria-label="Next registration"
+        >
+          <img src="/arrow-takeoff-next.PNG" alt="" />
+        </button>
       </div>
 
       {showEdit && (
