@@ -24,6 +24,8 @@ export default function AirportDetailView({ airport, onBack }) {
   const [firstHere, setFirstHere] = useState(null)
   const [recentHere, setRecentHere] = useState(null)
 
+  const [showSkyline, setShowSkyline] = useState(false)
+
   const [diagramGeometry, setDiagramGeometry] = useState(null)
   const [diagramStatus, setDiagramStatus] = useState('loading')
 
@@ -75,6 +77,9 @@ export default function AirportDetailView({ airport, onBack }) {
 
   const codes = [airport.icao, airport.iata].filter(Boolean).join(' / ')
 
+  const SKYLINE_IMAGES = { OKA: '/oka-hero.PNG' }
+  const skylineImage = SKYLINE_IMAGES[airport.iata] || null
+
   const runwayRefs = (diagramGeometry ?? [])
     .filter((w) => w.aeroway === 'runway' && w.ref)
     .map((w) => w.ref)
@@ -100,6 +105,14 @@ export default function AirportDetailView({ airport, onBack }) {
             </div>
           )}
         </div>
+        {skylineImage && (
+          <img
+            className="ap-skyline-thumb"
+            src={skylineImage}
+            alt={`${airport.name} skyline`}
+            onClick={() => setShowSkyline(true)}
+          />
+        )}
       </header>
 
       {loading && <p className="state-message">Loading…</p>}
@@ -146,6 +159,12 @@ export default function AirportDetailView({ airport, onBack }) {
             />
           )}
         </main>
+      )}
+
+      {showSkyline && skylineImage && (
+        <div className="ap-skyline-overlay" onClick={() => setShowSkyline(false)}>
+          <img className="ap-skyline-overlay__img" src={skylineImage} alt={`${airport.name}`} />
+        </div>
       )}
     </div>
   )
