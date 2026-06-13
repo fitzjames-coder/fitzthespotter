@@ -3812,3 +3812,22 @@
 
 .reg-nav--prev { left: 14px; }
 .reg-nav--next { right: 14px; }
+
+/* ════════════════════════════════════════════════════════════════ */
+/* ── Airport skyline band ────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════ */
+
+.ap-skyline {
+  width: 100%;
+  margin-top: 1.25rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  line-height: 0;
+}
+
+.ap-skyline__img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  object-position: center 42%;
+  display: block;
+}

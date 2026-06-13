@@ -75,6 +75,9 @@ export default function AirportDetailView({ airport, onBack }) {
 
   const codes = [airport.icao, airport.iata].filter(Boolean).join(' / ')
 
+  const SKYLINE_IMAGES = { OKA: '/oka-hero.PNG' }
+  const skylineImage = SKYLINE_IMAGES[airport.iata] || null
+
   const runwayRefs = (diagramGeometry ?? [])
     .filter((w) => w.aeroway === 'runway' && w.ref)
     .map((w) => w.ref)
@@ -144,6 +147,12 @@ export default function AirportDetailView({ airport, onBack }) {
               src={airport.runway_image_url}
               alt={`${airport.iata} runway`}
             />
+          )}
+
+          {skylineImage && (
+            <div className="ap-skyline">
+              <img className="ap-skyline__img" src={skylineImage} alt={`${airport.name} skyline`} />
+            </div>
           )}
         </main>
       )}
