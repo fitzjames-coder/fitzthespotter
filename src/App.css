@@ -2605,6 +2605,29 @@
   z-index: 10;
 }
 
+/* ── OKA-specific sunset hero header ────────────────────────────── */
+.ap-top-bar--oka {
+  position: relative;
+  background-image:
+    linear-gradient(180deg, rgba(22,32,59,0.18) 0%, rgba(22,32,59,0.30) 55%, rgba(22,32,59,0.62) 100%),
+    url('/oka-hero.PNG');
+  background-size: cover;
+  background-position: center 38%;
+  background-repeat: no-repeat;
+  border-bottom: 3px solid var(--color-amber);
+}
+
+/* lift text legibility over the bright sky */
+.ap-top-bar--oka .ap-top-bar__name {
+  text-shadow: 0 2px 10px rgba(22,32,59,0.55);
+}
+.ap-top-bar--oka .ap-top-bar__back,
+.ap-top-bar--oka .ap-top-bar__codes,
+.ap-top-bar--oka .ap-top-bar__country,
+.ap-top-bar--oka .ap-top-bar__runways {
+  text-shadow: 0 1px 6px rgba(22,32,59,0.55);
+}
+
 .ap-top-bar__back {
   background: none;
   border: none;

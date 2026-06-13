@@ -83,7 +83,7 @@ export default function AirportDetailView({ airport, onBack }) {
   return (
     <div className="page page--deep-blue">
       <AirportDiagram geometry={diagramGeometry} status={diagramStatus} />
-      <header className="ap-top-bar">
+      <header className={`ap-top-bar${airport.iata === 'OKA' ? ' ap-top-bar--oka' : ''}`}>
         <button className="ap-top-bar__back" onClick={onBack} aria-label="Back to airports">
           ‹ Back
         </button>
