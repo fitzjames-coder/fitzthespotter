@@ -23,6 +23,7 @@ export default function AirportDetailView({ airport, onBack }) {
   const [sightingCount, setSightingCount] = useState(0)
   const [firstHere, setFirstHere] = useState(null)
   const [recentHere, setRecentHere] = useState(null)
+  const [showSkyline, setShowSkyline] = useState(false)
 
   const [diagramGeometry, setDiagramGeometry] = useState(null)
   const [diagramStatus, setDiagramStatus] = useState('loading')
@@ -103,6 +104,14 @@ export default function AirportDetailView({ airport, onBack }) {
             </div>
           )}
         </div>
+        {skylineImage && (
+          <img
+            className="ap-skyline-thumb"
+            src={skylineImage}
+            alt={`${airport.name} skyline`}
+            onClick={() => setShowSkyline(true)}
+          />
+        )}
       </header>
 
       {loading && <p className="state-message">Loading…</p>}
@@ -155,6 +164,12 @@ export default function AirportDetailView({ airport, onBack }) {
             </div>
           )}
         </main>
+      )}
+
+      {showSkyline && skylineImage && (
+        <div className="ap-skyline-overlay" onClick={() => setShowSkyline(false)}>
+          <img className="ap-skyline-overlay__img" src={skylineImage} alt={`${airport.name}`} />
+        </div>
       )}
     </div>
   )
