@@ -105,13 +105,17 @@ export default function AirportDetailView({ airport, onBack }) {
             </div>
           )}
         </div>
-        {skylineImage && (
+        {skylineImage ? (
           <img
             className="ap-skyline-thumb"
             src={skylineImage}
             alt={`${airport.name} skyline`}
             onClick={() => setShowSkyline(true)}
           />
+        ) : (
+          <div className="ap-skyline-thumb ap-skyline-thumb--empty" aria-label="Add a photo (coming soon)">
+            <span className="ap-skyline-thumb__plus">+</span>
+          </div>
         )}
       </header>
 
