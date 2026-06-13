@@ -3818,16 +3818,22 @@
 /* ════════════════════════════════════════════════════════════════ */
 
 .ap-skyline {
-  width: 100%;
-  margin-top: 1.25rem;
-  border-top: 1px solid rgba(255,255,255,0.08);
+  position: relative;
+  z-index: 1;
+  width: calc(100% + 2rem);
+  margin-left: -1rem;
+  margin-right: -1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  background: #00305a;
+  border-top: 2px solid var(--color-amber);
   line-height: 0;
 }
 
 .ap-skyline__img {
   width: 100%;
-  height: 160px;
+  height: 150px;
   object-fit: cover;
-  object-position: center 42%;
+  object-position: center 45%;
   display: block;
 }
