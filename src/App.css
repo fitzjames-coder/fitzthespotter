@@ -3553,6 +3553,28 @@
   display: none;
 }
 
+/* Wide 16:9 background images for desktop — swap in the desktop assets */
+.desktop-mode .airports-page::before {
+  background-image: url('/airport-bg-desktop.PNG');
+  background-size: cover; background-position: center center; background-repeat: no-repeat;
+}
+.desktop-mode .airlines-page::before {
+  background-image: url('/celebration-bg-desktop.PNG');
+  background-size: cover; background-position: center center; background-repeat: no-repeat;
+}
+.desktop-mode .fi-page::before {
+  background-image: url('/celebration-bg-desktop.PNG');
+  background-size: cover; background-position: center center; background-repeat: no-repeat;
+}
+.desktop-mode .airline-detail-page::before {
+  background-image: url('/airline-profile-bg-desktop.PNG');
+  background-size: cover; background-position: center center; background-repeat: no-repeat;
+}
+.desktop-mode .search-page::before {
+  background-image: url('/working-bg-desktop.PNG');
+  background-size: cover; background-position: center center; background-repeat: no-repeat;
+}
+
 /* ════════════════════════════════════════════════════════════════ */
 /* ── Search tab celebratory background ─────────────────────────── */
 /* ════════════════════════════════════════════════════════════════ */
