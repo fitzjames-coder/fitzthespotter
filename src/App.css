@@ -3505,6 +3505,54 @@
   width: 100%;
 }
 
+/* Airports list → 3-across large tiles (desktop only) */
+.desktop-mode .airport-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.desktop-mode .airport-list > li {
+  margin: 0;
+}
+.desktop-mode .airport-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  min-height: 120px;
+  padding: 20px;
+  border-radius: 16px;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.desktop-mode .airport-row:hover {
+  background: rgba(255,255,255,0.09);
+  border-color: var(--color-amber);
+}
+.desktop-mode .airport-row__iata {
+  font-size: 2rem;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.desktop-mode .airport-row__body {
+  flex: none;
+}
+.desktop-mode .airport-row__name {
+  font-size: 1.05rem;
+}
+.desktop-mode .airport-row__country {
+  margin-top: 6px;
+}
+/* the chevron is a row affordance; hide it in tile layout */
+.desktop-mode .airport-row__chevron {
+  display: none;
+}
+
 /* ════════════════════════════════════════════════════════════════ */
 /* ── Search tab celebratory background ─────────────────────────── */
 /* ════════════════════════════════════════════════════════════════ */
