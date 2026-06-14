@@ -3575,6 +3575,28 @@
   background-size: cover; background-position: center center; background-repeat: no-repeat;
 }
 
+/* Consistent hover highlight on list cards (desktop only) */
+/* .airline-card has border:none so use box-shadow glow instead of border-color */
+.desktop-mode .airline-card:hover {
+  background: rgba(255,255,255,0.09);
+  box-shadow: 0 0 0 1.5px var(--color-amber), 0 1px 4px rgba(22,32,59,0.10);
+}
+/* .search-result-card has a 1px solid border — border-color works directly */
+.desktop-mode .search-result-card:hover {
+  background: rgba(255,255,255,0.09);
+  border-color: var(--color-amber);
+}
+/* Manufacturer tiles have border:none — upgrade faint hover with amber glow */
+.desktop-mode .mfr-gallery-tile:hover {
+  background: rgba(246,239,220,0.05);
+  box-shadow: 0 0 0 1.5px var(--color-amber);
+}
+/* .fi-card has a 1px solid border; background is set inline per cycle-colour so don't override it */
+.desktop-mode .fi-card:hover {
+  border-color: var(--color-amber) !important;
+  filter: brightness(1.06);
+}
+
 /* ════════════════════════════════════════════════════════════════ */
 /* ── Search tab celebratory background ─────────────────────────── */
 /* ════════════════════════════════════════════════════════════════ */
