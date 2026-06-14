@@ -3559,7 +3559,7 @@
   background-size: cover; background-position: center center; background-repeat: no-repeat;
 }
 .desktop-mode .airlines-page::before {
-  background-image: url('/celebration-bg-desktop.PNG');
+  background-image: url('/working-bg-desktop.PNG');
   background-size: cover; background-position: center center; background-repeat: no-repeat;
 }
 .desktop-mode .fi-page::before {
@@ -3571,7 +3571,7 @@
   background-size: cover; background-position: center center; background-repeat: no-repeat;
 }
 .desktop-mode .search-page::before {
-  background-image: url('/working-bg-desktop.PNG');
+  background-image: url('/celebration-bg-desktop.PNG');
   background-size: cover; background-position: center center; background-repeat: no-repeat;
 }
 
