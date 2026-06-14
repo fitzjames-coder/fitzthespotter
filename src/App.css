@@ -3553,6 +3553,17 @@
   display: none;
 }
 
+/* Tame over-zoomed page backgrounds on desktop */
+.desktop-mode .search-page::before,
+.desktop-mode .airlines-page::before,
+.desktop-mode .airports-page::before,
+.desktop-mode .fi-page::before {
+  background-size: auto 100% !important;   /* scale to viewport HEIGHT, keep aspect — stops the runaway width zoom */
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
+  background-color: #00305a;               /* fill any side gaps with the deep navy so edges aren't bare */
+}
+
 /* ════════════════════════════════════════════════════════════════ */
 /* ── Search tab celebratory background ─────────────────────────── */
 /* ════════════════════════════════════════════════════════════════ */
