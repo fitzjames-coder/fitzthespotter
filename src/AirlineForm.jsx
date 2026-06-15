@@ -8,6 +8,7 @@ export default function AirlineForm({ initialName, onCancel, onCreated }) {
   const [countrySearch, setCountrySearch] = useState('')
   const [selectedCountry, setSelectedCountry] = useState(null)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [logoFile, setLogoFile] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
 
@@ -30,18 +31,41 @@ export default function AirlineForm({ initialName, onCancel, onCreated }) {
     if (!supabase) { setSaveError('Supabase is not configured.'); return }
     setSaving(true)
     setSaveError(null)
-    const { data, error: err } = await supabase
-      .from('airlines')
-      .insert({
-        name: name.trim(),
-        country: selectedCountry.name,
-        country_flag: selectedCountry.code.toUpperCase(),
-      })
-      .select('id, name, country, country_flag')
-      .single()
-    setSaving(false)
-    if (err) { setSaveError(err.message); return }
-    onCreated(data)
+    try {
+      let logoUrl = null
+      if (logoFile) {
+        const base64 = await new Promise((resolve, reject) => {
+          const r = new FileReader()
+          r.onload = () => resolve(String(r.result).split(',')[1])
+          r.onerror = reject
+          r.readAsDataURL(logoFile)
+        })
+        const resp = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileBase64: base64, contentType: logoFile.type, keyPrefix: 'airline-logos' }),
+        })
+        const uploadData = await resp.json()
+        if (!resp.ok) throw new Error(uploadData.error || 'Logo upload failed')
+        logoUrl = uploadData.url
+      }
+      const { data, error: err } = await supabase
+        .from('airlines')
+        .insert({
+          name: name.trim(),
+          country: selectedCountry.name,
+          country_flag: selectedCountry.code.toUpperCase(),
+          logo_url: logoUrl,
+        })
+        .select('id, name, country, country_flag, logo_url')
+        .single()
+      setSaving(false)
+      if (err) { setSaveError(err.message); return }
+      onCreated(data)
+    } catch (e) {
+      setSaving(false)
+      setSaveError(e?.message || 'Save failed')
+    }
   }
 
   return (
@@ -104,6 +128,17 @@ export default function AirlineForm({ initialName, onCancel, onCreated }) {
                   </div>
                 )}
               </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="airline-logo-input">Airline logo (optional)</label>
+              <input
+                id="airline-logo-input"
+                className="form-input"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setLogoFile(e.target.files[0] ?? null)}
+              />
             </div>
           </div>
 
