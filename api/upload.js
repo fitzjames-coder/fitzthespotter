@@ -1,3 +1,4 @@
+// redeploy touch — refresh env vars
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
 
 export const config = { api: { bodyParser: { sizeLimit: '10mb' } } }
