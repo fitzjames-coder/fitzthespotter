@@ -5,6 +5,7 @@ import RegistrationProfileView from './RegistrationProfileView'
 import StatsView from './StatsView'
 import ManufacturersView from './ManufacturersView'
 import FlownInView from './FlownInView'
+import AirlinesGalleryView from './AirlinesGalleryView'
 
 function SearchTopBar() {
   const [showForm, setShowForm] = useState(false)
@@ -70,6 +71,14 @@ function StatsCard({ onOpen }) {
   )
 }
 
+function AirlinesCard({ onOpen }) {
+  return (
+    <button className="stats-card" onClick={onOpen}>
+      <span className="stats-card__title">Airlines Spotted</span>
+    </button>
+  )
+}
+
 function ManufacturersCard({ onOpen }) {
   return (
     <button className="stats-card" onClick={onOpen}>
@@ -91,6 +100,7 @@ export default function SearchView() {
   const [showStats, setShowStats] = useState(false)
   const [showManufacturers, setShowManufacturers] = useState(false)
   const [showFlownIn, setShowFlownIn] = useState(false)
+  const [showAirlines, setShowAirlines] = useState(false)
 
   function fetchAll() {
     if (!supabase) {
@@ -176,6 +186,10 @@ export default function SearchView() {
     )
   }
 
+  if (showAirlines) {
+    return <AirlinesGalleryView onBack={() => setShowAirlines(false)} />
+  }
+
   return (
     <div className="page search-page">
       <SearchTopBar />
@@ -253,6 +267,7 @@ export default function SearchView() {
             <span className="stats-flownin-card__chevron" aria-hidden="true">›</span>
           </button>
           <StatsCard onOpen={() => setShowStats(true)} />
+          <AirlinesCard onOpen={() => setShowAirlines(true)} />
           <ManufacturersCard onOpen={() => setShowManufacturers(true)} />
         </div>
       </main>

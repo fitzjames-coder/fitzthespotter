@@ -347,16 +347,6 @@ export default function StatsView({ onBack }) {
               <span className="stats-headline__label">Total Unique Registrations</span>
             </div>
 
-            {stats.airlinesSpotted.length > 0 && (
-              <StatCard title="Airlines spotted">
-                <div className="stat-logo-grid">
-                  {stats.airlinesSpotted.map((airline) => (
-                    <LogoTile key={airline.id} name={airline.name} logoUrl={airline.logo_url} />
-                  ))}
-                </div>
-              </StatCard>
-            )}
-
             <StatCard title="Counts">
               <div className="stat-mini-tiles">
                 <MiniTile label="Airlines"      value={stats.airlines}      />
