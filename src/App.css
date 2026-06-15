@@ -3596,6 +3596,16 @@
   border-color: var(--color-amber) !important;
   filter: brightness(1.06);
 }
+/* .reg-card has a 1px solid border — border-color works directly */
+.desktop-mode .reg-card:hover {
+  background: rgba(255,255,255,0.09);
+  border-color: var(--color-amber);
+}
+/* .stats-flownin-card uses a gradient-border background trick; overriding
+   background would destroy the gradient, so use an amber glow ring instead */
+.desktop-mode .stats-flownin-card:hover {
+  box-shadow: 0 0 0 1.5px var(--color-amber);
+}
 
 /* ════════════════════════════════════════════════════════════════ */
 /* ── Search tab celebratory background ─────────────────────────── */
