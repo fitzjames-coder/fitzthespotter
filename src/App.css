@@ -3607,6 +3607,19 @@
   box-shadow: 0 0 0 1.5px var(--color-amber);
 }
 
+/* Manufacturers: 4-across larger tiles on desktop */
+.desktop-mode .mfr-gallery {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.1rem;
+}
+
+/* Flown-in: 3-across grid on desktop (was single column) */
+.desktop-mode .fi-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.9rem;
+}
+
 /* ════════════════════════════════════════════════════════════════ */
 /* ── Search tab celebratory background ─────────────────────────── */
 /* ════════════════════════════════════════════════════════════════ */
