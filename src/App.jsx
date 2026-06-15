@@ -60,16 +60,30 @@ function RegCountPill({ count }) {
   )
 }
 
+function cardInitials(name) {
+  if (!name) return '?'
+  const words = name.trim().split(/\s+/)
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase()
+  return (words[0][0] + words[1][0]).toUpperCase()
+}
+
 function AirlineCard({ airline, regCount, onSelect }) {
   const isClosed = airline.is_closed
   return (
     <button className="airline-card" onClick={() => onSelect(airline)}>
       <div className="airline-card__main">
-        <FlagIcon countryCode={airline.country_flag} />
+        <div className="airline-card__logo">
+          {airline.logo_url
+            ? <img className="airline-card__logo-img" src={airline.logo_url} alt="" />
+            : <span className="airline-card__logo-initials">{cardInitials(airline.name)}</span>}
+        </div>
         <div className="airline-card__text">
           <span className="airline-card__name">{airline.name}</span>
-          {airline.country && (
-            <span className="airline-card__country">{airline.country}</span>
+          {(airline.country_flag || airline.country) && (
+            <span className="airline-card__country">
+              <FlagIcon countryCode={airline.country_flag} />
+              {airline.country}
+            </span>
           )}
         </div>
       </div>
