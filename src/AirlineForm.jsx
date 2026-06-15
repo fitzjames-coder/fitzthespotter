@@ -3,14 +3,23 @@ import { supabase } from './lib/supabaseClient'
 import { FlagIcon } from './App'
 import { COUNTRIES } from './data/countries'
 
-export default function AirlineForm({ initialName, onCancel, onCreated }) {
-  const [name, setName] = useState(initialName ?? '')
-  const [countrySearch, setCountrySearch] = useState('')
-  const [selectedCountry, setSelectedCountry] = useState(null)
+export default function AirlineForm({ initialName, existing, onCancel, onCreated, onUpdated, onDeleted }) {
+  const isEdit = Boolean(existing)
+
+  const initialCountry = isEdit
+    ? (COUNTRIES.find((c) => c.code.toUpperCase() === (existing.country_flag || '').toUpperCase()) ?? null)
+    : null
+
+  const [name, setName] = useState(existing?.name ?? initialName ?? '')
+  const [countrySearch, setCountrySearch] = useState(existing?.country ?? '')
+  const [selectedCountry, setSelectedCountry] = useState(initialCountry)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [logoFile, setLogoFile] = useState(null)
+  const [logoUrl, setLogoUrl] = useState(existing?.logo_url ?? null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const filtered = countrySearch.trim()
     ? COUNTRIES.filter((c) =>
@@ -32,7 +41,7 @@ export default function AirlineForm({ initialName, onCancel, onCreated }) {
     setSaving(true)
     setSaveError(null)
     try {
-      let logoUrl = null
+      let finalLogoUrl = logoUrl
       if (logoFile) {
         const base64 = await new Promise((resolve, reject) => {
           const r = new FileReader()
@@ -47,32 +56,58 @@ export default function AirlineForm({ initialName, onCancel, onCreated }) {
         })
         const uploadData = await resp.json()
         if (!resp.ok) throw new Error(uploadData.error || 'Logo upload failed')
-        logoUrl = uploadData.url
+        finalLogoUrl = uploadData.url
       }
-      const { data, error: err } = await supabase
-        .from('airlines')
-        .insert({
-          name: name.trim(),
-          country: selectedCountry.name,
-          country_flag: selectedCountry.code.toUpperCase(),
-          logo_url: logoUrl,
-        })
-        .select('id, name, country, country_flag, logo_url')
-        .single()
-      setSaving(false)
-      if (err) { setSaveError(err.message); return }
-      onCreated(data)
+
+      if (isEdit) {
+        const { data, error: err } = await supabase
+          .from('airlines')
+          .update({
+            name: name.trim(),
+            country: selectedCountry.name,
+            country_flag: selectedCountry.code.toUpperCase(),
+            logo_url: finalLogoUrl,
+          })
+          .eq('id', existing.id)
+          .select('id, name, country, country_flag, logo_url')
+          .single()
+        setSaving(false)
+        if (err) { setSaveError(err.message); return }
+        onUpdated(data)
+      } else {
+        const { data, error: err } = await supabase
+          .from('airlines')
+          .insert({
+            name: name.trim(),
+            country: selectedCountry.name,
+            country_flag: selectedCountry.code.toUpperCase(),
+            logo_url: finalLogoUrl,
+          })
+          .select('id, name, country, country_flag, logo_url')
+          .single()
+        setSaving(false)
+        if (err) { setSaveError(err.message); return }
+        onCreated(data)
+      }
     } catch (e) {
       setSaving(false)
       setSaveError(e?.message || 'Save failed')
     }
   }
 
+  async function handleDelete() {
+    setDeleting(true)
+    const { error: err } = await supabase.from('airlines').delete().eq('id', existing.id)
+    setDeleting(false)
+    if (err) { setSaveError(err.message); return }
+    onDeleted()
+  }
+
   return (
     <div className="entry-modal-backdrop" onClick={onCancel}>
       <div className="entry-modal airline-form-modal" onClick={(e) => e.stopPropagation()}>
         <div className="form-header">
-          <h2 className="form-title">New Airline</h2>
+          <h2 className="form-title">{isEdit ? 'Edit Airline' : 'New Airline'}</h2>
           <button type="button" className="form-close" onClick={onCancel} aria-label="Close">×</button>
         </div>
 
@@ -132,6 +167,22 @@ export default function AirlineForm({ initialName, onCancel, onCreated }) {
 
             <div className="form-group">
               <label className="form-label" htmlFor="airline-logo-input">Airline logo (optional)</label>
+              {isEdit && logoUrl && (
+                <div className="logo-preview-row">
+                  <img
+                    src={logoUrl}
+                    alt=""
+                    className="logo-preview-thumb"
+                  />
+                  <button
+                    type="button"
+                    className="btn-secondary logo-remove-btn"
+                    onClick={() => setLogoUrl(null)}
+                  >
+                    Remove logo
+                  </button>
+                </div>
+              )}
               <input
                 id="airline-logo-input"
                 className="form-input"
@@ -143,6 +194,34 @@ export default function AirlineForm({ initialName, onCancel, onCreated }) {
           </div>
 
           {saveError && <p className="form-error">{saveError}</p>}
+
+          {isEdit && !showDeleteConfirm && (
+            <div className="danger-row">
+              <button
+                type="button"
+                className="btn-delete-reg"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                Delete airline
+              </button>
+            </div>
+          )}
+
+          {isEdit && showDeleteConfirm && (
+            <div className="delete-confirm">
+              <button
+                className="btn-confirm-delete"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? 'Deleting…' : 'Confirm Delete'}
+              </button>
+              <p className="delete-confirm__hint">This cannot be undone.</p>
+              <button className="btn-cancel-delete" onClick={() => setShowDeleteConfirm(false)}>
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="form-footer">
@@ -155,7 +234,7 @@ export default function AirlineForm({ initialName, onCancel, onCreated }) {
             onClick={handleSave}
             disabled={!canSave || saving}
           >
-            {saving ? 'Saving…' : 'Add airline'}
+            {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Add airline'}
           </button>
         </div>
       </div>

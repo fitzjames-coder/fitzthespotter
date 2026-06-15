@@ -103,6 +103,9 @@ function AirlinesTab() {
   const [selectedAirline, setSelectedAirline] = useState(null)
   const [selectedManufacturer, setSelectedManufacturer] = useState(null)
   const [manufacturerAirline, setManufacturerAirline] = useState(null)
+  const [reloadNonce, setReloadNonce] = useState(0)
+
+  function reloadAirlines() { setReloadNonce((n) => n + 1) }
 
   useEffect(() => {
     if (!supabase) {
@@ -139,7 +142,7 @@ function AirlinesTab() {
 
       setLoading(false)
     })
-  }, [])
+  }, [reloadNonce])
 
   if (selectedManufacturer) {
     return (
@@ -161,6 +164,8 @@ function AirlinesTab() {
           setSelectedManufacturer(mfr)
           setManufacturerAirline(selectedAirline ? { id: selectedAirline.id, name: selectedAirline.name } : null)
         }}
+        onUpdated={(row) => { setSelectedAirline(row); reloadAirlines() }}
+        onDeleted={() => { setSelectedAirline(null); reloadAirlines() }}
       />
     )
   }
@@ -239,7 +244,12 @@ export default function App() {
         <AirportsTab key={navNonce} onSelectAirport={setSelectedAirport} />
       )}
       {activeTab === 'airports' && selectedAirport && (
-        <AirportDetailView airport={selectedAirport} onBack={() => setSelectedAirport(null)} />
+        <AirportDetailView
+          airport={selectedAirport}
+          onBack={() => setSelectedAirport(null)}
+          onUpdated={(row) => setSelectedAirport(row)}
+          onDeleted={() => { setSelectedAirport(null); setNavNonce((n) => n + 1) }}
+        />
       )}
       {activeTab === 'search'   && <SearchView key={navNonce} />}
 

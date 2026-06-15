@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import RegistrationProfileView from './RegistrationProfileView'
 import StatusMarks from './StatusMarks'
+import AirlineForm from './AirlineForm'
 
 function heroInitials(name) {
   return name.split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 3)
@@ -46,7 +47,7 @@ function AirlineHeroLogo({ airline }) {
   )
 }
 
-function AirlineHero({ airline, regCount, loading, onBack }) {
+function AirlineHero({ airline, regCount, loading, onBack, onEdit }) {
   const isClosed = airline.is_closed
   const year = closedYear(airline)
 
@@ -60,6 +61,7 @@ function AirlineHero({ airline, regCount, loading, onBack }) {
       <button className="top-bar__back" onClick={onBack} aria-label="Back to airlines list">
         ‹ Back
       </button>
+      <button className="edit-btn" onClick={onEdit} aria-label="Edit airline">Edit</button>
       <div className="airline-hero__body">
         <AirlineHeroLogo airline={airline} />
         <div className="airline-hero__name-row">
@@ -198,11 +200,12 @@ function RegistrationCard({ reg, onSelect }) {
   )
 }
 
-export default function AirlineDetailView({ airline, onBack, onSelectManufacturer }) {
+export default function AirlineDetailView({ airline, onBack, onSelectManufacturer, onUpdated, onDeleted }) {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedReg, setSelectedReg] = useState(null)
+  const [showEdit, setShowEdit] = useState(false)
 
   function loadRegistrations() {
     if (!supabase) {
@@ -284,16 +287,28 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   }
 
   return (
-    <div className="page page--navy airline-detail-page">
-      <AirlineHero
-        airline={airline}
-        regCount={regCount}
-        loading={loading}
-        onBack={onBack}
-      />
-      <main className="content">
-        {renderBody()}
-      </main>
-    </div>
+    <>
+      <div className="page page--navy airline-detail-page">
+        <AirlineHero
+          airline={airline}
+          regCount={regCount}
+          loading={loading}
+          onBack={onBack}
+          onEdit={() => setShowEdit(true)}
+        />
+        <main className="content">
+          {renderBody()}
+        </main>
+      </div>
+
+      {showEdit && (
+        <AirlineForm
+          existing={airline}
+          onCancel={() => setShowEdit(false)}
+          onUpdated={(row) => { setShowEdit(false); onUpdated?.(row) }}
+          onDeleted={() => { setShowEdit(false); onDeleted?.() }}
+        />
+      )}
+    </>
   )
 }

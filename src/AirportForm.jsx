@@ -3,16 +3,24 @@ import { supabase } from './lib/supabaseClient'
 import { FlagIcon } from './App'
 import { COUNTRIES } from './data/countries'
 
-export default function AirportForm({ initialCode, onCancel, onCreated }) {
-  const [iata, setIata] = useState(initialCode ?? '')
-  const [icao, setIcao] = useState('')
-  const [name, setName] = useState('')
-  const [remarks, setRemarks] = useState('')
-  const [countrySearch, setCountrySearch] = useState('')
-  const [selectedCountry, setSelectedCountry] = useState(null)
+export default function AirportForm({ initialCode, existing, onCancel, onCreated, onUpdated, onDeleted }) {
+  const isEdit = Boolean(existing)
+
+  const initialCountry = isEdit
+    ? (COUNTRIES.find((c) => c.code.toUpperCase() === (existing.country_flag || '').toUpperCase()) ?? null)
+    : null
+
+  const [iata, setIata] = useState(existing?.iata ?? initialCode ?? '')
+  const [icao, setIcao] = useState(existing?.icao ?? '')
+  const [name, setName] = useState(existing?.name ?? '')
+  const [remarks, setRemarks] = useState(existing?.remarks ?? '')
+  const [countrySearch, setCountrySearch] = useState(existing?.country ?? '')
+  const [selectedCountry, setSelectedCountry] = useState(initialCountry)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const filtered = countrySearch.trim()
     ? COUNTRIES.filter((c) =>
@@ -34,42 +42,74 @@ export default function AirportForm({ initialCode, onCancel, onCreated }) {
     setSaving(true)
     setSaveError(null)
     const code = iata.trim().toUpperCase()
-    const { data: existing } = await supabase
-      .from('airports')
-      .select('iata')
-      .eq('iata', code)
-      .maybeSingle()
-    if (existing) {
-      setSaveError('An airport with this code already exists.')
+
+    if (isEdit) {
+      const { data, error: err } = await supabase
+        .from('airports')
+        .update({
+          iata: code,
+          icao: icao.trim().toUpperCase() || null,
+          name: name.trim(),
+          country: selectedCountry.name,
+          country_flag: selectedCountry.code.toUpperCase(),
+          remarks: remarks.trim() || null,
+        })
+        .eq('iata', existing.iata)
+        .select('iata, icao, name, country, country_flag, remarks')
+        .single()
       setSaving(false)
-      return
+      if (err) {
+        if (err.code === '23505') { setSaveError('An airport with this code already exists.'); return }
+        setSaveError(err.message)
+        return
+      }
+      onUpdated(data)
+    } else {
+      const { data: dup } = await supabase
+        .from('airports')
+        .select('iata')
+        .eq('iata', code)
+        .maybeSingle()
+      if (dup) {
+        setSaveError('An airport with this code already exists.')
+        setSaving(false)
+        return
+      }
+      const { data, error: err } = await supabase
+        .from('airports')
+        .insert({
+          iata: code,
+          icao: icao.trim().toUpperCase() || null,
+          name: name.trim(),
+          country: selectedCountry.name,
+          country_flag: selectedCountry.code.toUpperCase(),
+          remarks: remarks.trim() || null,
+        })
+        .select('iata, name')
+        .single()
+      setSaving(false)
+      if (err) {
+        if (err.code === '23505') { setSaveError('An airport with this code already exists.'); return }
+        setSaveError(err.message)
+        return
+      }
+      onCreated(data)
     }
-    const { data, error: err } = await supabase
-      .from('airports')
-      .insert({
-        iata: code,
-        icao: icao.trim().toUpperCase() || null,
-        name: name.trim(),
-        country: selectedCountry.name,
-        country_flag: selectedCountry.code.toUpperCase(),
-        remarks: remarks.trim() || null,
-      })
-      .select('iata, name')
-      .single()
-    setSaving(false)
-    if (err) {
-      if (err.code === '23505') { setSaveError('An airport with this code already exists.'); return }
-      setSaveError(err.message)
-      return
-    }
-    onCreated(data)
+  }
+
+  async function handleDelete() {
+    setDeleting(true)
+    const { error: err } = await supabase.from('airports').delete().eq('iata', existing.iata)
+    setDeleting(false)
+    if (err) { setSaveError(err.message); return }
+    onDeleted()
   }
 
   return (
     <div className="entry-modal-backdrop" onClick={onCancel}>
       <div className="entry-modal airport-form-modal" onClick={(e) => e.stopPropagation()}>
         <div className="form-header">
-          <h2 className="form-title">New Airport</h2>
+          <h2 className="form-title">{isEdit ? 'Edit Airport' : 'New Airport'}</h2>
           <button type="button" className="form-close" onClick={onCancel} aria-label="Close">×</button>
         </div>
 
@@ -169,6 +209,34 @@ export default function AirportForm({ initialCode, onCancel, onCreated }) {
           </div>
 
           {saveError && <p className="form-error">{saveError}</p>}
+
+          {isEdit && !showDeleteConfirm && (
+            <div className="danger-row">
+              <button
+                type="button"
+                className="btn-delete-reg"
+                onClick={() => setShowDeleteConfirm(true)}
+              >
+                Delete airport
+              </button>
+            </div>
+          )}
+
+          {isEdit && showDeleteConfirm && (
+            <div className="delete-confirm">
+              <button
+                className="btn-confirm-delete"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                {deleting ? 'Deleting…' : 'Confirm Delete'}
+              </button>
+              <p className="delete-confirm__hint">This cannot be undone.</p>
+              <button className="btn-cancel-delete" onClick={() => setShowDeleteConfirm(false)}>
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="form-footer">
@@ -181,7 +249,7 @@ export default function AirportForm({ initialCode, onCancel, onCreated }) {
             onClick={handleSave}
             disabled={!canSave || saving}
           >
-            {saving ? 'Saving…' : 'Add airport'}
+            {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Add airport'}
           </button>
         </div>
       </div>
