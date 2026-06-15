@@ -1463,6 +1463,7 @@
   padding: 0.65rem 1rem 1.5rem;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .airline-hero__body {
@@ -3960,4 +3961,48 @@
   line-height: 1;
   color: rgba(246,239,220,0.55);
   font-weight: 400;
+}
+
+/* Edit button — amber-outlined pill, anchored bottom-right of banner */
+.edit-btn {
+  background: rgba(251,173,25,0.14);
+  border: 1px solid rgba(251,173,25,0.55);
+  color: var(--color-amber);
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 0.32rem 0.8rem;
+  border-radius: 8px;
+  line-height: 1;
+  position: absolute;
+  bottom: 0.7rem;
+  right: 1rem;
+  cursor: pointer;
+}
+
+/* Logo preview row in edit form */
+.logo-preview-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.logo-preview-thumb {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: rgba(44,66,123,0.08);
+}
+
+.logo-remove-btn {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+}
+
+/* Danger row — delete trigger at bottom of edit form */
+.danger-row {
+  margin-top: 1.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(232,96,122,0.25);
 }

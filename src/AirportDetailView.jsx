@@ -3,6 +3,7 @@ import { supabase } from './lib/supabaseClient'
 import { getAirportDiagram } from './lib/airportDiagram'
 import { FlagIcon } from './App'
 import AirportDiagram from './AirportDiagram'
+import AirportForm from './AirportForm'
 
 function LogoTile({ name, logoUrl }) {
   const initials = name.trim().split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 2)
@@ -16,13 +17,14 @@ function LogoTile({ name, logoUrl }) {
   )
 }
 
-export default function AirportDetailView({ airport, onBack }) {
+export default function AirportDetailView({ airport, onBack, onUpdated, onDeleted }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [gallery, setGallery] = useState([])
   const [sightingCount, setSightingCount] = useState(0)
   const [firstHere, setFirstHere] = useState(null)
   const [recentHere, setRecentHere] = useState(null)
+  const [showEdit, setShowEdit] = useState(false)
 
   const [showSkyline, setShowSkyline] = useState(false)
 
@@ -117,6 +119,7 @@ export default function AirportDetailView({ airport, onBack }) {
             <span className="ap-skyline-thumb__plus">+</span>
           </div>
         )}
+        <button className="edit-btn" onClick={() => setShowEdit(true)} aria-label="Edit airport">Edit</button>
       </header>
 
       {loading && <p className="state-message">Loading…</p>}
@@ -169,6 +172,15 @@ export default function AirportDetailView({ airport, onBack }) {
         <div className="ap-skyline-overlay" onClick={() => setShowSkyline(false)}>
           <img className="ap-skyline-overlay__img" src={skylineImage} alt={`${airport.name}`} />
         </div>
+      )}
+
+      {showEdit && (
+        <AirportForm
+          existing={airport}
+          onCancel={() => setShowEdit(false)}
+          onUpdated={(row) => { setShowEdit(false); onUpdated?.(row) }}
+          onDeleted={() => { setShowEdit(false); onDeleted?.() }}
+        />
       )}
     </div>
   )
