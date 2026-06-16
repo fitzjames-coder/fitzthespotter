@@ -13,6 +13,69 @@ function formatFlownInDate(iso) {
   return `${parseInt(d, 10)} ${months[parseInt(m, 10) - 1]} ${y}`
 }
 
+const PHOTO_MAX_LONG_EDGE = 2560
+const PHOTO_MAX_UPLOAD_BYTES = 3.8 * 1024 * 1024
+const PHOTO_QUALITY_STEPS = [0.92, 0.86, 0.80, 0.74]
+
+function loadImageFile(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = async () => {
+      try {
+        if (img.decode) await img.decode()
+      } catch {
+        // dimensions are already usable even if decode() itself rejects
+      }
+      URL.revokeObjectURL(url)
+      resolve(img)
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      reject(new Error('Could not read this image'))
+    }
+    img.src = url
+  })
+}
+
+function canvasToJpegBlob(canvas, quality) {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality)
+  })
+}
+
+async function prepareImageForUpload(file) {
+  const img = await loadImageFile(file)
+  const longEdge = Math.max(img.naturalWidth, img.naturalHeight)
+  const scale = longEdge > PHOTO_MAX_LONG_EDGE ? PHOTO_MAX_LONG_EDGE / longEdge : 1
+  const width = Math.round(img.naturalWidth * scale)
+  const height = Math.round(img.naturalHeight * scale)
+
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(img, 0, 0, width, height)
+
+  let blob = null
+  for (const quality of PHOTO_QUALITY_STEPS) {
+    blob = await canvasToJpegBlob(canvas, quality)
+    if (blob && blob.size <= PHOTO_MAX_UPLOAD_BYTES) break
+  }
+  if (!blob) throw new Error('Could not process this image')
+
+  return { blob, contentType: 'image/jpeg' }
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader()
+    r.onload = () => resolve(String(r.result).split(',')[1])
+    r.onerror = reject
+    r.readAsDataURL(blob)
+  })
+}
+
 function SpotlightOverlay({ label = 'REMARK', remark, onClose }) {
   return (
     <div
@@ -368,16 +431,12 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     setUploadingPhoto(true)
     setPhotoError(null)
     try {
-      const base64 = await new Promise((resolve, reject) => {
-        const r = new FileReader()
-        r.onload = () => resolve(String(r.result).split(',')[1])
-        r.onerror = reject
-        r.readAsDataURL(file)
-      })
+      const { blob, contentType } = await prepareImageForUpload(file)
+      const base64 = await blobToBase64(blob)
       const resp = await fetch('/api/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileBase64: base64, contentType: file.type, keyPrefix: 'reg-photos' }),
+        body: JSON.stringify({ fileBase64: base64, contentType, keyPrefix: 'reg-photos' }),
       })
       const uploadData = await resp.json()
       if (!resp.ok) throw new Error(uploadData.error || 'Photo upload failed')
