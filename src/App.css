@@ -3095,7 +3095,8 @@
   height: 40px !important;
 }
 
-.status-marks__img {
+.status-marks__img,
+.status-marks__alliance-img {
   display: block;
   object-fit: contain;
   flex-shrink: 0;
@@ -3150,7 +3151,8 @@
 }
 
 .top-bar__detail-info .status-marks__img,
-.top-bar__detail-info .status-marks__spacer {
+.top-bar__detail-info .status-marks__spacer,
+.top-bar__detail-info .status-marks__alliance-img {
   width: 44px !important;
   height: 44px !important;
 }
