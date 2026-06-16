@@ -17,6 +17,8 @@ export default function AirportForm({ initialCode, existing, onCancel, onCreated
   const [countrySearch, setCountrySearch] = useState(existing?.country ?? '')
   const [selectedCountry, setSelectedCountry] = useState(initialCountry)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [headerImageFile, setHeaderImageFile] = useState(null)
+  const [headerImageUrl, setHeaderImageUrl] = useState(existing?.header_image_url ?? null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -43,57 +45,82 @@ export default function AirportForm({ initialCode, existing, onCancel, onCreated
     setSaveError(null)
     const code = iata.trim().toUpperCase()
 
-    if (isEdit) {
-      const { data, error: err } = await supabase
-        .from('airports')
-        .update({
-          iata: code,
-          icao: icao.trim().toUpperCase() || null,
-          name: name.trim(),
-          country: selectedCountry.name,
-          country_flag: selectedCountry.code.toUpperCase(),
-          remarks: remarks.trim() || null,
+    try {
+      let finalHeaderImageUrl = headerImageUrl
+      if (headerImageFile) {
+        const base64 = await new Promise((resolve, reject) => {
+          const r = new FileReader()
+          r.onload = () => resolve(String(r.result).split(',')[1])
+          r.onerror = reject
+          r.readAsDataURL(headerImageFile)
         })
-        .eq('iata', existing.iata)
-        .select('iata, icao, name, country, country_flag, remarks')
-        .single()
-      setSaving(false)
-      if (err) {
-        if (err.code === '23505') { setSaveError('An airport with this code already exists.'); return }
-        setSaveError(err.message)
-        return
+        const resp = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileBase64: base64, contentType: headerImageFile.type, keyPrefix: 'airport-headers' }),
+        })
+        const uploadData = await resp.json()
+        if (!resp.ok) throw new Error(uploadData.error || 'Image upload failed')
+        finalHeaderImageUrl = uploadData.url
       }
-      onUpdated(data)
-    } else {
-      const { data: dup } = await supabase
-        .from('airports')
-        .select('iata')
-        .eq('iata', code)
-        .maybeSingle()
-      if (dup) {
-        setSaveError('An airport with this code already exists.')
+
+      if (isEdit) {
+        const { data, error: err } = await supabase
+          .from('airports')
+          .update({
+            iata: code,
+            icao: icao.trim().toUpperCase() || null,
+            name: name.trim(),
+            country: selectedCountry.name,
+            country_flag: selectedCountry.code.toUpperCase(),
+            remarks: remarks.trim() || null,
+            header_image_url: finalHeaderImageUrl,
+          })
+          .eq('iata', existing.iata)
+          .select('iata, icao, name, country, country_flag, remarks, header_image_url')
+          .single()
         setSaving(false)
-        return
+        if (err) {
+          if (err.code === '23505') { setSaveError('An airport with this code already exists.'); return }
+          setSaveError(err.message)
+          return
+        }
+        onUpdated(data)
+      } else {
+        const { data: dup } = await supabase
+          .from('airports')
+          .select('iata')
+          .eq('iata', code)
+          .maybeSingle()
+        if (dup) {
+          setSaveError('An airport with this code already exists.')
+          setSaving(false)
+          return
+        }
+        const { data, error: err } = await supabase
+          .from('airports')
+          .insert({
+            iata: code,
+            icao: icao.trim().toUpperCase() || null,
+            name: name.trim(),
+            country: selectedCountry.name,
+            country_flag: selectedCountry.code.toUpperCase(),
+            remarks: remarks.trim() || null,
+            header_image_url: finalHeaderImageUrl,
+          })
+          .select('iata, name, header_image_url')
+          .single()
+        setSaving(false)
+        if (err) {
+          if (err.code === '23505') { setSaveError('An airport with this code already exists.'); return }
+          setSaveError(err.message)
+          return
+        }
+        onCreated(data)
       }
-      const { data, error: err } = await supabase
-        .from('airports')
-        .insert({
-          iata: code,
-          icao: icao.trim().toUpperCase() || null,
-          name: name.trim(),
-          country: selectedCountry.name,
-          country_flag: selectedCountry.code.toUpperCase(),
-          remarks: remarks.trim() || null,
-        })
-        .select('iata, name')
-        .single()
+    } catch (e) {
       setSaving(false)
-      if (err) {
-        if (err.code === '23505') { setSaveError('An airport with this code already exists.'); return }
-        setSaveError(err.message)
-        return
-      }
-      onCreated(data)
+      setSaveError(e?.message || 'Save failed')
     }
   }
 
@@ -204,6 +231,33 @@ export default function AirportForm({ initialCode, existing, onCancel, onCreated
                 onChange={(e) => setRemarks(e.target.value)}
                 placeholder="Any notes about this airport…"
                 rows={2}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="airport-header-image-input">Header image (optional)</label>
+              {isEdit && headerImageUrl && (
+                <div className="logo-preview-row">
+                  <img
+                    src={headerImageUrl}
+                    alt=""
+                    className="logo-preview-thumb"
+                  />
+                  <button
+                    type="button"
+                    className="btn-secondary logo-remove-btn"
+                    onClick={() => setHeaderImageUrl(null)}
+                  >
+                    Remove image
+                  </button>
+                </div>
+              )}
+              <input
+                id="airport-header-image-input"
+                className="form-input"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setHeaderImageFile(e.target.files[0] ?? null)}
               />
             </div>
           </div>

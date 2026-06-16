@@ -15,7 +15,7 @@ export default function AirportsTab({ onSelectAirport }) {
     }
     supabase
       .from('airports')
-      .select('iata, icao, name, country, country_flag')
+      .select('iata, icao, name, country, country_flag, header_image_url')
       .order('iata')
       .then(({ data, error: err }) => {
         if (err) setError(err.message)

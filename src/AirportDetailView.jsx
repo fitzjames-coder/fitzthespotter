@@ -79,8 +79,7 @@ export default function AirportDetailView({ airport, onBack, onUpdated, onDelete
 
   const codes = [airport.icao, airport.iata].filter(Boolean).join(' / ')
 
-  const SKYLINE_IMAGES = { OKA: '/oka-hero.PNG' }
-  const skylineImage = SKYLINE_IMAGES[airport.iata] || null
+  const skylineImage = airport.header_image_url || null
 
   const runwayRefs = (diagramGeometry ?? [])
     .filter((w) => w.aeroway === 'runway' && w.ref)
@@ -115,9 +114,7 @@ export default function AirportDetailView({ airport, onBack, onUpdated, onDelete
             onClick={() => setShowSkyline(true)}
           />
         ) : (
-          <div className="ap-skyline-thumb ap-skyline-thumb--empty" aria-label="Add a photo (coming soon)">
-            <span className="ap-skyline-thumb__plus">+</span>
-          </div>
+          <div className="ap-skyline-thumb ap-skyline-thumb--empty" aria-label="No photo yet" />
         )}
         <button className="edit-btn" onClick={() => setShowEdit(true)} aria-label="Edit airport">Edit</button>
       </header>
