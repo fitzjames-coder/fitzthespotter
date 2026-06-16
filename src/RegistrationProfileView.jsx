@@ -153,11 +153,42 @@ function ImageSpotlightOverlay({ src, alt, onClose }) {
   )
 }
 
-function TypeTemplateHero({ templateUrl, label, onOpen }) {
+function PhotoGallery({ slides, onSlideClick }) {
+  const trackRef = useRef(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  function handleScroll() {
+    const track = trackRef.current
+    if (!track) return
+    const idx = Math.round(track.scrollLeft / track.clientWidth)
+    setActiveIndex(Math.max(0, Math.min(idx, slides.length - 1)))
+  }
+
   return (
-    <button className="reg-template-hero" onClick={onOpen} aria-label={`View ${label} image`}>
-      <img className="reg-template-hero__img" src={templateUrl} alt={label} />
-    </button>
+    <div className="reg-gallery">
+      <div className="reg-gallery__track" ref={trackRef} onScroll={handleScroll}>
+        {slides.map((src, i) => (
+          <button
+            key={i}
+            className="reg-gallery__slide"
+            onClick={() => onSlideClick(src)}
+            aria-label={`View photo ${i + 1} of ${slides.length}`}
+          >
+            <img className="reg-gallery__img" src={src} alt="" aria-hidden="true" />
+          </button>
+        ))}
+      </div>
+      {slides.length > 1 && (
+        <div className="reg-gallery__dots" aria-hidden="true">
+          {slides.map((_, i) => (
+            <span
+              key={i}
+              className={`reg-gallery__dot${i === activeIndex ? ' reg-gallery__dot--active' : ''}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -269,7 +300,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [deleteError, setDeleteError] = useState(null)
   const [flagged, setFlagged] = useState(false)
   const [siblingIds, setSiblingIds] = useState([])
-  const [imageSpotlight, setImageSpotlight] = useState(false)
+  const [spotlightSrc, setSpotlightSrc] = useState(null)
   const [photoUrls, setPhotoUrls] = useState([])
   const [showFlagConfirm, setShowFlagConfirm] = useState(false)
   const [flagBusy, setFlagBusy] = useState(false)
@@ -492,19 +523,17 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
 
   const templateUrl = reg.aircraft_types?.template_url ?? null
   const typeLabel = reg.aircraft_types?.name ?? reg.registration
+  const photoSlides = [...photoUrls].reverse()
+  const slides = templateUrl ? [...photoSlides, templateUrl] : [...photoSlides]
 
   return (
     <>
       <div className="page reg-profile-page">
         <RegTopBar reg={reg} onBack={onBack} onEdit={() => setShowEdit(true)} />
-        {templateUrl ? (
-          <TypeTemplateHero
-            templateUrl={templateUrl}
-            label={typeLabel}
-            onOpen={() => setImageSpotlight(true)}
-          />
-        ) : (
+        {slides.length === 0 ? (
           <GalleryPlaceholder />
+        ) : (
+          <PhotoGallery slides={slides} onSlideClick={(src) => setSpotlightSrc(src)} />
         )}
         <main className="content reg-info-area" style={{ opacity: loading ? 0.6 : 1 }}>
           <div className="section-label-row">
@@ -594,11 +623,11 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
         />
       )}
 
-      {imageSpotlight && templateUrl && (
+      {spotlightSrc && (
         <ImageSpotlightOverlay
-          src={templateUrl}
+          src={spotlightSrc}
           alt={typeLabel}
-          onClose={() => setImageSpotlight(false)}
+          onClose={() => setSpotlightSrc(null)}
         />
       )}
 
