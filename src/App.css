@@ -1295,6 +1295,7 @@
   padding: 0.65rem 1rem 1.5rem;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .mfr-hero__body {

@@ -3,13 +3,23 @@ import { supabase } from './lib/supabaseClient'
 import { FlagIcon } from './App'
 import { COUNTRIES } from './data/countries'
 
-export default function ManufacturerForm({ initialName, onCancel, onCreated }) {
-  const [name, setName] = useState(initialName ?? '')
-  const [originCountry, setOriginCountry] = useState('')
-  const [foundedYear, setFoundedYear] = useState('')
-  const [countrySearch, setCountrySearch] = useState('')
-  const [selectedCountry, setSelectedCountry] = useState(null)
+export default function ManufacturerForm({ initialName, existing, onCancel, onCreated, onUpdated }) {
+  const isEdit = Boolean(existing)
+
+  const initialCountry = isEdit
+    ? (COUNTRIES.find((c) => c.code.toUpperCase() === (existing.hq_flag || '').toUpperCase())
+        ?? COUNTRIES.find((c) => c.name === existing.hq_country)
+        ?? null)
+    : null
+
+  const [name, setName] = useState(existing?.name ?? initialName ?? '')
+  const [originCountry, setOriginCountry] = useState(existing?.origin_country ?? '')
+  const [foundedYear, setFoundedYear] = useState(existing?.founded_year != null ? String(existing.founded_year) : '')
+  const [countrySearch, setCountrySearch] = useState(existing?.hq_country ?? '')
+  const [selectedCountry, setSelectedCountry] = useState(initialCountry)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [logoFile, setLogoFile] = useState(null)
+  const [logoUrl, setLogoUrl] = useState(existing?.logo_url ?? null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
 
@@ -32,27 +42,70 @@ export default function ManufacturerForm({ initialName, onCancel, onCreated }) {
     if (!supabase) { setSaveError('Supabase is not configured.'); return }
     setSaving(true)
     setSaveError(null)
-    const { data, error: err } = await supabase
-      .from('manufacturers')
-      .insert({
-        name: name.trim(),
-        hq_country: selectedCountry.name,
-        hq_flag: selectedCountry.code.toUpperCase(),
-        origin_country: originCountry.trim() || null,
-        founded_year: foundedYear ? Number(foundedYear) : null,
-      })
-      .select('id, name')
-      .single()
-    setSaving(false)
-    if (err) { setSaveError(err.message); return }
-    onCreated(data)
+    try {
+      let finalLogoUrl = logoUrl
+      if (logoFile) {
+        const base64 = await new Promise((resolve, reject) => {
+          const r = new FileReader()
+          r.onload = () => resolve(String(r.result).split(',')[1])
+          r.onerror = reject
+          r.readAsDataURL(logoFile)
+        })
+        const resp = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileBase64: base64, contentType: logoFile.type, keyPrefix: 'manufacturer-logos' }),
+        })
+        const uploadData = await resp.json()
+        if (!resp.ok) throw new Error(uploadData.error || 'Logo upload failed')
+        finalLogoUrl = uploadData.url
+      }
+
+      if (isEdit) {
+        const { data, error: err } = await supabase
+          .from('manufacturers')
+          .update({
+            name: name.trim(),
+            hq_country: selectedCountry.name,
+            hq_flag: selectedCountry.code.toUpperCase(),
+            origin_country: originCountry.trim() || null,
+            founded_year: foundedYear ? Number(foundedYear) : null,
+            logo_url: finalLogoUrl,
+          })
+          .eq('id', existing.id)
+          .select('id, name, hq_country, hq_flag, origin_country, founded_year, logo_url')
+          .single()
+        setSaving(false)
+        if (err) { setSaveError(err.message); return }
+        onUpdated(data)
+      } else {
+        const { data, error: err } = await supabase
+          .from('manufacturers')
+          .insert({
+            name: name.trim(),
+            hq_country: selectedCountry.name,
+            hq_flag: selectedCountry.code.toUpperCase(),
+            origin_country: originCountry.trim() || null,
+            founded_year: foundedYear ? Number(foundedYear) : null,
+            logo_url: finalLogoUrl,
+          })
+          .select('id, name, logo_url')
+          .single()
+        setSaving(false)
+        if (err) { setSaveError(err.message); return }
+        onCreated(data)
+      }
+    } catch (e) {
+      setSaving(false)
+      setSaveError(e?.message || 'Save failed')
+    }
   }
 
   return (
     <div className="entry-modal-backdrop" onClick={onCancel}>
       <div className="entry-modal manufacturer-form-modal" onClick={(e) => e.stopPropagation()}>
         <div className="form-header">
-          <h2 className="form-title">New Manufacturer</h2>
+          <h2 className="form-title">{isEdit ? 'Edit Manufacturer' : 'New Manufacturer'}</h2>
           <button type="button" className="form-close" onClick={onCancel} aria-label="Close">×</button>
         </div>
 
@@ -136,6 +189,33 @@ export default function ManufacturerForm({ initialName, onCancel, onCreated }) {
                 max={new Date().getFullYear()}
               />
             </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="mfr-logo-input">Manufacturer logo (optional)</label>
+              {isEdit && logoUrl && (
+                <div className="logo-preview-row">
+                  <img
+                    src={logoUrl}
+                    alt=""
+                    className="logo-preview-thumb"
+                  />
+                  <button
+                    type="button"
+                    className="btn-secondary logo-remove-btn"
+                    onClick={() => setLogoUrl(null)}
+                  >
+                    Remove logo
+                  </button>
+                </div>
+              )}
+              <input
+                id="mfr-logo-input"
+                className="form-input"
+                type="file"
+                accept="image/*"
+                onChange={(e) => setLogoFile(e.target.files[0] ?? null)}
+              />
+            </div>
           </div>
 
           {saveError && <p className="form-error">{saveError}</p>}
@@ -151,7 +231,7 @@ export default function ManufacturerForm({ initialName, onCancel, onCreated }) {
             onClick={handleSave}
             disabled={!canSave || saving}
           >
-            {saving ? 'Saving…' : 'Add manufacturer'}
+            {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Add manufacturer'}
           </button>
         </div>
       </div>
