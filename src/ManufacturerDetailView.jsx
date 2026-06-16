@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import ManufacturerForm from './ManufacturerForm'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
@@ -71,6 +72,7 @@ export default function ManufacturerDetailView({ manufacturerId, airlineId = nul
   const [regCounts, setRegCounts] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [showEdit, setShowEdit] = useState(false)
 
   useEffect(() => {
     if (!supabase) {
@@ -133,43 +135,54 @@ export default function ManufacturerDetailView({ manufacturerId, airlineId = nul
   const meta = manufacturer ? buildMeta(manufacturer) : ''
 
   return (
-    <div className="page page--navy">
-      <div className="mfr-hero">
-        <button className="top-bar__back" onClick={onBack} aria-label="Back">
-          ‹ Back
-        </button>
-        {manufacturer && (
-          <div className="mfr-hero__body">
-            <HeroLogo manufacturer={manufacturer} />
-            <h1 className="mfr-hero__name">{manufacturer.name}</h1>
-            {airlineName && (
-              <p className="mfr-hero__filter-context">Filtered to {airlineName}</p>
-            )}
-            {meta && <p className="mfr-hero__meta">{meta}</p>}
-            {!loading && (
-              <div className="mfr-hero__stats">
-                <span className="mfr-regs-logged__number">{totalRegs}</span>
-                <span className="mfr-regs-logged__label">REGS LOGGED</span>
-              </div>
-            )}
-          </div>
-        )}
+    <>
+      <div className="page page--navy">
+        <div className="mfr-hero">
+          <button className="top-bar__back" onClick={onBack} aria-label="Back">
+            ‹ Back
+          </button>
+          {manufacturer && (
+            <div className="mfr-hero__body">
+              <button className="edit-btn" onClick={() => setShowEdit(true)} aria-label="Edit manufacturer">Edit</button>
+              <HeroLogo manufacturer={manufacturer} />
+              <h1 className="mfr-hero__name">{manufacturer.name}</h1>
+              {airlineName && (
+                <p className="mfr-hero__filter-context">Filtered to {airlineName}</p>
+              )}
+              {meta && <p className="mfr-hero__meta">{meta}</p>}
+              {!loading && (
+                <div className="mfr-hero__stats">
+                  <span className="mfr-regs-logged__number">{totalRegs}</span>
+                  <span className="mfr-regs-logged__label">REGS LOGGED</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <main className="content">
+          <p className="section-label">Aircraft Types</p>
+          {loading && <p className="state-message">Loading…</p>}
+          {!loading && error && <p className="state-message state-message--error">{error}</p>}
+          {!loading && !error && types.length === 0 && (
+            <p className="state-message">No aircraft types yet.</p>
+          )}
+          {!loading && !error && types.length > 0 && (
+            <div className="type-gallery">
+              {types.map((type) => (
+                <TypeTile key={type.id} type={type} count={regCounts[type.id] ?? 0} />
+              ))}
+            </div>
+          )}
+        </main>
       </div>
-      <main className="content">
-        <p className="section-label">Aircraft Types</p>
-        {loading && <p className="state-message">Loading…</p>}
-        {!loading && error && <p className="state-message state-message--error">{error}</p>}
-        {!loading && !error && types.length === 0 && (
-          <p className="state-message">No aircraft types yet.</p>
-        )}
-        {!loading && !error && types.length > 0 && (
-          <div className="type-gallery">
-            {types.map((type) => (
-              <TypeTile key={type.id} type={type} count={regCounts[type.id] ?? 0} />
-            ))}
-          </div>
-        )}
-      </main>
-    </div>
+
+      {showEdit && manufacturer && (
+        <ManufacturerForm
+          existing={manufacturer}
+          onCancel={() => setShowEdit(false)}
+          onUpdated={(row) => { setManufacturer(row); setShowEdit(false) }}
+        />
+      )}
+    </>
   )
 }
