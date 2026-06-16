@@ -145,10 +145,20 @@ function GalleryPlaceholder() {
   )
 }
 
-function ImageSpotlightOverlay({ src, alt, onClose }) {
+function ImageSpotlightOverlay({ src, alt, onClose, onDelete, deleting }) {
   return (
     <div className="reg-image-overlay" onClick={onClose}>
       <img className="reg-image-overlay__img" src={src} alt={alt} />
+      {onDelete && (
+        <button
+          className="reg-image-overlay__delete"
+          onClick={(e) => { e.stopPropagation(); onDelete() }}
+          disabled={deleting}
+          aria-label="Delete this photo"
+        >
+          {deleting ? 'Deleting…' : 'Delete photo'}
+        </button>
+      )}
     </div>
   )
 }
@@ -308,6 +318,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [photoError, setPhotoError] = useState(null)
   const [photoLimitNote, setPhotoLimitNote] = useState(false)
+  const [deletingPhoto, setDeletingPhoto] = useState(false)
   const fileInputRef = useRef(null)
   const tapTimerRef = useRef(null)
   // incremented by onSaved so the effect re-runs without changing currentRegId
@@ -487,6 +498,20 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     }
   }
 
+  async function handleDeletePhoto(src) {
+    if (deletingPhoto) return
+    setDeletingPhoto(true)
+    const nextUrls = photoUrls.filter((u) => u !== src)
+    const { error: err } = await supabase
+      .from('registrations')
+      .update({ photo_urls: nextUrls })
+      .eq('id', currentRegId)
+    setDeletingPhoto(false)
+    if (err) { setPhotoError(err.message); return }
+    setPhotoUrls(nextUrls)
+    setSpotlightSrc(null)
+  }
+
   async function handleDelete() {
     setDeleting(true)
     setDeleteError(null)
@@ -628,6 +653,8 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           src={spotlightSrc}
           alt={typeLabel}
           onClose={() => setSpotlightSrc(null)}
+          onDelete={spotlightSrc !== templateUrl ? () => handleDeletePhoto(spotlightSrc) : undefined}
+          deleting={deletingPhoto}
         />
       )}
 
