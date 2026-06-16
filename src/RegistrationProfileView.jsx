@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import NewRegistrationForm from './NewRegistrationForm'
 import StatusMarks from './StatusMarks'
@@ -154,6 +154,26 @@ function InfoSection({ reg, lastSighting }) {
   )
 }
 
+function ActionConfirmSheet({ message, confirmLabel, busyLabel, onConfirm, onCancel, busy }) {
+  return (
+    <div className="entry-modal-backdrop" onClick={onCancel}>
+      <div className="entry-modal delete-confirm action-confirm" onClick={(e) => e.stopPropagation()}>
+        <p className="action-confirm__message">{message}</p>
+        <button
+          className="btn-confirm-action"
+          onClick={onConfirm}
+          disabled={busy}
+        >
+          {busy ? busyLabel : confirmLabel}
+        </button>
+        <button className="btn-cancel-delete" onClick={onCancel} disabled={busy}>
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function DeleteConfirmSheet({ regId, onConfirm, onCancel, deleting }) {
   return (
     <div className="entry-modal-backdrop" onClick={onCancel}>
@@ -187,8 +207,21 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [flagged, setFlagged] = useState(false)
   const [siblingIds, setSiblingIds] = useState([])
   const [imageSpotlight, setImageSpotlight] = useState(false)
+  const [photoUrls, setPhotoUrls] = useState([])
+  const [showFlagConfirm, setShowFlagConfirm] = useState(false)
+  const [flagBusy, setFlagBusy] = useState(false)
+  const [showUploadConfirm, setShowUploadConfirm] = useState(false)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [photoError, setPhotoError] = useState(null)
+  const [photoLimitNote, setPhotoLimitNote] = useState(false)
+  const fileInputRef = useRef(null)
+  const tapTimerRef = useRef(null)
   // incremented by onSaved so the effect re-runs without changing currentRegId
   const [reloadKey, setReloadKey] = useState(0)
+
+  useEffect(() => {
+    return () => { if (tapTimerRef.current) clearTimeout(tapTimerRef.current) }
+  }, [])
 
   useEffect(() => { setCurrentRegId(regId) }, [regId])
 
@@ -213,6 +246,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           remark,
           statuses,
           flagged,
+          photo_urls,
           aircraft_types (
             id,
             name,
@@ -236,6 +270,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
 
       setReg(data)
       setFlagged(Boolean(data.flagged))
+      setPhotoUrls(Array.isArray(data.photo_urls) ? data.photo_urls : [])
 
       const { data: ls } = await supabase
         .from('sightings')
@@ -289,6 +324,76 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     setFlagged(next)
     if (supabase) {
       await supabase.from('registrations').update({ flagged: next }).eq('id', currentRegId)
+    }
+  }
+
+  async function handleConfirmFlag() {
+    if (flagBusy) return
+    setFlagBusy(true)
+    await handleToggleFlag()
+    setFlagBusy(false)
+    setShowFlagConfirm(false)
+  }
+
+  function handleCameraTap() {
+    if (uploadingPhoto) return
+    if (tapTimerRef.current) {
+      clearTimeout(tapTimerRef.current)
+      tapTimerRef.current = null
+      handleCameraDoubleTap()
+    } else {
+      tapTimerRef.current = setTimeout(() => {
+        tapTimerRef.current = null
+        setShowFlagConfirm(true)
+      }, 260)
+    }
+  }
+
+  function handleCameraDoubleTap() {
+    if (photoUrls.length >= 5) {
+      setPhotoLimitNote(true)
+      setTimeout(() => setPhotoLimitNote(false), 2000)
+      return
+    }
+    setShowUploadConfirm(true)
+  }
+
+  function handleConfirmUpload() {
+    setShowUploadConfirm(false)
+    fileInputRef.current?.click()
+  }
+
+  async function handleUploadPhoto(file) {
+    if (uploadingPhoto) return
+    setUploadingPhoto(true)
+    setPhotoError(null)
+    try {
+      const base64 = await new Promise((resolve, reject) => {
+        const r = new FileReader()
+        r.onload = () => resolve(String(r.result).split(',')[1])
+        r.onerror = reject
+        r.readAsDataURL(file)
+      })
+      const resp = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileBase64: base64, contentType: file.type, keyPrefix: 'reg-photos' }),
+      })
+      const uploadData = await resp.json()
+      if (!resp.ok) throw new Error(uploadData.error || 'Photo upload failed')
+
+      const nextUrls = [...photoUrls, uploadData.url]
+      const { error: err } = await supabase
+        .from('registrations')
+        .update({ photo_urls: nextUrls })
+        .eq('id', currentRegId)
+      if (err) throw new Error(err.message)
+
+      setPhotoUrls(nextUrls)
+    } catch (e) {
+      setPhotoError(e?.message || 'Photo upload failed')
+    } finally {
+      setUploadingPhoto(false)
     }
   }
 
@@ -347,20 +452,38 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
             <p className="section-label">
               {airline?.name ?? ''}
             </p>
-            <button
-              type="button"
-              className="camera-flag-btn"
-              onClick={handleToggleFlag}
-              aria-label="Toggle photo flag"
-            >
-              <img
-                src={flagged ? cameraIcon : cameraOffIcon}
-                alt=""
-                aria-hidden="true"
-                className="camera-flag__img"
+            <div className="camera-flag-area">
+              <span className="camera-flag__count">
+                {uploadingPhoto ? 'Uploading…' : photoLimitNote ? '5 of 5 photos' : `${photoUrls.length}/5`}
+              </span>
+              <button
+                type="button"
+                className="camera-flag-btn"
+                onClick={handleCameraTap}
+                disabled={uploadingPhoto}
+                aria-label="Tap to flag, double-tap to upload a photo"
+              >
+                <img
+                  src={flagged ? cameraIcon : cameraOffIcon}
+                  alt=""
+                  aria-hidden="true"
+                  className="camera-flag__img"
+                />
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="camera-flag__file-input"
+                onChange={(e) => {
+                  const file = e.target.files[0] ?? null
+                  e.target.value = ''
+                  if (file) handleUploadPhoto(file)
+                }}
               />
-            </button>
+            </div>
           </div>
+          {photoError && <p className="form-error" style={{ marginTop: '0.5rem' }}>{photoError}</p>}
           <InfoSection reg={reg} lastSighting={lastSighting} />
           {deleteError && <p className="form-error" style={{ marginTop: '1rem' }}>{deleteError}</p>}
           <button
@@ -417,6 +540,26 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           src={templateUrl}
           alt={typeLabel}
           onClose={() => setImageSpotlight(false)}
+        />
+      )}
+
+      {showFlagConfirm && (
+        <ActionConfirmSheet
+          message="Flag this registration?"
+          confirmLabel="Confirm"
+          busyLabel="Saving…"
+          busy={flagBusy}
+          onConfirm={handleConfirmFlag}
+          onCancel={() => setShowFlagConfirm(false)}
+        />
+      )}
+
+      {showUploadConfirm && (
+        <ActionConfirmSheet
+          message="Upload a picture?"
+          confirmLabel="Confirm"
+          onConfirm={handleConfirmUpload}
+          onCancel={() => setShowUploadConfirm(false)}
         />
       )}
     </>

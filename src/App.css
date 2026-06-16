@@ -512,6 +512,21 @@
   margin-bottom: 0;
 }
 
+.camera-flag-area {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.camera-flag__count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(44, 66, 123, 0.55);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
 .camera-flag-btn {
   background: none;
   border: none;
@@ -522,11 +537,20 @@
   flex-shrink: 0;
 }
 
+.camera-flag-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .camera-flag__img {
   display: block;
   width: 32px;
   height: 32px;
   object-fit: contain;
+}
+
+.camera-flag__file-input {
+  display: none;
 }
 
 /* ── Airline list ───────────────────────────────────────────────── */
@@ -1728,6 +1752,30 @@
   color: rgba(22, 32, 59, 0.5);
   text-align: center;
   margin: 0;
+}
+
+.action-confirm__message {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-align: center;
+  margin: 0;
+}
+
+.btn-confirm-action {
+  width: 100%;
+  background: var(--color-amber);
+  border: none;
+  border-radius: 10px;
+  color: var(--color-ink);
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.9rem 1rem;
+  cursor: pointer;
+}
+
+.btn-confirm-action:disabled {
+  opacity: 0.6;
 }
 
 .btn-cancel-delete {
