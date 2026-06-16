@@ -73,6 +73,7 @@ export default function ManufacturerDetailView({ manufacturerId, airlineId = nul
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showEdit, setShowEdit] = useState(false)
+  const [refreshNonce, setRefreshNonce] = useState(0)
 
   useEffect(() => {
     if (!supabase) {
@@ -129,7 +130,7 @@ export default function ManufacturerDetailView({ manufacturerId, airlineId = nul
 
       setLoading(false)
     })
-  }, [manufacturerId, airlineId])
+  }, [manufacturerId, airlineId, refreshNonce])
 
   const totalRegs = Object.values(regCounts).reduce((sum, n) => sum + n, 0)
   const meta = manufacturer ? buildMeta(manufacturer) : ''
@@ -179,8 +180,8 @@ export default function ManufacturerDetailView({ manufacturerId, airlineId = nul
       {showEdit && manufacturer && (
         <ManufacturerForm
           existing={manufacturer}
-          onCancel={() => setShowEdit(false)}
-          onUpdated={(row) => { setManufacturer(row); setShowEdit(false) }}
+          onCancel={() => { setShowEdit(false); setRefreshNonce((n) => n + 1) }}
+          onUpdated={(row) => { setManufacturer(row); setShowEdit(false); setRefreshNonce((n) => n + 1) }}
         />
       )}
     </>
