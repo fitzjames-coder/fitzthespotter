@@ -1482,7 +1482,7 @@
   height: 64px;
   object-fit: contain;
   border-radius: 12px;
-  background: rgba(246, 239, 220, 0.08);
+  background: var(--color-cream);
   margin-bottom: 0.4rem;
 }
 
