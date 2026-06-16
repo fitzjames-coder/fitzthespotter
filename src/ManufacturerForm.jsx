@@ -391,7 +391,7 @@ export default function ManufacturerForm({ initialName, existing, onCancel, onCr
                               aria-label={`Delete ${type.name}`}
                               disabled={isDeleting}
                             >
-                              🗑
+                              Del
                             </button>
                           </div>
                         </div>
