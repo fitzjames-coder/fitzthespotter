@@ -82,6 +82,22 @@ function GalleryPlaceholder() {
   )
 }
 
+function ImageSpotlightOverlay({ src, alt, onClose }) {
+  return (
+    <div className="reg-image-overlay" onClick={onClose}>
+      <img className="reg-image-overlay__img" src={src} alt={alt} />
+    </div>
+  )
+}
+
+function TypeTemplateHero({ templateUrl, label, onOpen }) {
+  return (
+    <button className="reg-template-hero" onClick={onOpen} aria-label={`View ${label} image`}>
+      <img className="reg-template-hero__img" src={templateUrl} alt={label} />
+    </button>
+  )
+}
+
 function InfoSection({ reg, lastSighting }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
   const model = reg.aircraft_types?.name
@@ -170,6 +186,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [deleteError, setDeleteError] = useState(null)
   const [flagged, setFlagged] = useState(false)
   const [siblingIds, setSiblingIds] = useState([])
+  const [imageSpotlight, setImageSpotlight] = useState(false)
   // incremented by onSaved so the effect re-runs without changing currentRegId
   const [reloadKey, setReloadKey] = useState(0)
 
@@ -199,6 +216,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           aircraft_types (
             id,
             name,
+            template_url,
             manufacturers (
               id,
               name
@@ -308,11 +326,22 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
 
   if (!reg) return null
 
+  const templateUrl = reg.aircraft_types?.template_url ?? null
+  const typeLabel = reg.aircraft_types?.name ?? reg.registration
+
   return (
     <>
       <div className="page reg-profile-page">
         <RegTopBar reg={reg} onBack={onBack} onEdit={() => setShowEdit(true)} />
-        <GalleryPlaceholder />
+        {templateUrl ? (
+          <TypeTemplateHero
+            templateUrl={templateUrl}
+            label={typeLabel}
+            onOpen={() => setImageSpotlight(true)}
+          />
+        ) : (
+          <GalleryPlaceholder />
+        )}
         <main className="content reg-info-area" style={{ opacity: loading ? 0.6 : 1 }}>
           <div className="section-label-row">
             <p className="section-label">
@@ -380,6 +409,14 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           onConfirm={handleDelete}
           onCancel={() => setShowDeleteConfirm(false)}
           deleting={deleting}
+        />
+      )}
+
+      {imageSpotlight && templateUrl && (
+        <ImageSpotlightOverlay
+          src={templateUrl}
+          alt={typeLabel}
+          onClose={() => setImageSpotlight(false)}
         />
       )}
     </>
