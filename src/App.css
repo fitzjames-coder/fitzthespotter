@@ -3957,12 +3957,7 @@
   background: rgba(246,239,220,0.06);
   border: 1.5px dashed rgba(246,239,220,0.45);
   box-shadow: none;
-}
-.ap-skyline-thumb__plus {
-  font-size: 1.2rem;
-  line-height: 1;
-  color: rgba(246,239,220,0.55);
-  font-weight: 400;
+  cursor: default;
 }
 
 /* Edit button — amber-outlined pill, anchored bottom-right of banner */
