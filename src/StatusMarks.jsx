@@ -2,6 +2,9 @@ import markRemark from './assets/marks/mark-remark.png'
 import markSpecialLivery from './assets/marks/mark-special-livery.png'
 import markRetro from './assets/marks/mark-retro.png'
 import markFlownIn from './assets/marks/mark-flown-in.png'
+import allianceStar from './assets/marks/mark-alliance-star.png'
+import allianceSkyteam from './assets/marks/mark-alliance-skyteam.png'
+import allianceOneworld from './assets/marks/mark-alliance-oneworld.png'
 
 function allianceLetters(name) {
   if (name === 'Star Alliance') return 'SA'
@@ -10,10 +13,29 @@ function allianceLetters(name) {
   return 'AL'
 }
 
+const ALLIANCE_EMBLEMS = {
+  'Star Alliance': allianceStar,
+  SkyTeam: allianceSkyteam,
+  Oneworld: allianceOneworld,
+}
+
 export function AllianceBadge({ name, size }) {
   const style = size
     ? { width: size, height: size, fontSize: Math.round(size * 0.38) }
     : { width: '2.73em', height: '2.73em', fontSize: '0.55em' }
+
+  const emblem = ALLIANCE_EMBLEMS[name]
+  if (emblem) {
+    return (
+      <img
+        src={emblem}
+        alt={name}
+        className="status-marks__alliance-img"
+        style={style}
+      />
+    )
+  }
+
   return (
     <span
       className="status-marks__alliance"
