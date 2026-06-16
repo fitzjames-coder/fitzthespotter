@@ -1081,6 +1081,41 @@
   letter-spacing: 0.02em;
 }
 
+.reg-template-hero {
+  display: block;
+  width: 100%;
+  height: 200px;
+  padding: 0;
+  border: none;
+  background: var(--color-cream);
+  cursor: pointer;
+}
+
+.reg-template-hero__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.reg-image-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12,19,34,0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.reg-image-overlay__img {
+  max-width: 100%;
+  max-height: 82%;
+  border-radius: 12px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+
 /* ── Info card ──────────────────────────────────────────────────── */
 .info-card {
   background: #ffffff;
