@@ -1,7 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { FlagIcon } from './App'
 import { COUNTRIES } from './data/countries'
+
+function thumbAbbrev(model) {
+  const seg = model.split(/[-\s]/)[0]
+  return seg.length <= 5 ? seg : seg.slice(0, 4)
+}
+
+function regLabel(n) {
+  return `${n} registration${n === 1 ? '' : 's'}`
+}
 
 export default function ManufacturerForm({ initialName, existing, onCancel, onCreated, onUpdated }) {
   const isEdit = Boolean(existing)
@@ -22,6 +31,114 @@ export default function ManufacturerForm({ initialName, existing, onCancel, onCr
   const [logoUrl, setLogoUrl] = useState(existing?.logo_url ?? null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
+
+  const [types, setTypes] = useState([])
+  const [typeCounts, setTypeCounts] = useState({})
+  const [typesLoading, setTypesLoading] = useState(false)
+  const [typesError, setTypesError] = useState(null)
+  const [uploadingTypeId, setUploadingTypeId] = useState(null)
+  const [deletingTypeId, setDeletingTypeId] = useState(null)
+  const [confirmDeleteTypeId, setConfirmDeleteTypeId] = useState(null)
+  const [newTypeName, setNewTypeName] = useState('')
+  const [addingType, setAddingType] = useState(false)
+
+  useEffect(() => {
+    if (!isEdit) return
+    if (!supabase) { setTypesError('Supabase is not configured.'); return }
+    setTypesLoading(true)
+    supabase
+      .from('aircraft_types')
+      .select('id, name, template_url')
+      .eq('manufacturer_id', existing.id)
+      .order('name', { ascending: true })
+      .then(async ({ data, error: err }) => {
+        if (err) {
+          setTypesError(err.message)
+          setTypesLoading(false)
+          return
+        }
+        const fetchedTypes = data ?? []
+        setTypes(fetchedTypes)
+
+        if (fetchedTypes.length > 0) {
+          const typeIds = fetchedTypes.map((t) => t.id)
+          const { data: regsData } = await supabase
+            .from('registrations')
+            .select('aircraft_type_id')
+            .in('aircraft_type_id', typeIds)
+          if (regsData) {
+            const counts = {}
+            for (const row of regsData) {
+              counts[row.aircraft_type_id] = (counts[row.aircraft_type_id] ?? 0) + 1
+            }
+            setTypeCounts(counts)
+          }
+        }
+        setTypesLoading(false)
+      })
+  }, [isEdit, existing?.id])
+
+  async function handleUploadTemplate(typeId, file) {
+    if (!file || uploadingTypeId) return
+    setUploadingTypeId(typeId)
+    setTypesError(null)
+    try {
+      const base64 = await new Promise((resolve, reject) => {
+        const r = new FileReader()
+        r.onload = () => resolve(String(r.result).split(',')[1])
+        r.onerror = reject
+        r.readAsDataURL(file)
+      })
+      const resp = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileBase64: base64, contentType: file.type, keyPrefix: 'type-templates' }),
+      })
+      const uploadData = await resp.json()
+      if (!resp.ok) throw new Error(uploadData.error || 'Template upload failed')
+
+      const { error: err } = await supabase
+        .from('aircraft_types')
+        .update({ template_url: uploadData.url })
+        .eq('id', typeId)
+      if (err) throw new Error(err.message)
+
+      setTypes((prev) => prev.map((t) => (t.id === typeId ? { ...t, template_url: uploadData.url } : t)))
+    } catch (e) {
+      setTypesError(e?.message || 'Template upload failed')
+    } finally {
+      setUploadingTypeId(null)
+    }
+  }
+
+  async function handleDeleteType(typeId) {
+    if (deletingTypeId) return
+    setDeletingTypeId(typeId)
+    setTypesError(null)
+    const { error: err } = await supabase.from('aircraft_types').delete().eq('id', typeId)
+    setDeletingTypeId(null)
+    if (err) { setTypesError(err.message); return }
+    setTypes((prev) => prev.filter((t) => t.id !== typeId))
+    setConfirmDeleteTypeId(null)
+  }
+
+  async function handleAddType() {
+    const trimmed = newTypeName.trim()
+    if (!trimmed || addingType) return
+    setAddingType(true)
+    setTypesError(null)
+    const { data, error: err } = await supabase
+      .from('aircraft_types')
+      .insert({ name: trimmed, manufacturer_id: existing.id })
+      .select('id, name, template_url')
+      .single()
+    setAddingType(false)
+    if (err) { setTypesError(err.message); return }
+    setTypes((prev) =>
+      [...prev, data].sort((a, b) => a.name.localeCompare(b.name))
+    )
+    setNewTypeName('')
+  }
 
   const filtered = countrySearch.trim()
     ? COUNTRIES.filter((c) =>
@@ -219,6 +336,120 @@ export default function ManufacturerForm({ initialName, existing, onCancel, onCr
           </div>
 
           {saveError && <p className="form-error">{saveError}</p>}
+
+          {isEdit && (
+            <div className="form-section type-mgmt-section">
+              <h3 className="type-mgmt-heading">Aircraft types</h3>
+              <p className="type-mgmt-subtext">
+                One template image per type — shared by every registration of that type.
+              </p>
+
+              {typesLoading && <p className="state-message">Loading types…</p>}
+
+              {!typesLoading && types.length > 0 && (
+                <ul className="type-mgmt-list">
+                  {types.map((type) => {
+                    const count = typeCounts[type.id] ?? 0
+                    const isUploading = uploadingTypeId === type.id
+                    const isDeleting = deletingTypeId === type.id
+                    const isConfirming = confirmDeleteTypeId === type.id
+                    return (
+                      <li key={type.id} className="type-mgmt-row">
+                        <div className="type-mgmt-row__main">
+                          <div className="type-mgmt-thumb">
+                            {type.template_url ? (
+                              <img className="type-mgmt-thumb__img" src={type.template_url} alt="" aria-hidden="true" />
+                            ) : (
+                              <div className="type-mgmt-thumb__placeholder" aria-hidden="true">
+                                {thumbAbbrev(type.name)}
+                              </div>
+                            )}
+                          </div>
+                          <div className="type-mgmt-row__info">
+                            <span className="type-mgmt-row__name">{type.name}</span>
+                            <span className="type-mgmt-row__count">{regLabel(count)}</span>
+                          </div>
+                          <div className="type-mgmt-row__actions">
+                            <label className={`btn-secondary type-mgmt-upload-btn${isUploading ? ' type-mgmt-upload-btn--busy' : ''}`}>
+                              {isUploading ? 'Uploading…' : type.template_url ? 'Replace' : 'Upload'}
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="type-mgmt-upload-input"
+                                disabled={isUploading}
+                                onChange={(e) => {
+                                  const file = e.target.files[0] ?? null
+                                  e.target.value = ''
+                                  if (file) handleUploadTemplate(type.id, file)
+                                }}
+                              />
+                            </label>
+                            <button
+                              type="button"
+                              className="type-mgmt-trash-btn"
+                              onClick={() => setConfirmDeleteTypeId(type.id)}
+                              aria-label={`Delete ${type.name}`}
+                              disabled={isDeleting}
+                            >
+                              Del
+                            </button>
+                          </div>
+                        </div>
+
+                        {isConfirming && (
+                          <div className="delete-confirm type-mgmt-inline-confirm">
+                            <p className="delete-confirm__hint">
+                              Delete {type.name}? {regLabel(count)} will lose their type.
+                            </p>
+                            <button
+                              className="btn-confirm-delete"
+                              onClick={() => handleDeleteType(type.id)}
+                              disabled={isDeleting}
+                            >
+                              {isDeleting ? 'Deleting…' : 'Confirm Delete'}
+                            </button>
+                            <button
+                              className="btn-cancel-delete"
+                              onClick={() => setConfirmDeleteTypeId(null)}
+                              disabled={isDeleting}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        )}
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+
+              <div className="type-mgmt-add-row">
+                <input
+                  className="form-input"
+                  type="text"
+                  value={newTypeName}
+                  onChange={(e) => setNewTypeName(e.target.value)}
+                  placeholder="Add a new type…"
+                  autoComplete="off"
+                  disabled={addingType}
+                />
+                <button
+                  type="button"
+                  className="btn-secondary type-mgmt-add-btn"
+                  onClick={handleAddType}
+                  disabled={!newTypeName.trim() || addingType}
+                >
+                  {addingType ? 'Adding…' : 'Add'}
+                </button>
+              </div>
+
+              {typesError && <p className="form-error">{typesError}</p>}
+
+              <p className="type-mgmt-warning">
+                Deleting a type doesn't delete its registrations — they lose their type link (the regs survive).
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="form-footer">

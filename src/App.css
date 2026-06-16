@@ -632,6 +632,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  background: var(--color-cream);
 }
 
 .airline-card__logo-initials {
@@ -1312,7 +1313,7 @@
   height: 64px;
   object-fit: contain;
   border-radius: 12px;
-  background: rgba(246, 239, 220, 0.08);
+  background: var(--color-cream);
   margin-bottom: 0.4rem;
 }
 
@@ -1481,7 +1482,7 @@
   height: 64px;
   object-fit: contain;
   border-radius: 12px;
-  background: rgba(246, 239, 220, 0.08);
+  background: var(--color-cream);
   margin-bottom: 0.4rem;
 }
 
@@ -2345,6 +2346,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  background: var(--color-cream);
 }
 
 .stat-logo-tile__initials {
@@ -2901,6 +2903,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  background: var(--color-cream);
 }
 
 .mfr-gallery-tile__logo-initials {
@@ -4003,4 +4006,171 @@
   margin-top: 1.2rem;
   padding-top: 0.8rem;
   border-top: 1px solid rgba(232,96,122,0.25);
+}
+
+/* Aircraft types management section — manufacturer edit form */
+.type-mgmt-section {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(44,66,123,0.12);
+}
+
+.type-mgmt-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  margin: 0 0 0.2rem;
+}
+
+.type-mgmt-subtext {
+  font-size: 0.8rem;
+  color: rgba(22,32,59,0.6);
+  margin: 0 0 0.9rem;
+}
+
+.type-mgmt-list {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.type-mgmt-row {
+  border: 1px solid rgba(44,66,123,0.12);
+  border-radius: 10px;
+  padding: 0.6rem;
+}
+
+.type-mgmt-row__main {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.type-mgmt-thumb {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--color-cream);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.type-mgmt-thumb__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.type-mgmt-thumb__placeholder {
+  width: 100%;
+  height: 100%;
+  border: 1px dashed rgba(44,66,123,0.35);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: rgba(44,66,123,0.55);
+  text-transform: uppercase;
+}
+
+.type-mgmt-row__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.type-mgmt-row__name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.type-mgmt-row__count {
+  font-size: 0.75rem;
+  color: rgba(22,32,59,0.55);
+}
+
+.type-mgmt-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.type-mgmt-upload-btn {
+  position: relative;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+}
+
+.type-mgmt-upload-btn--busy {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.type-mgmt-upload-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.type-mgmt-trash-btn {
+  background: rgba(232, 96, 122, 0.12);
+  border: 1px solid rgba(232, 96, 122, 0.55);
+  color: var(--color-coral);
+  font-size: 0.75rem;
+  font-weight: bold;
+  padding: 0.35rem 0.6rem;
+  border-radius: 7px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.type-mgmt-trash-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.type-mgmt-inline-confirm {
+  margin-top: 0.6rem;
+  padding: 0.8rem 0.6rem 0.2rem;
+}
+
+.type-mgmt-add-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.type-mgmt-add-row .form-input {
+  flex: 1;
+}
+
+.type-mgmt-add-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.type-mgmt-warning {
+  margin: 0.8rem 0 0;
+  font-size: 0.78rem;
+  color: var(--color-amber);
 }
