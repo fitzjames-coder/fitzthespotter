@@ -411,24 +411,6 @@
   padding-top: 0.5rem;
 }
 
-/* ── Illustration / photo stubs ─────────────────────────────────── */
-.form-illustration-stub,
-.form-photos-stub {
-  background: rgba(44, 66, 123, 0.06);
-  border-radius: 8px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 0.9rem;
-}
-
-.form-stub__label {
-  font-family: Georgia, 'Times New Roman', Times, serif;
-  font-size: 0.8rem;
-  color: rgba(44, 66, 123, 0.4);
-}
-
 /* ── Form footer (sticky) ────────────────────────────────────────── */
 .form-footer {
   display: flex;

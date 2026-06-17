@@ -720,9 +720,6 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 addNewLabel="Add new type"
               />
             </div>
-            <div className="form-illustration-stub">
-              <span className="form-stub__label">Aircraft image coming soon</span>
-            </div>
           </div>
 
           {!isEdit && (
@@ -827,9 +824,6 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
 
           <div className="form-section">
             <p className="form-section__label">Notes</p>
-            <div className="form-photos-stub">
-              <span className="form-stub__label">Photo upload coming soon</span>
-            </div>
             <div className="form-group">
               <label className="form-label" htmlFor="remark-input">Remark</label>
               <textarea
