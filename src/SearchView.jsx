@@ -40,6 +40,7 @@ const QUICK_FILTERS = [
   { id: 'remarks',        label: 'Remarks'        },
   { id: 'flown_in',       label: 'Flown-in'       },
   { id: 'flagged',        label: 'Flagged'        },
+  { id: 'closed',         label: 'Closed'         },
 ]
 
 function ResultCard({ reg, onSelect }) {
@@ -112,7 +113,7 @@ export default function SearchView() {
       .from('registrations')
       .select(`
         id, registration, airports, remark, statuses, flagged,
-        airlines ( id, name, country, country_flag ),
+        airlines ( id, name, country, country_flag, is_closed ),
         aircraft_types ( id, name, manufacturers ( id, name ) )
       `)
       .then(({ data, error: err }) => {
@@ -145,6 +146,7 @@ export default function SearchView() {
     ? allRegs.filter((reg) => {
         for (const fid of activeFilters) {
           if (fid === 'flagged') { if (!reg.flagged) return false; continue }
+          if (fid === 'closed') { if (!reg.airlines?.is_closed) return false; continue }
           if (!reg.statuses?.[fid]) return false
         }
         if (q === '') return true
