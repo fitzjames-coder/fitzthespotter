@@ -177,6 +177,15 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [sightingAirportKnown, setSightingAirportKnown] = useState(false)
   const [sightingSaving, setSightingSaving] = useState(false)
 
+  const [sightingsMgrOpen, setSightingsMgrOpen] = useState(false)
+  const [sightingsFetched, setSightingsFetched] = useState(false)
+  const [sightings, setSightings] = useState([])
+  const [sightingsLoading, setSightingsLoading] = useState(false)
+  const [sightingsMgrError, setSightingsMgrError] = useState(null)
+  const [savingDateId, setSavingDateId] = useState(null)
+  const [confirmDeleteSightingId, setConfirmDeleteSightingId] = useState(null)
+  const [deletingSightingId, setDeletingSightingId] = useState(null)
+
   const [airlineFormOpen, setAirlineFormOpen] = useState(false)
   const [airlineFormName, setAirlineFormName] = useState('')
   const [mfrFormOpen, setMfrFormOpen] = useState(false)
@@ -259,6 +268,59 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   function handleManufacturerSelect(mfr) {
     setManufacturer(mfr)
     setType(null)
+  }
+
+  async function fetchSightings() {
+    if (!supabase) return
+    setSightingsLoading(true)
+    setSightingsMgrError(null)
+    const { data, error: err } = await supabase
+      .from('sightings')
+      .select('id, spotted_on, airport')
+      .eq('registration_id', existingReg.id)
+      .order('spotted_on', { ascending: true, nullsFirst: false })
+    setSightingsLoading(false)
+    setSightingsFetched(true)
+    if (err) { setSightingsMgrError(err.message); return }
+    setSightings(data ?? [])
+  }
+
+  function handleToggleSightingsMgr() {
+    if (!sightingsMgrOpen && !sightingsFetched) {
+      fetchSightings()
+    }
+    setSightingsMgrOpen((o) => !o)
+  }
+
+  async function handleSightingDateChange(sightingId, value) {
+    if (savingDateId) return
+    setSavingDateId(sightingId)
+    setSightingsMgrError(null)
+    const { error: err } = await supabase
+      .from('sightings')
+      .update({ spotted_on: value || null })
+      .eq('id', sightingId)
+    setSavingDateId(null)
+    if (err) { setSightingsMgrError(err.message); return }
+    setSightings((prev) =>
+      prev.map((s) => s.id === sightingId ? { ...s, spotted_on: value || null } : s)
+    )
+    onSaved?.()
+  }
+
+  async function handleDeleteSighting(sightingId) {
+    if (deletingSightingId) return
+    setDeletingSightingId(sightingId)
+    setSightingsMgrError(null)
+    const { error: err } = await supabase
+      .from('sightings')
+      .delete()
+      .eq('id', sightingId)
+    setDeletingSightingId(null)
+    if (err) { setSightingsMgrError(err.message); return }
+    setSightings((prev) => prev.filter((s) => s.id !== sightingId))
+    setConfirmDeleteSightingId(null)
+    onSaved?.()
   }
 
   async function handleSave() {
@@ -763,6 +825,90 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               />
             </div>
           </div>
+
+          {isEdit && (
+            <div className="form-section sightings-mgr-section">
+              <button
+                type="button"
+                className="sightings-mgr-toggle"
+                onClick={handleToggleSightingsMgr}
+                aria-expanded={sightingsMgrOpen}
+              >
+                <span>Sightings</span>
+                <span className="sightings-mgr-toggle__chevron" aria-hidden="true">
+                  {sightingsMgrOpen ? '▾' : '›'}
+                </span>
+              </button>
+
+              {sightingsMgrOpen && (
+                <div className="sightings-mgr-body">
+                  {sightingsLoading && (
+                    <p className="sightings-mgr-empty">Loading…</p>
+                  )}
+                  {!sightingsLoading && sightings.length === 0 && (
+                    <p className="sightings-mgr-empty">No sightings yet.</p>
+                  )}
+                  {!sightingsLoading && sightings.length > 0 && (
+                    <ul className="sightings-mgr-list">
+                      {sightings.map((s) => {
+                        const isConfirming = confirmDeleteSightingId === s.id
+                        const isDeleting = deletingSightingId === s.id
+                        const isSavingDate = savingDateId === s.id
+                        return (
+                          <li key={s.id} className="sightings-mgr-row">
+                            <div className="sightings-mgr-row__main">
+                              <span className="sightings-mgr-airport">{s.airport ?? '—'}</span>
+                              <input
+                                type="date"
+                                className="form-input sightings-mgr-date"
+                                value={s.spotted_on ?? ''}
+                                disabled={isSavingDate || !!deletingSightingId}
+                                onChange={(e) => handleSightingDateChange(s.id, e.target.value)}
+                                aria-label={`Date for sighting at ${s.airport ?? 'unknown airport'}`}
+                              />
+                              <button
+                                type="button"
+                                className="type-mgmt-trash-btn"
+                                onClick={() => setConfirmDeleteSightingId(s.id)}
+                                disabled={!!deletingSightingId || !!savingDateId}
+                                aria-label={`Delete sighting at ${s.airport ?? 'unknown airport'}`}
+                              >
+                                Del
+                              </button>
+                            </div>
+                            {isConfirming && (
+                              <div className="delete-confirm type-mgmt-inline-confirm">
+                                <p className="delete-confirm__hint">
+                                  Delete this sighting? This is permanent.
+                                </p>
+                                <button
+                                  className="btn-confirm-delete"
+                                  onClick={() => handleDeleteSighting(s.id)}
+                                  disabled={isDeleting}
+                                >
+                                  {isDeleting ? 'Deleting…' : 'Confirm Delete'}
+                                </button>
+                                <button
+                                  className="btn-cancel-delete"
+                                  onClick={() => setConfirmDeleteSightingId(null)}
+                                  disabled={isDeleting}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            )}
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+                  {sightingsMgrError && (
+                    <p className="form-error" style={{ marginTop: '0.5rem' }}>{sightingsMgrError}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {saveError && <p className="form-error">{saveError}</p>}
         </div>
