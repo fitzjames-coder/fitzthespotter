@@ -88,7 +88,10 @@ function AirlineCard({ airline, regCount, onSelect }) {
         </div>
       </div>
       <div className="airline-card__right">
-        {isClosed && <span className="airline-card__closed-badge">CLOSED</span>}
+        {isClosed && (
+          <img className="airline-card__closed-banner" src="/Closed.PNG"
+               alt="Closed — ceased operations" />
+        )}
         {regCount !== undefined && <RegCountPill count={regCount} />}
       </div>
     </button>
