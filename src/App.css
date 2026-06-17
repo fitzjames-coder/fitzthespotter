@@ -3024,6 +3024,11 @@
   max-height: 85vh;
 }
 
+.airline-form-closed-row {
+  margin-top: 0.5rem;
+  border-bottom: none;
+}
+
 .country-picker {
   position: relative;
 }

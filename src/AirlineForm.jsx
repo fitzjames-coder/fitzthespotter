@@ -16,6 +16,7 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
   const [pickerOpen, setPickerOpen] = useState(false)
   const [logoFile, setLogoFile] = useState(null)
   const [logoUrl, setLogoUrl] = useState(existing?.logo_url ?? null)
+  const [isClosed, setIsClosed] = useState(existing?.is_closed ?? false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -67,9 +68,10 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
             country: selectedCountry.name,
             country_flag: selectedCountry.code.toUpperCase(),
             logo_url: finalLogoUrl,
+            is_closed: isClosed,
           })
           .eq('id', existing.id)
-          .select('id, name, country, country_flag, logo_url')
+          .select('id, name, country, country_flag, logo_url, is_closed')
           .single()
         setSaving(false)
         if (err) { setSaveError(err.message); return }
@@ -82,8 +84,9 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
             country: selectedCountry.name,
             country_flag: selectedCountry.code.toUpperCase(),
             logo_url: finalLogoUrl,
+            is_closed: isClosed,
           })
-          .select('id, name, country, country_flag, logo_url')
+          .select('id, name, country, country_flag, logo_url, is_closed')
           .single()
         setSaving(false)
         if (err) { setSaveError(err.message); return }
@@ -191,6 +194,21 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
                 onChange={(e) => setLogoFile(e.target.files[0] ?? null)}
               />
             </div>
+          </div>
+
+          <div className="status-switch airline-form-closed-row">
+            <span className="status-switch__left">
+              <span className="status-switch__label">Ceased operations</span>
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isClosed}
+              className={`status-toggle${isClosed ? ' status-toggle--on' : ''}`}
+              onClick={() => setIsClosed((v) => !v)}
+            >
+              <span className="status-toggle__knob" />
+            </button>
           </div>
 
           {saveError && <p className="form-error">{saveError}</p>}
