@@ -1604,6 +1604,21 @@
   flex: 1;
 }
 
+/* ── Closed banner overlay ───────────────────────────────────────── */
+.airline-hero__closed-banner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  width: 78%;
+  max-width: 360px;
+  height: auto;
+  opacity: 0.96;
+  pointer-events: none;
+  z-index: 5;
+  filter: drop-shadow(0 3px 10px rgba(0, 0, 0, 0.55));
+}
+
 /* ── Logo / initials placeholder ────────────────────────────────── */
 .airline-hero__logo {
   width: 64px;
