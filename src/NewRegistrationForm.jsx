@@ -333,6 +333,17 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     setSaving(true)
     setSaveError(null)
 
+    const sinceLines = []
+    if (!isEdit && firstSpotted) {
+      if (statusSpecialLivery)
+        sinceLines.push(`Special livery${liveryName.trim() ? ' — ' + liveryName.trim() : ''} since ${firstSpotted}`)
+      if (statusRetro)
+        sinceLines.push(`Retro livery${liveryName.trim() ? ' — ' + liveryName.trim() : ''} since ${firstSpotted}`)
+      if (statusAlliance)
+        sinceLines.push(`${allianceName ? allianceName + ' alliance' : 'Alliance'} livery since ${firstSpotted}`)
+    }
+    const finalRemark = [remark.trim(), ...sinceLines].filter(Boolean).join('\n')
+
     const statuses = {}
     if (statusSpecialLivery) statuses.special_livery = true
     if (statusRetro) statuses.retro = true
@@ -341,7 +352,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       statuses.alliance = true
       if (allianceName) statuses.alliance_name = allianceName
     }
-    if (remark.trim()) statuses.remarks = true
+    if (finalRemark) statuses.remarks = true
     if (statusFlownIn) {
       statuses.flown_in = true
       if (flownInDate) statuses.flown_in_date = flownInDate
@@ -351,7 +362,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       registration: trimmed,
       airline_id: airline?.id ?? null,
       aircraft_type_id: type?.id ?? null,
-      remark: remark.trim() || null,
+      remark: finalRemark || null,
       statuses: Object.keys(statuses).length > 0 ? statuses : null,
     }
 
@@ -414,6 +425,12 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       lines.push(`Used to wear ${origLivery.current.liveryName || 'retro livery'} until ${effectiveDate}`)
     if (origLivery.current.wasAlliance && !statusAlliance)
       lines.push(`Used to wear ${origLivery.current.allianceName ? origLivery.current.allianceName + ' alliance livery' : 'alliance livery'} until ${effectiveDate}`)
+    if (!origLivery.current.wasSpecial && statusSpecialLivery)
+      lines.push(`Special livery${liveryName.trim() ? ' — ' + liveryName.trim() : ''} since ${effectiveDate}`)
+    if (!origLivery.current.wasRetro && statusRetro)
+      lines.push(`Retro livery${liveryName.trim() ? ' — ' + liveryName.trim() : ''} since ${effectiveDate}`)
+    if (!origLivery.current.wasAlliance && statusAlliance)
+      lines.push(`${allianceName ? allianceName + ' alliance' : 'Alliance'} livery since ${effectiveDate}`)
 
     const newRemark = [remark.trim(), ...lines].filter(Boolean).join('\n')
     setRemark(newRemark)
