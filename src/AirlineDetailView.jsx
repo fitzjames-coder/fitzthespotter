@@ -64,22 +64,24 @@ function AirlineHero({ airline, regCount, loading, onBack, onEdit }) {
       <button className="edit-btn" onClick={onEdit} aria-label="Edit airline">Edit</button>
       <div className="airline-hero__body">
         <AirlineHeroLogo airline={airline} />
-        <div className="airline-hero__name-row">
-          <h1 className="airline-hero__name">{airline.name}</h1>
-          {isClosed && <span className="airline-closed-chip">CLOSED</span>}
-        </div>
-        {(airline.country_flag || meta) && (
-          <p className="airline-hero__meta">
-            <FlagIcon countryCode={airline.country_flag} />
-            {meta && <span>{meta}</span>}
-          </p>
-        )}
-        {!loading && (
-          <div className="airline-hero__stats">
-            <span className="airline-regs-logged__number">{regCount}</span>
-            <span className="airline-regs-logged__label">REGS LOGGED</span>
+        <div className="airline-hero__text">
+          <div className="airline-hero__name-row">
+            <h1 className="airline-hero__name">{airline.name}</h1>
+            {isClosed && <span className="airline-closed-chip">CLOSED</span>}
           </div>
-        )}
+          {(airline.country_flag || meta) && (
+            <p className="airline-hero__meta">
+              <FlagIcon countryCode={airline.country_flag} />
+              {meta && <span>{meta}</span>}
+            </p>
+          )}
+          {!loading && (
+            <div className="airline-hero__stats">
+              <span className="airline-regs-logged__number">{regCount}</span>
+              <span className="airline-regs-logged__label">REGS LOGGED</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
