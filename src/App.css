@@ -579,6 +579,7 @@
   align-items: center;
   gap: 0.45rem;
   flex-shrink: 0;
+  position: relative;
 }
 
 .airline-card__flag-svg {
@@ -658,16 +659,13 @@
   height: 12px;
 }
 
-.airline-card__closed-badge {
-  font-size: 0.65rem;
-  font-weight: bold;
-  letter-spacing: 0.08em;
-  color: var(--color-coral);
-  border: 1.5px solid var(--color-coral);
-  border-radius: 4px;
-  padding: 0.15rem 0.35rem;
-  white-space: nowrap;
+.airline-card__closed-banner {
+  width: 92px;
+  height: auto;
+  transform: rotate(-10deg);
+  pointer-events: none;
   flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
 }
 
 /* ── State messages ─────────────────────────────────────────────── */
@@ -1610,8 +1608,8 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(-12deg);
-  width: 78%;
-  max-width: 360px;
+  width: 46%;
+  max-width: 200px;
   height: auto;
   opacity: 0.96;
   pointer-events: none;
