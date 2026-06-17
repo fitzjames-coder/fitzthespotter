@@ -83,6 +83,13 @@ function AirlineHero({ airline, regCount, loading, onBack, onEdit }) {
           )}
         </div>
       </div>
+      {isClosed && (
+        <img
+          className="airline-hero__closed-banner"
+          src="/Closed.PNG"
+          alt="Closed — ceased operations"
+        />
+      )}
     </div>
   )
 }
