@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import { supabase } from './lib/supabaseClient'
+import Splash from './Splash'
 import AirlineDetailView from './AirlineDetailView'
 import ManufacturerDetailView from './ManufacturerDetailView'
 import AirportsTab from './AirportsTab'
@@ -218,6 +219,15 @@ export default function App() {
     () => typeof window !== 'undefined' && window.innerWidth >= 1024
   )
   const [userToggled, setUserToggled] = useState(false)
+  const [splashDone, setSplashDone] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth >= 1024
+  )
+
+  useEffect(() => {
+    if (window.innerWidth >= 1024) return
+    const id = setTimeout(() => setSplashDone(true), 1600)
+    return () => clearTimeout(id)
+  }, [])
 
   useEffect(() => {
     if (userToggled) return
@@ -264,6 +274,7 @@ export default function App() {
         desktopMode={desktopMode}
         onToggleDesktop={handleToggleDesktop}
       />
+      {!splashDone && <Splash />}
     </div>
   )
 }
