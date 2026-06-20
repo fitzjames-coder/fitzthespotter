@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Fragment } from 'react'
 import './App.css'
 import { supabase } from './lib/supabaseClient'
 import AirlineDetailView from './AirlineDetailView'
@@ -9,6 +9,14 @@ import BottomNav from './BottomNav'
 import PlaceholderScreen from './PlaceholderScreen'
 import NewRegistrationForm from './NewRegistrationForm'
 import SearchView from './SearchView'
+
+function airlineBucket(name) {
+  const c = (name || '').trim().charAt(0)
+  if (!c) return '#'
+  if (/[0-9]/.test(c)) return '#'
+  const base = c.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase()
+  return /[A-Z]/.test(base) ? base : '#'
+}
 
 function compareAirlineNames(a, b) {
   const an = (a.name ?? '').trim()
@@ -174,6 +182,16 @@ function AirlinesTab() {
   }
 
   function renderBody() {
+    // px: navy banner (~54px) + breathing room. Nudge on device if header lands hidden.
+    const STICKY_OFFSET = 60
+
+    function jumpToBucket(b) {
+      const el = document.getElementById(`ag-${b}`)
+      if (!el) return
+      const y = el.getBoundingClientRect().top + window.scrollY - STICKY_OFFSET
+      window.scrollTo({ top: y, behavior: 'smooth' })
+    }
+
     if (loading) {
       return <p className="state-message">Loading airlines…</p>
     }
@@ -183,18 +201,47 @@ function AirlinesTab() {
     if (airlines.length === 0) {
       return <p className="state-message">No airlines yet.</p>
     }
+
+    const groups = []
+    const bucketMap = new Map()
+    for (const airline of airlines) {
+      const b = airlineBucket(airline.name)
+      if (!bucketMap.has(b)) { bucketMap.set(b, []); groups.push(b) }
+      bucketMap.get(b).push(airline)
+    }
+
     return (
-      <ul className="airline-list">
-        {airlines.map((airline) => (
-          <li key={airline.id}>
-            <AirlineCard
-              airline={airline}
-              regCount={regCounts[airline.id] ?? 0}
-              onSelect={setSelectedAirline}
-            />
-          </li>
-        ))}
-      </ul>
+      <>
+        <ul className="airline-list">
+          {groups.map((bucket) => (
+            <Fragment key={bucket}>
+              <li className="airline-group-header" id={`ag-${bucket}`}>{bucket}</li>
+              {bucketMap.get(bucket).map((airline) => (
+                <li key={airline.id}>
+                  <AirlineCard
+                    airline={airline}
+                    regCount={regCounts[airline.id] ?? 0}
+                    onSelect={setSelectedAirline}
+                  />
+                </li>
+              ))}
+            </Fragment>
+          ))}
+        </ul>
+        {groups.length > 1 && (
+          <nav className="az-rail" aria-label="Jump to letter">
+            {groups.map((b) => (
+              <button
+                key={b}
+                className="az-rail__letter"
+                onClick={() => jumpToBucket(b)}
+              >
+                {b}
+              </button>
+            ))}
+          </nav>
+        )}
+      </>
     )
   }
 

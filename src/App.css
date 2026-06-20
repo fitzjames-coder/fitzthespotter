@@ -538,9 +538,75 @@
 /* ── Airline list ───────────────────────────────────────────────── */
 .airline-list {
   list-style: none;
+  display: block;
+}
+
+.airline-list > li {
+  margin-bottom: 0.65rem;
+}
+
+.airline-list > li:last-child {
+  margin-bottom: 0;
+}
+
+/* ── A–Z index ─────────────────────────────────────────────────── */
+.airline-group-header {
+  /* Sticky top: bottom edge of the navy top-bar (~54px = 0.85rem×2 + 1.5rem font + 3px border).
+     Nudge this value on device if the header tucks under the bar. */
+  position: sticky;
+  top: 54px;
+  z-index: 5;
+  background: #F6EFDC;
+  color: #2C427B;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: bold;
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+  padding: 5px 14px;
+  /* Square top corners so it reads as a shelf flush against the banner */
+  border-radius: 0 0 8px 8px;
+  border-bottom: 3px solid #FBAD19;
+  /* No top margin — gap would let the fixed background bleed through */
+  margin: 0 0 4px;
+}
+
+.az-rail {
+  position: fixed;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  align-items: center;
+  gap: 1px;
+  z-index: 60;
+  padding: 4px 2px;
+  background: rgba(246, 239, 220, 0.6);
+  border-radius: 12px;
+  max-height: 70vh;
+  overflow-y: auto;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.az-rail::-webkit-scrollbar { display: none; }
+.az-rail { scrollbar-width: none; }
+
+.az-rail__letter {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px 6px;
+  line-height: 1.15;
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #2C427B;
+  min-width: 16px;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
 }
 
 /* ── Airline card (now a button) ────────────────────────────────── */
@@ -4002,6 +4068,13 @@
 .airlines-page > * {
   position: relative;
   z-index: 1;
+}
+
+/* Re-assert sticky on the top-bar; .airlines-page > * { position: relative } has equal
+   specificity and appears later, overriding it. This higher-specificity rule wins. */
+.airlines-page > .top-bar {
+  position: sticky;
+  z-index: 10;
 }
 
 .airlines-page .airline-card {
