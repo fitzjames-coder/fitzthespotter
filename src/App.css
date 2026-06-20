@@ -538,13 +538,15 @@
 /* ── Airline list ───────────────────────────────────────────────── */
 .airline-list {
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
+  display: block;
 }
 
-.airline-list__divider-item {
-  list-style: none;
+.airline-list > li {
+  margin-bottom: 0.65rem;
+}
+
+.airline-list > li:last-child {
+  margin-bottom: 0;
 }
 
 /* ── A–Z index ─────────────────────────────────────────────────── */
@@ -574,12 +576,14 @@
   flex-direction: column;
   align-items: center;
   gap: 1px;
-  z-index: 20;
+  z-index: 60;
   padding: 4px 2px;
   background: rgba(246, 239, 220, 0.6);
   border-radius: 12px;
   max-height: 70vh;
   overflow-y: auto;
+  pointer-events: auto;
+  touch-action: manipulation;
 }
 
 .az-rail::-webkit-scrollbar { display: none; }
@@ -589,13 +593,17 @@
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 2px 6px;
   line-height: 1.15;
   font-size: 0.72rem;
   font-weight: bold;
   color: #2C427B;
   min-width: 16px;
-  text-align: center;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
 }
 
 /* ── Airline card (now a button) ────────────────────────────────── */

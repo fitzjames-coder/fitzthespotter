@@ -205,9 +205,7 @@ function AirlinesTab() {
         <ul className="airline-list">
           {groups.map((bucket) => (
             <Fragment key={bucket}>
-              <li className="airline-list__divider-item">
-                <div className="airline-group-header" id={`ag-${bucket}`}>{bucket}</div>
-              </li>
+              <li className="airline-group-header" id={`ag-${bucket}`}>{bucket}</li>
               {bucketMap.get(bucket).map((airline) => (
                 <li key={airline.id}>
                   <AirlineCard
