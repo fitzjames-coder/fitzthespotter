@@ -115,6 +115,7 @@ function AirlinesTab() {
   const [selectedManufacturer, setSelectedManufacturer] = useState(null)
   const [manufacturerAirline, setManufacturerAirline] = useState(null)
   const [reloadNonce, setReloadNonce] = useState(0)
+  const [airlineQuery, setAirlineQuery] = useState('')
 
   function reloadAirlines() { setReloadNonce((n) => n + 1) }
 
@@ -202,9 +203,18 @@ function AirlinesTab() {
       return <p className="state-message">No airlines yet.</p>
     }
 
+    const q = airlineQuery.trim().toLowerCase()
+    const filtered = q
+      ? airlines.filter((a) => a.name.toLowerCase().includes(q))
+      : airlines
+
+    if (q && filtered.length === 0) {
+      return <p className="state-message">No airlines match.</p>
+    }
+
     const groups = []
     const bucketMap = new Map()
-    for (const airline of airlines) {
+    for (const airline of filtered) {
       const b = airlineBucket(airline.name)
       if (!bucketMap.has(b)) { bucketMap.set(b, []); groups.push(b) }
       bucketMap.get(b).push(airline)
@@ -249,7 +259,29 @@ function AirlinesTab() {
     <div className="page airlines-page">
       <TopBar />
       <main className="content">
-        <p className="section-label">Airlines Spotted</p>
+        <div className="list-head">
+          <p className="section-label">Airlines Spotted</p>
+          <div className="list-search list-search--inline">
+            <div className="list-search__field">
+              <span className="list-search__icon" aria-hidden="true">🔍</span>
+              <input
+                className="list-search__input"
+                type="text"
+                placeholder="Search airlines…"
+                value={airlineQuery}
+                onChange={(e) => setAirlineQuery(e.target.value)}
+                aria-label="Search this list"
+              />
+              {airlineQuery && (
+                <button
+                  className="list-search__clear"
+                  aria-label="Clear search"
+                  onClick={() => setAirlineQuery('')}
+                >×</button>
+              )}
+            </div>
+          </div>
+        </div>
         {renderBody()}
       </main>
     </div>

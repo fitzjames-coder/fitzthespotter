@@ -6,6 +6,7 @@ export default function AirportsTab({ onSelectAirport }) {
   const [airports, setAirports] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [airportQuery, setAirportQuery] = useState('')
 
   useEffect(() => {
     if (!supabase) {
@@ -32,15 +33,49 @@ export default function AirportsTab({ onSelectAirport }) {
         </span>
       </header>
       <main className="content">
-        <p className="section-label">Airports Spotted</p>
+        <div className="list-head">
+          <p className="section-label">Airports Spotted</p>
+          <div className="list-search list-search--inline">
+            <div className="list-search__field">
+              <span className="list-search__icon" aria-hidden="true">🔍</span>
+              <input
+                className="list-search__input"
+                type="text"
+                placeholder="Search airports…"
+                value={airportQuery}
+                onChange={(e) => setAirportQuery(e.target.value)}
+                aria-label="Search this list"
+              />
+              {airportQuery && (
+                <button
+                  className="list-search__clear"
+                  aria-label="Clear search"
+                  onClick={() => setAirportQuery('')}
+                >×</button>
+              )}
+            </div>
+          </div>
+        </div>
         {loading && <p className="state-message">Loading airports…</p>}
         {error && <p className="state-message state-message--error">{error}</p>}
         {!loading && !error && airports.length === 0 && (
           <p className="state-message">No airports yet.</p>
         )}
-        {!loading && !error && airports.length > 0 && (
+        {!loading && !error && airports.length > 0 && (() => {
+          const q = airportQuery.trim().toLowerCase()
+          const filtered = q
+            ? airports.filter((ap) =>
+                (ap.name ?? '').toLowerCase().includes(q) ||
+                (ap.iata ?? '').toLowerCase().includes(q) ||
+                (ap.icao ?? '').toLowerCase().includes(q)
+              )
+            : airports
+          if (q && filtered.length === 0) {
+            return <p className="state-message">No airports match.</p>
+          }
+          return (
           <ul className="airport-list">
-            {airports.map((ap) => (
+            {filtered.map((ap) => (
               <li key={ap.iata}>
                 <button className="airport-row" onClick={() => onSelectAirport(ap)}>
                   <span className="airport-row__iata">{ap.iata}</span>
@@ -56,7 +91,8 @@ export default function AirportsTab({ onSelectAirport }) {
               </li>
             ))}
           </ul>
-        )}
+          )
+        })()}
       </main>
     </div>
   )
