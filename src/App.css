@@ -543,6 +543,61 @@
   gap: 0.65rem;
 }
 
+.airline-list__divider-item {
+  list-style: none;
+}
+
+/* ── A–Z index ─────────────────────────────────────────────────── */
+.airline-group-header {
+  /* Sticky top: matches top-bar height (~54px). Nudge if it tucks under the bar on device. */
+  position: sticky;
+  top: 56px;
+  z-index: 5;
+  background: #F6EFDC;
+  color: #2C427B;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-weight: bold;
+  font-size: 1.15rem;
+  letter-spacing: 1px;
+  padding: 5px 14px;
+  border-radius: 8px;
+  border-bottom: 3px solid #FBAD19;
+  margin: 14px 0 4px;
+}
+
+.az-rail {
+  position: fixed;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  z-index: 20;
+  padding: 4px 2px;
+  background: rgba(246, 239, 220, 0.6);
+  border-radius: 12px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.az-rail::-webkit-scrollbar { display: none; }
+.az-rail { scrollbar-width: none; }
+
+.az-rail__letter {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1.15;
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #2C427B;
+  min-width: 16px;
+  text-align: center;
+}
+
 /* ── Airline card (now a button) ────────────────────────────────── */
 .airline-card {
   background: #ffffff;
