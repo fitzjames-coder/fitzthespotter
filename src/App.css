@@ -4077,6 +4077,14 @@
   z-index: 10;
 }
 
+/* Same fix for the New Registration modal: the Fragment in TopBar() makes
+   .entry-modal-backdrop a direct child of .airlines-page, so > * clobbers its
+   position: fixed. Re-assert it here with higher specificity. */
+.airlines-page > .entry-modal-backdrop {
+  position: fixed;
+  z-index: 100;
+}
+
 .airlines-page .airline-card {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(2px);
