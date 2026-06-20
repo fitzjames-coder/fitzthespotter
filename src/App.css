@@ -482,6 +482,73 @@
   margin-bottom: 0.85rem;
 }
 
+/* ── List head (title + inline search row) ──────────────────────── */
+.list-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 0 6px;
+}
+
+.list-head .section-label {
+  padding: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.list-search--inline {
+  flex: 1;
+  padding: 0;
+  min-width: 0;
+}
+
+.list-search__field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1.5px solid #e2d8bd;
+  border-radius: 22px;
+  padding: 7px 14px;
+  box-shadow: 0 2px 6px rgba(22, 32, 59, 0.06);
+}
+
+.list-search__field:focus-within {
+  border-color: #FBAD19;
+}
+
+.list-search__icon {
+  color: #9aa3b5;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.list-search__input {
+  border: none;
+  outline: none;
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  color: #16203B;
+  background: none;
+}
+
+.list-search__clear {
+  border: none;
+  background: #eef0f4;
+  color: #7a8499;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 /* ── Camera flag (registration profile) ────────────────────────── */
 .section-label-row {
   display: flex;

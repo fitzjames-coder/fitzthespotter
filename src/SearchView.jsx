@@ -219,7 +219,7 @@ export default function SearchView() {
             <span className="search-title--amber"> / </span>
             <span className="search-title--cream">Stats</span>
           </h1>
-          <p className="search-subtitle">Reg · airline · type · airport</p>
+          <p className="search-subtitle">Registrations only</p>
         </div>
 
         <div className="search-bar-wrap">
