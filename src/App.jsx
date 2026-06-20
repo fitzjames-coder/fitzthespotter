@@ -182,6 +182,16 @@ function AirlinesTab() {
   }
 
   function renderBody() {
+    // px: navy banner (~54px) + breathing room. Nudge on device if header lands hidden.
+    const STICKY_OFFSET = 60
+
+    function jumpToBucket(b) {
+      const el = document.getElementById(`ag-${b}`)
+      if (!el) return
+      const y = el.getBoundingClientRect().top + window.scrollY - STICKY_OFFSET
+      window.scrollTo({ top: y, behavior: 'smooth' })
+    }
+
     if (loading) {
       return <p className="state-message">Loading airlines…</p>
     }
@@ -224,7 +234,7 @@ function AirlinesTab() {
               <button
                 key={b}
                 className="az-rail__letter"
-                onClick={() => document.getElementById(`ag-${b}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                onClick={() => jumpToBucket(b)}
               >
                 {b}
               </button>
