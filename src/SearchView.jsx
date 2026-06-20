@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { exportBackupCsv } from './exportBackup'
 import NewRegistrationForm from './NewRegistrationForm'
 import RegistrationProfileView from './RegistrationProfileView'
 import StatsView from './StatsView'
@@ -9,6 +10,13 @@ import AirlinesGalleryView from './AirlinesGalleryView'
 
 function SearchTopBar() {
   const [showForm, setShowForm] = useState(false)
+
+  async function handleExport() {
+    if (!window.confirm('Download a readable CSV backup of your whole logbook? It opens in Excel or Numbers.')) return
+    try { await exportBackupCsv(supabase) }
+    catch (e) { alert('Backup failed: ' + (e?.message || 'unknown error')) }
+  }
+
   return (
     <>
       <header className="top-bar top-bar--dark">
@@ -21,6 +29,13 @@ function SearchTopBar() {
           <span className="top-bar__title--amber">the</span>
           <span className="top-bar__title--cream">spotter</span>
           <sup className="top-bar__plus" aria-hidden="true">+</sup>
+        </button>
+        <button
+          className="top-bar__export"
+          onClick={handleExport}
+          aria-label="Download a readable CSV backup of your logbook"
+        >
+          <img src="/export-container.PNG" alt="" className="top-bar__export-icon" />
         </button>
       </header>
       {showForm && <NewRegistrationForm onClose={() => setShowForm(false)} />}
