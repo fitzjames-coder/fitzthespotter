@@ -551,9 +551,10 @@
 
 /* ── A–Z index ─────────────────────────────────────────────────── */
 .airline-group-header {
-  /* Sticky top: matches top-bar height (~54px). Nudge if it tucks under the bar on device. */
+  /* Sticky top: bottom edge of the navy top-bar (~54px = 0.85rem×2 + 1.5rem font + 3px border).
+     Nudge this value on device if the header tucks under the bar. */
   position: sticky;
-  top: 56px;
+  top: 54px;
   z-index: 5;
   background: #F6EFDC;
   color: #2C427B;
@@ -562,9 +563,11 @@
   font-size: 1.15rem;
   letter-spacing: 1px;
   padding: 5px 14px;
-  border-radius: 8px;
+  /* Square top corners so it reads as a shelf flush against the banner */
+  border-radius: 0 0 8px 8px;
   border-bottom: 3px solid #FBAD19;
-  margin: 14px 0 4px;
+  /* No top margin — gap would let the fixed background bleed through */
+  margin: 0 0 4px;
 }
 
 .az-rail {
@@ -4065,6 +4068,13 @@
 .airlines-page > * {
   position: relative;
   z-index: 1;
+}
+
+/* Re-assert sticky on the top-bar; .airlines-page > * { position: relative } has equal
+   specificity and appears later, overriding it. This higher-specificity rule wins. */
+.airlines-page > .top-bar {
+  position: sticky;
+  z-index: 10;
 }
 
 .airlines-page .airline-card {
