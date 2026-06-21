@@ -277,7 +277,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     setSightingsMgrError(null)
     const { data, error: err } = await supabase
       .from('sightings')
-      .select('id, spotted_on, airport, is_book_candidate')
+      .select('id, spotted_on, airport, is_book_candidate, book_story')
       .eq('registration_id', existingReg.id)
       .order('spotted_on', { ascending: true, nullsFirst: false })
     setSightingsLoading(false)
@@ -911,6 +911,32 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                             >
                               {s.is_book_candidate ? '★' : '☆'} Book candidate
                             </button>
+                            {s.is_book_candidate && (
+                              <textarea
+                                className="book-story-input"
+                                rows={2}
+                                placeholder="Story / note for the book…"
+                                value={s.book_story ?? ''}
+                                onChange={(e) => {
+                                  const val = e.target.value
+                                  setSightings((prev) =>
+                                    prev.map((r) => r.id === s.id ? { ...r, book_story: val } : r)
+                                  )
+                                }}
+                                onBlur={(e) => {
+                                  const val = e.target.value.trim()
+                                  supabase
+                                    .from('sightings')
+                                    .update({ book_story: val || null })
+                                    .eq('id', s.id)
+                                    .then(() => {
+                                      setSightings((prev) =>
+                                        prev.map((r) => r.id === s.id ? { ...r, book_story: val || null } : r)
+                                      )
+                                    })
+                                }}
+                              />
+                            )}
                             {isConfirming && (
                               <div className="delete-confirm type-mgmt-inline-confirm">
                                 <p className="delete-confirm__hint">

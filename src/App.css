@@ -4621,3 +4621,23 @@
   opacity: 0.5;
   cursor: default;
 }
+
+.book-story-input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 8px;
+  margin-left: 2px;
+  padding: 8px 10px;
+  background: #FBF7EC;
+  border: 1px solid #d8cfb0;
+  border-radius: 8px;
+  color: #16203B;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  resize: vertical;
+  font-family: inherit;
+}
+.book-story-input::placeholder {
+  color: #b0a88a;
+}
