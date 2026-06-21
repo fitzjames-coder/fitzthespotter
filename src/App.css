@@ -4641,3 +4641,10 @@
 .book-story-input::placeholder {
   color: #b0a88a;
 }
+
+.book-cap-msg {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: #E8607A;
+  line-height: 1.4;
+}

@@ -93,6 +93,12 @@ function StatusSwitch({ label, checked, onChange, markEl }) {
 
 const ALLIANCES = ['Star Alliance', 'Oneworld', 'SkyTeam']
 
+const BOOK_CANDIDATES_PER_MONTH = 10
+
+function monthBucket(spottedOn) {
+  return spottedOn ? spottedOn.slice(0, 7) : 'undated'
+}
+
 async function fetchAirlines(q) {
   if (!supabase) return []
   const { data } = await supabase
@@ -186,6 +192,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [confirmDeleteSightingId, setConfirmDeleteSightingId] = useState(null)
   const [deletingSightingId, setDeletingSightingId] = useState(null)
   const [savingBookCandidateId, setSavingBookCandidateId] = useState(null)
+  const [capMessageSightingId, setCapMessageSightingId] = useState(null)
 
   const [airlineFormOpen, setAirlineFormOpen] = useState(false)
   const [airlineFormName, setAirlineFormName] = useState('')
@@ -310,8 +317,29 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   }
 
   async function handleToggleBookCandidate(sightingId, current) {
-    setSavingBookCandidateId(sightingId)
     const next = !current
+
+    if (next) {
+      const thisSighting = sightings.find((s) => s.id === sightingId)
+      const bucket = monthBucket(thisSighting?.spotted_on ?? null)
+
+      const { data: existing } = await supabase
+        .from('sightings')
+        .select('id, spotted_on')
+        .eq('is_book_candidate', true)
+
+      const countInBucket = (existing ?? []).filter(
+        (r) => monthBucket(r.spotted_on) === bucket
+      ).length
+
+      if (countInBucket >= BOOK_CANDIDATES_PER_MONTH) {
+        setCapMessageSightingId(sightingId)
+        return
+      }
+    }
+
+    setCapMessageSightingId(null)
+    setSavingBookCandidateId(sightingId)
     const { error: err } = await supabase
       .from('sightings')
       .update({ is_book_candidate: next })
@@ -911,6 +939,11 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                             >
                               {s.is_book_candidate ? '★' : '☆'} Book candidate
                             </button>
+                            {capMessageSightingId === s.id && (
+                              <p className="book-cap-msg">
+                                That month already has {BOOK_CANDIDATES_PER_MONTH} book candidates (the max). Turn one off first, or leave this as a normal sighting and revisit later.
+                              </p>
+                            )}
                             {s.is_book_candidate && (
                               <textarea
                                 className="book-story-input"
