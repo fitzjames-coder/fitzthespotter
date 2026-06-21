@@ -73,7 +73,7 @@ export default function BookCandidatesView({ onBack, onSelectReg }) {
   })
 
   return (
-    <div className="page bookcand-page">
+    <div className="page page--navy bookcand-page">
       <button className="top-bar__back fi-back" onClick={onBack} aria-label="Back">
         ‹ Back
       </button>
