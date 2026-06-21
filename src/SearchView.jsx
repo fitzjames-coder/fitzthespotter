@@ -7,6 +7,7 @@ import StatsView from './StatsView'
 import ManufacturersView from './ManufacturersView'
 import FlownInView from './FlownInView'
 import AirlinesGalleryView from './AirlinesGalleryView'
+import BookCandidatesView from './BookCandidatesView'
 
 function SearchTopBar() {
   const [showForm, setShowForm] = useState(false)
@@ -105,6 +106,17 @@ function ManufacturersCard({ onOpen }) {
   )
 }
 
+function BookCandidatesCard({ onOpen }) {
+  return (
+    <button className="stats-card bookcand-card" onClick={onOpen}>
+      <img src="/book-card.PNG" alt="" className="bookcand-card__icon" aria-hidden="true" />
+      <span className="stats-card__title">Book Candidates</span>
+      <span className="stats-card__sub">Review &amp; rank by month</span>
+      <span className="stats-card__chevron" aria-hidden="true">›</span>
+    </button>
+  )
+}
+
 
 export default function SearchView() {
   const [allRegs, setAllRegs] = useState([])
@@ -117,6 +129,7 @@ export default function SearchView() {
   const [showManufacturers, setShowManufacturers] = useState(false)
   const [showFlownIn, setShowFlownIn] = useState(false)
   const [showAirlines, setShowAirlines] = useState(false)
+  const [showBookCandidates, setShowBookCandidates] = useState(false)
 
   function fetchAll() {
     if (!supabase) {
@@ -207,6 +220,15 @@ export default function SearchView() {
     return <AirlinesGalleryView onBack={() => setShowAirlines(false)} />
   }
 
+  if (showBookCandidates) {
+    return (
+      <BookCandidatesView
+        onBack={() => setShowBookCandidates(false)}
+        onSelectReg={setSelectedReg}
+      />
+    )
+  }
+
   return (
     <div className="page search-page">
       <SearchTopBar />
@@ -286,6 +308,7 @@ export default function SearchView() {
           <StatsCard onOpen={() => setShowStats(true)} />
           <AirlinesCard onOpen={() => setShowAirlines(true)} />
           <ManufacturersCard onOpen={() => setShowManufacturers(true)} />
+          <BookCandidatesCard onOpen={() => setShowBookCandidates(true)} />
         </div>
       </main>
     </div>
