@@ -185,6 +185,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [savingDateId, setSavingDateId] = useState(null)
   const [confirmDeleteSightingId, setConfirmDeleteSightingId] = useState(null)
   const [deletingSightingId, setDeletingSightingId] = useState(null)
+  const [savingBookCandidateId, setSavingBookCandidateId] = useState(null)
 
   const [airlineFormOpen, setAirlineFormOpen] = useState(false)
   const [airlineFormName, setAirlineFormName] = useState('')
@@ -276,7 +277,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     setSightingsMgrError(null)
     const { data, error: err } = await supabase
       .from('sightings')
-      .select('id, spotted_on, airport')
+      .select('id, spotted_on, airport, is_book_candidate')
       .eq('registration_id', existingReg.id)
       .order('spotted_on', { ascending: true, nullsFirst: false })
     setSightingsLoading(false)
@@ -306,6 +307,21 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       prev.map((s) => s.id === sightingId ? { ...s, spotted_on: value || null } : s)
     )
     onSaved?.()
+  }
+
+  async function handleToggleBookCandidate(sightingId, current) {
+    setSavingBookCandidateId(sightingId)
+    const next = !current
+    const { error: err } = await supabase
+      .from('sightings')
+      .update({ is_book_candidate: next })
+      .eq('id', sightingId)
+    if (!err) {
+      setSightings((prev) =>
+        prev.map((s) => s.id === sightingId ? { ...s, is_book_candidate: next } : s)
+      )
+    }
+    setSavingBookCandidateId(null)
   }
 
   async function handleDeleteSighting(sightingId) {
@@ -887,6 +903,14 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                                 Del
                               </button>
                             </div>
+                            <button
+                              type="button"
+                              className={`book-candidate-toggle${s.is_book_candidate ? ' book-candidate-toggle--on' : ''}`}
+                              onClick={() => handleToggleBookCandidate(s.id, s.is_book_candidate)}
+                              disabled={savingBookCandidateId === s.id}
+                            >
+                              {s.is_book_candidate ? '★' : '☆'} Book candidate
+                            </button>
                             {isConfirming && (
                               <div className="delete-confirm type-mgmt-inline-confirm">
                                 <p className="delete-confirm__hint">
