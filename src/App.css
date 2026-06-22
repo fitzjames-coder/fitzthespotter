@@ -4815,3 +4815,63 @@
   background: #FBAD19;
   color: #16203B;
 }
+
+/* ── BookCandidates year + month nav ───────────────────────── */
+.bookcand-nav {
+  padding: 0 1.25rem 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.bookcand-years {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.bookcand-year-btn {
+  background: transparent;
+  border: 1.5px solid rgba(251, 173, 25, 0.5);
+  color: rgba(251, 173, 25, 0.75);
+  border-radius: 8px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  min-height: 34px;
+}
+.bookcand-year-btn--on {
+  background: #FBAD19;
+  border-color: #FBAD19;
+  color: #16203B;
+}
+.bookcand-pills {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+.bookcand-pills::-webkit-scrollbar {
+  display: none;
+}
+.bookcand-pill {
+  background: transparent;
+  border: 1.5px solid rgba(251, 173, 25, 0.4);
+  color: rgba(251, 173, 25, 0.7);
+  border-radius: 20px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-height: 32px;
+}
+.bookcand-pill--on {
+  background: #FBAD19;
+  border-color: #FBAD19;
+  color: #16203B;
+  font-weight: 700;
+}
