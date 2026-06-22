@@ -3,6 +3,7 @@ import { supabase } from './lib/supabaseClient'
 import RegistrationProfileView from './RegistrationProfileView'
 import StatusMarks from './StatusMarks'
 import AirlineForm from './AirlineForm'
+import NewRegistrationForm from './NewRegistrationForm'
 
 function heroInitials(name) {
   return name.split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 3)
@@ -47,7 +48,7 @@ function AirlineHeroLogo({ airline }) {
   )
 }
 
-function AirlineHero({ airline, regCount, loading, onBack, onEdit }) {
+function AirlineHero({ airline, regCount, loading, onBack, onEdit, onAddReg }) {
   const isClosed = airline.is_closed
   const year = closedYear(airline)
 
@@ -62,6 +63,7 @@ function AirlineHero({ airline, regCount, loading, onBack, onEdit }) {
         ‹ Back
       </button>
       <button className="edit-btn" onClick={onEdit} aria-label="Edit airline">Edit</button>
+      <button className="reg-add-btn" onClick={onAddReg} aria-label="Add registration">REG</button>
       <div className="airline-hero__body">
         <AirlineHeroLogo airline={airline} />
         <div className="airline-hero__text">
@@ -215,6 +217,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   const [error, setError] = useState(null)
   const [selectedReg, setSelectedReg] = useState(null)
   const [showEdit, setShowEdit] = useState(false)
+  const [showRegForm, setShowRegForm] = useState(false)
 
   function loadRegistrations() {
     if (!supabase) {
@@ -304,6 +307,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
           loading={loading}
           onBack={onBack}
           onEdit={() => setShowEdit(true)}
+          onAddReg={() => setShowRegForm(true)}
         />
         <main className="content">
           {renderBody()}
@@ -316,6 +320,12 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
           onCancel={() => setShowEdit(false)}
           onUpdated={(row) => { setShowEdit(false); onUpdated?.(row) }}
           onDeleted={() => { setShowEdit(false); onDeleted?.() }}
+        />
+      )}
+      {showRegForm && (
+        <NewRegistrationForm
+          onClose={() => setShowRegForm(false)}
+          initialAirline={{ id: airline.id, name: airline.name }}
         />
       )}
     </>
