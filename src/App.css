@@ -4696,7 +4696,7 @@
   text-align: center;
 }
 .bookcand-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 .bookcand-group__header {
   display: flex;
@@ -4704,7 +4704,7 @@
   justify-content: space-between;
   padding: 0.35rem 1.25rem 0.35rem;
   border-bottom: 2px solid rgba(251, 173, 25, 0.35);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 .bookcand-group__month {
   font-family: Georgia, 'Times New Roman', Times, serif;
@@ -4720,51 +4720,98 @@
 .bookcand-list {
   list-style: none;
   margin: 0;
-  padding: 0;
-}
-.bookcand-row {
+  padding: 0 1rem;
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ── Candidate item card ──────────────────────────────────── */
+.bookcand-item {
+  background: rgba(246, 239, 220, 0.06);
+  border: 1px solid rgba(246, 239, 220, 0.1);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  overflow: hidden;
+}
+.bookcand-item__top {
+  display: flex;
+  gap: 0.85rem;
   align-items: flex-start;
-  gap: 0.5rem;
-  width: 100%;
-  background: rgba(246, 239, 220, 0.05);
+}
+.bookcand-item__thumb {
+  width: 96px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: rgba(44, 66, 123, 0.5);
+}
+.bookcand-item__thumb--placeholder {
+  background: rgba(44, 66, 123, 0.4);
+  border: 1px dashed rgba(246, 239, 220, 0.15);
+  border-radius: 8px;
+}
+.bookcand-item__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.bookcand-item__reg {
+  background: none;
   border: none;
-  border-bottom: 1px solid rgba(246, 239, 220, 0.08);
-  padding: 0.75rem 1.1rem 0.75rem 1.25rem;
+  padding: 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: var(--color-amber);
+  letter-spacing: 0.06em;
   text-align: left;
   cursor: pointer;
 }
-.bookcand-row:disabled {
+.bookcand-item__reg:disabled {
   cursor: default;
 }
-.bookcand-row__main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+.bookcand-item__meta {
+  font-size: 0.72rem;
+  color: rgba(246, 239, 220, 0.55);
+  line-height: 1.4;
 }
-.bookcand-row__reg {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 1rem;
-  font-weight: bold;
-  color: var(--color-cream);
-  letter-spacing: 0.04em;
-}
-.bookcand-row__meta {
-  font-size: 0.75rem;
-  color: rgba(246, 239, 220, 0.6);
-}
-.bookcand-row__story {
-  margin: 0.35rem 0 0;
+.bookcand-item__story {
+  margin: 0.3rem 0 0;
   font-size: 0.8rem;
   color: rgba(246, 239, 220, 0.75);
   font-style: italic;
   line-height: 1.4;
   white-space: pre-wrap;
 }
-.bookcand-row__chevron {
-  color: rgba(246, 239, 220, 0.4);
-  font-size: 1.2rem;
-  align-self: center;
-  margin-left: 0.25rem;
+
+/* ── Rating row ───────────────────────────────────────────── */
+.bookcand-rate {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(246, 239, 220, 0.08);
+}
+.bookcand-rate__btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1.5px solid #FBAD19;
+  background: transparent;
+  color: #FBAD19;
+  font-size: 0.95rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s, color 0.12s;
+}
+.bookcand-rate__btn--on {
+  background: #FBAD19;
+  color: #16203B;
 }
