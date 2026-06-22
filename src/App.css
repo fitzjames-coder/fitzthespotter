@@ -4649,6 +4649,7 @@
   line-height: 1.4;
 }
 
+
 /* ── Book Candidates card (search screen) ──────────────────── */
 .bookcand-card {
   gap: 0.75rem;
@@ -4661,40 +4662,122 @@
   border-radius: 6px;
 }
 
-/* ── BookCandidatesView ────────────────────────────────────── */
-.bookcand-hero {
+/* ── BookCandidatesView page ───────────────────────────────── */
+.bookcand-page {
+  background: #16203B;
+  min-height: 100vh;
+}
+
+/* ── Hero header bar ───────────────────────────────────────── */
+.bookcand-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 0.5rem 1.25rem 1rem;
+  gap: 0.85rem;
+  padding: 0.6rem 1.1rem 0.6rem 0.75rem;
+  background: #2C427B;
+  border-bottom: 3px solid #FBAD19;
 }
-.bookcand-hero__icon {
-  width: 52px;
-  height: 52px;
+.bookcand-header__back {
+  background: none;
+  border: none;
+  color: #FBAD19;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.35rem 0.5rem 0.35rem 0;
+  flex-shrink: 0;
+  letter-spacing: 0.01em;
+}
+.bookcand-header__icon {
+  width: 64px;
+  height: 64px;
   object-fit: contain;
   border-radius: 10px;
   flex-shrink: 0;
 }
-.bookcand-hero__title {
+.bookcand-header__title {
   font-family: Georgia, 'Times New Roman', Times, serif;
-  font-size: 1.6rem;
-  color: var(--color-cream);
+  font-size: 1.35rem;
+  color: #F6EFDC;
   margin: 0 0 0.1rem;
+  line-height: 1.2;
 }
-.bookcand-hero__sub {
-  font-size: 0.78rem;
-  color: rgba(246, 239, 220, 0.5);
+.bookcand-header__sub {
+  font-size: 0.72rem;
+  color: rgba(246, 239, 220, 0.48);
   margin: 0;
 }
+
+/* ── Year picker ───────────────────────────────────────────── */
+.bookcand-years {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.75rem 1.1rem 0.4rem;
+}
+.bookcand-year-btn {
+  background: transparent;
+  border: 1.5px solid rgba(251, 173, 25, 0.55);
+  color: rgba(251, 173, 25, 0.8);
+  border-radius: 8px;
+  padding: 0.28rem 0.8rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  min-height: 34px;
+}
+.bookcand-year-btn--on {
+  background: #FBAD19;
+  border-color: #FBAD19;
+  color: #16203B;
+}
+
+/* ── Month pills ───────────────────────────────────────────── */
+.bookcand-pills {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0 1.1rem 0.75rem;
+}
+.bookcand-pills::-webkit-scrollbar {
+  display: none;
+}
+.bookcand-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #aeb6cc;
+  border-radius: 16px;
+  padding: 0.28rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+}
+.bookcand-pill--on {
+  background: #FBAD19;
+  color: #16203B;
+  font-weight: 700;
+}
+
+/* ── Content area ──────────────────────────────────────────── */
 .bookcand-content {
-  padding-bottom: 2rem;
+  padding-bottom: 3rem;
 }
 .bookcand-empty {
-  padding: 2rem 1.25rem;
-  color: rgba(246, 239, 220, 0.5);
+  padding: 2.5rem 1.25rem;
+  color: rgba(246, 239, 220, 0.45);
   font-size: 0.9rem;
   text-align: center;
 }
+
+/* ── Month group ───────────────────────────────────────────── */
 .bookcand-group {
   margin-bottom: 1.75rem;
 }
@@ -4702,19 +4785,19 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 0.35rem 1.25rem 0.35rem;
-  border-bottom: 2px solid rgba(251, 173, 25, 0.35);
+  padding: 0.4rem 1.1rem 0.4rem;
+  border-bottom: 2px solid #FBAD19;
   margin-bottom: 0.75rem;
 }
 .bookcand-group__month {
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 1rem;
   font-weight: bold;
-  color: var(--color-amber);
+  color: #FBAD19;
 }
 .bookcand-group__count {
   font-size: 0.75rem;
-  color: rgba(246, 239, 220, 0.45);
+  color: rgba(246, 239, 220, 0.4);
   letter-spacing: 0.02em;
 }
 .bookcand-list {
@@ -4726,12 +4809,13 @@
   gap: 0.75rem;
 }
 
-/* ── Candidate item card ──────────────────────────────────── */
+/* ── Candidate item card ───────────────────────────────────── */
 .bookcand-item {
-  background: rgba(246, 239, 220, 0.06);
-  border: 1px solid rgba(246, 239, 220, 0.1);
-  border-radius: 14px;
-  padding: 0.85rem 1rem;
+  background: rgba(44, 66, 123, 0.45);
+  border: 1px solid rgba(251, 173, 25, 0.18);
+  border-radius: 12px;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 4px 18px rgba(251, 173, 25, 0.18);
   overflow: hidden;
 }
 .bookcand-item__top {
@@ -4745,10 +4829,9 @@
   object-fit: cover;
   border-radius: 8px;
   flex-shrink: 0;
-  background: rgba(44, 66, 123, 0.5);
 }
 .bookcand-item__thumb--placeholder {
-  background: rgba(44, 66, 123, 0.4);
+  background: rgba(22, 32, 59, 0.6);
   border: 1px dashed rgba(246, 239, 220, 0.15);
   border-radius: 8px;
 }
@@ -4766,7 +4849,7 @@
   font-family: 'Courier New', Courier, monospace;
   font-size: 1.05rem;
   font-weight: bold;
-  color: var(--color-amber);
+  color: #FBAD19;
   letter-spacing: 0.06em;
   text-align: left;
   cursor: pointer;
@@ -4788,13 +4871,13 @@
   white-space: pre-wrap;
 }
 
-/* ── Rating row ───────────────────────────────────────────── */
+/* ── Rating row ────────────────────────────────────────────── */
 .bookcand-rate {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.85rem;
   padding-top: 0.75rem;
-  border-top: 1px solid rgba(246, 239, 220, 0.08);
+  border-top: 1px solid rgba(251, 173, 25, 0.15);
 }
 .bookcand-rate__btn {
   width: 36px;

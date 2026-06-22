@@ -3,9 +3,14 @@ import { supabase } from './lib/supabaseClient'
 
 const BOOK_CANDIDATES_PER_MONTH = 10
 const RATINGS = [1, 2, 3, 4]
+const SHORT_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
 function monthBucket(spottedOn) {
   return spottedOn ? spottedOn.slice(0, 7) : 'undated'
+}
+
+function yearOf(spottedOn) {
+  return spottedOn ? spottedOn.slice(0, 4) : 'Undated'
 }
 
 function formatMonth(bucket) {
@@ -15,16 +20,27 @@ function formatMonth(bucket) {
   return date.toLocaleString('default', { month: 'long', year: 'numeric' })
 }
 
+function shortMonth(bucket) {
+  if (bucket === 'undated') return 'Undated'
+  const m = parseInt(bucket.split('-')[1], 10)
+  return SHORT_MONTHS[m - 1]
+}
+
 function formatDate(spottedOn) {
   if (!spottedOn) return null
   const [y, m, d] = spottedOn.split('-')
   return `${d}/${m}/${y}`
 }
 
+function getSortedYears(candidates) {
+  const yearSet = new Set(candidates.map((s) => yearOf(s.spotted_on)))
+  const numeric = [...yearSet].filter((y) => y !== 'Undated').sort((a, b) => Number(b) - Number(a))
+  if (yearSet.has('Undated')) numeric.push('Undated')
+  return numeric
+}
+
 function Thumbnail({ src }) {
-  if (src) {
-    return <img src={src} alt="" className="bookcand-item__thumb" />
-  }
+  if (src) return <img src={src} alt="" className="bookcand-item__thumb" />
   return <div className="bookcand-item__thumb bookcand-item__thumb--placeholder" aria-hidden="true" />
 }
 
@@ -33,6 +49,8 @@ export default function BookCandidatesView({ onBack, onSelectReg }) {
   const [regsById, setRegsById] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [selectedYear, setSelectedYear] = useState(null)
+  const [selectedMonth, setSelectedMonth] = useState('all')
 
   useEffect(() => {
     if (!supabase) {
@@ -70,14 +88,10 @@ export default function BookCandidatesView({ onBack, onSelectReg }) {
   async function handleRate(sightingId, n) {
     const current = candidates.find((s) => s.id === sightingId)?.book_rating ?? null
     const next = current === n ? null : n
-
     setCandidates((prev) =>
       prev.map((s) => s.id === sightingId ? { ...s, book_rating: next } : s)
     )
-    await supabase
-      .from('sightings')
-      .update({ book_rating: next })
-      .eq('id', sightingId)
+    await supabase.from('sightings').update({ book_rating: next }).eq('id', sightingId)
   }
 
   const grouped = {}
@@ -87,25 +101,75 @@ export default function BookCandidatesView({ onBack, onSelectReg }) {
     grouped[bucket].push(s)
   }
 
-  const sortedBuckets = Object.keys(grouped).sort((a, b) => {
-    if (a === 'undated') return 1
-    if (b === 'undated') return -1
-    return a.localeCompare(b)
-  })
+  const sortedYears = getSortedYears(candidates)
+  const activeYear = selectedYear ?? sortedYears[0] ?? null
+
+  function handleYearSelect(year) {
+    setSelectedYear(year)
+    setSelectedMonth('all')
+  }
+
+  const bucketsForYear = activeYear === null
+    ? []
+    : activeYear === 'Undated'
+      ? (grouped['undated'] ? ['undated'] : [])
+      : Object.keys(grouped)
+          .filter((b) => b !== 'undated' && b.slice(0, 4) === activeYear)
+          .sort()
+
+  const displayBuckets = selectedMonth === 'all' ? bucketsForYear : [selectedMonth]
+
+  const hasData = !loading && !error && candidates.length > 0
 
   return (
-    <div className="page page--navy bookcand-page">
-      <button className="top-bar__back fi-back" onClick={onBack} aria-label="Back">
-        ‹ Back
-      </button>
-
-      <div className="bookcand-hero">
-        <img src="/book-card.PNG" alt="" aria-hidden="true" className="bookcand-hero__icon" />
-        <div className="bookcand-hero__text">
-          <h1 className="bookcand-hero__title">Book Candidates</h1>
-          <p className="bookcand-hero__sub">Tagged for the books · grouped by month</p>
+    <div className="page bookcand-page">
+      <header className="bookcand-header">
+        <button className="bookcand-header__back" onClick={onBack} aria-label="Back">
+          ‹ Back
+        </button>
+        <img src="/book-card.PNG" alt="" aria-hidden="true" className="bookcand-header__icon" />
+        <div className="bookcand-header__text">
+          <h1 className="bookcand-header__title">Book Candidates</h1>
+          <p className="bookcand-header__sub">Tagged for the books · by month</p>
         </div>
-      </div>
+      </header>
+
+      {hasData && (
+        <>
+          <div className="bookcand-years" role="group" aria-label="Select year">
+            {sortedYears.map((year) => (
+              <button
+                key={year}
+                className={`bookcand-year-btn${activeYear === year ? ' bookcand-year-btn--on' : ''}`}
+                onClick={() => handleYearSelect(year)}
+                aria-pressed={activeYear === year}
+              >
+                {year}
+              </button>
+            ))}
+          </div>
+
+          <div className="bookcand-pills" role="group" aria-label="Select month">
+            <button
+              className={`bookcand-pill${selectedMonth === 'all' ? ' bookcand-pill--on' : ''}`}
+              onClick={() => setSelectedMonth('all')}
+              aria-pressed={selectedMonth === 'all'}
+            >
+              All
+            </button>
+            {bucketsForYear.map((bucket) => (
+              <button
+                key={bucket}
+                className={`bookcand-pill${selectedMonth === bucket ? ' bookcand-pill--on' : ''}`}
+                onClick={() => setSelectedMonth(bucket)}
+                aria-pressed={selectedMonth === bucket}
+              >
+                {shortMonth(bucket)}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
       <main className="content bookcand-content">
         {loading && <p className="state-message">Loading…</p>}
@@ -115,8 +179,9 @@ export default function BookCandidatesView({ onBack, onSelectReg }) {
             No book candidates yet — tag sightings as you enter them.
           </p>
         )}
-        {!loading && !error && sortedBuckets.map((bucket) => {
+        {hasData && displayBuckets.map((bucket) => {
           const rows = grouped[bucket]
+          if (!rows) return null
           const count = rows.length
           return (
             <div key={bucket} className="bookcand-group">
