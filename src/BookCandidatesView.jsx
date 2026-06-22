@@ -50,7 +50,7 @@ export default function BookCandidatesView({ onBack, onSelectReg }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedYear, setSelectedYear] = useState(null)
-  const [selectedMonth, setSelectedMonth] = useState('all')
+  const [selectedMonths, setSelectedMonths] = useState(new Set())
 
   useEffect(() => {
     if (!supabase) {
@@ -106,7 +106,16 @@ export default function BookCandidatesView({ onBack, onSelectReg }) {
 
   function handleYearSelect(year) {
     setSelectedYear(year)
-    setSelectedMonth('all')
+    setSelectedMonths(new Set())
+  }
+
+  function toggleMonth(bucket) {
+    setSelectedMonths((prev) => {
+      const next = new Set(prev)
+      if (next.has(bucket)) next.delete(bucket)
+      else next.add(bucket)
+      return next
+    })
   }
 
   const bucketsForYear = activeYear === null
@@ -117,7 +126,9 @@ export default function BookCandidatesView({ onBack, onSelectReg }) {
           .filter((b) => b !== 'undated' && b.slice(0, 4) === activeYear)
           .sort()
 
-  const displayBuckets = selectedMonth === 'all' ? bucketsForYear : [selectedMonth]
+  const displayBuckets = selectedMonths.size === 0
+    ? bucketsForYear
+    : bucketsForYear.filter((b) => selectedMonths.has(b))
 
   const hasData = !loading && !error && candidates.length > 0
 
@@ -135,40 +146,31 @@ export default function BookCandidatesView({ onBack, onSelectReg }) {
       </header>
 
       {hasData && (
-        <>
-          <div className="bookcand-years" role="group" aria-label="Select year">
-            {sortedYears.map((year) => (
-              <button
-                key={year}
-                className={`bookcand-year-btn${activeYear === year ? ' bookcand-year-btn--on' : ''}`}
-                onClick={() => handleYearSelect(year)}
-                aria-pressed={activeYear === year}
-              >
-                {year}
-              </button>
-            ))}
-          </div>
-
-          <div className="bookcand-pills" role="group" aria-label="Select month">
+        <div className="bookcand-nav-row" role="group" aria-label="Year and month filter">
+          {sortedYears.map((year) => (
             <button
-              className={`bookcand-pill${selectedMonth === 'all' ? ' bookcand-pill--on' : ''}`}
-              onClick={() => setSelectedMonth('all')}
-              aria-pressed={selectedMonth === 'all'}
+              key={year}
+              className={`bookcand-year-btn${activeYear === year ? ' bookcand-year-btn--on' : ''}`}
+              onClick={() => handleYearSelect(year)}
+              aria-pressed={activeYear === year}
             >
-              All
+              {year}
             </button>
-            {bucketsForYear.map((bucket) => (
-              <button
-                key={bucket}
-                className={`bookcand-pill${selectedMonth === bucket ? ' bookcand-pill--on' : ''}`}
-                onClick={() => setSelectedMonth(bucket)}
-                aria-pressed={selectedMonth === bucket}
-              >
-                {shortMonth(bucket)}
-              </button>
-            ))}
-          </div>
-        </>
+          ))}
+          {bucketsForYear.length > 0 && (
+            <span className="bookcand-nav-sep" aria-hidden="true" />
+          )}
+          {bucketsForYear.map((bucket) => (
+            <button
+              key={bucket}
+              className={`bookcand-pill${selectedMonths.has(bucket) ? ' bookcand-pill--on' : ''}`}
+              onClick={() => toggleMonth(bucket)}
+              aria-pressed={selectedMonths.has(bucket)}
+            >
+              {shortMonth(bucket)}
+            </button>
+          ))}
+        </div>
       )}
 
       <main className="content bookcand-content">

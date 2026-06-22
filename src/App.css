@@ -4689,8 +4689,8 @@
   letter-spacing: 0.01em;
 }
 .bookcand-header__icon {
-  width: 64px;
-  height: 64px;
+  width: 92px;
+  height: 92px;
   object-fit: contain;
   border-radius: 10px;
   flex-shrink: 0;
@@ -4698,7 +4698,7 @@
 .bookcand-header__title {
   font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 1.35rem;
-  color: #F6EFDC;
+  color: #FBAD19;
   margin: 0 0 0.1rem;
   line-height: 1.2;
 }
@@ -4708,55 +4708,57 @@
   margin: 0;
 }
 
-/* ── Year picker ───────────────────────────────────────────── */
-.bookcand-years {
+/* ── Combined year + month nav row ────────────────────────── */
+.bookcand-nav-row {
   display: flex;
-  flex-wrap: wrap;
+  align-items: center;
   gap: 0.4rem;
-  padding: 0.75rem 1.1rem 0.4rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0.65rem 1.1rem 0.65rem;
+}
+.bookcand-nav-row::-webkit-scrollbar {
+  display: none;
+}
+.bookcand-nav-sep {
+  flex-shrink: 0;
+  width: 1px;
+  height: 22px;
+  background: rgba(251, 173, 25, 0.3);
+  margin: 0 0.15rem;
 }
 .bookcand-year-btn {
   background: transparent;
   border: 1.5px solid rgba(251, 173, 25, 0.55);
   color: rgba(251, 173, 25, 0.8);
-  border-radius: 8px;
-  padding: 0.28rem 0.8rem;
-  font-size: 0.88rem;
-  font-weight: 600;
+  border-radius: 7px;
+  padding: 0.22rem 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 700;
   cursor: pointer;
   letter-spacing: 0.02em;
-  min-height: 34px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-height: 30px;
 }
 .bookcand-year-btn--on {
   background: #FBAD19;
   border-color: #FBAD19;
   color: #16203B;
 }
-
-/* ── Month pills ───────────────────────────────────────────── */
-.bookcand-pills {
-  display: flex;
-  gap: 0.4rem;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  padding: 0 1.1rem 0.75rem;
-}
-.bookcand-pills::-webkit-scrollbar {
-  display: none;
-}
 .bookcand-pill {
   background: rgba(255, 255, 255, 0.08);
   border: none;
   color: #aeb6cc;
   border-radius: 16px;
-  padding: 0.28rem 0.85rem;
+  padding: 0.22rem 0.75rem;
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
   flex-shrink: 0;
-  min-height: 32px;
+  min-height: 30px;
   display: flex;
   align-items: center;
 }
