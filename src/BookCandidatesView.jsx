@@ -140,7 +140,7 @@ export default function BookCandidatesView({ onBack, onSelectReg }) {
         </button>
         <img src="/book-card.PNG" alt="" aria-hidden="true" className="bookcand-header__icon" />
         <div className="bookcand-header__text">
-          <h1 className="bookcand-header__title">Book Candidates</h1>
+          <h1 className="bookcand-header__title">Coffee Table</h1>
           <p className="bookcand-header__sub">Tagged for the books · by month</p>
         </div>
       </header>
