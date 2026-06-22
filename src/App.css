@@ -4389,6 +4389,22 @@
   cursor: default;
 }
 
+/* REG button — deep-blue pill, anchored top-right of banner */
+.reg-add-btn {
+  background: #005281;
+  border: none;
+  color: #F6EFDC;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 0.32rem 0.8rem;
+  border-radius: 8px;
+  line-height: 1;
+  position: absolute;
+  top: 0.7rem;
+  right: 1rem;
+  cursor: pointer;
+}
+
 /* Edit button — amber-outlined pill, anchored bottom-right of banner */
 .edit-btn {
   background: rgba(251,173,25,0.14);
