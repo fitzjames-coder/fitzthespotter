@@ -111,7 +111,6 @@ function BookCandidatesCard({ onOpen }) {
     <button className="stats-card bookcand-card" onClick={onOpen}>
       <img src="/book-card.PNG" alt="" className="bookcand-card__icon" aria-hidden="true" />
       <span className="stats-card__title">Coffee Table</span>
-      <span className="stats-card__sub">Review &amp; rank by month</span>
       <span className="stats-card__chevron" aria-hidden="true">›</span>
     </button>
   )
