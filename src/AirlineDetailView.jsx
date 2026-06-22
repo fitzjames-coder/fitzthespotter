@@ -62,8 +62,8 @@ function AirlineHero({ airline, regCount, loading, onBack, onEdit, onAddReg }) {
       <button className="top-bar__back" onClick={onBack} aria-label="Back to airlines list">
         ‹ Back
       </button>
-      <button className="reg-add-btn" onClick={onAddReg} aria-label="Add registration">REG</button>
       <button className="edit-btn" onClick={onEdit} aria-label="Edit airline">Edit</button>
+      <button className="reg-add-btn" onClick={onAddReg} aria-label="Add registration">REG</button>
       <div className="airline-hero__body">
         <AirlineHeroLogo airline={airline} />
         <div className="airline-hero__text">

@@ -4389,27 +4389,11 @@
   cursor: default;
 }
 
-/* REG button — deep-blue pill, anchored top-right of banner */
+/* REG button — amber primary pill, anchored bottom-right of banner (frequent action) */
 .reg-add-btn {
-  background: #005281;
+  background: #FBAD19;
   border: none;
-  color: #F6EFDC;
-  font-size: 0.8rem;
-  font-weight: bold;
-  padding: 0.32rem 0.8rem;
-  border-radius: 8px;
-  line-height: 1;
-  position: absolute;
-  top: 0.7rem;
-  right: 1rem;
-  cursor: pointer;
-}
-
-/* Edit button — amber-outlined pill, anchored bottom-right of banner */
-.edit-btn {
-  background: rgba(251,173,25,0.14);
-  border: 1px solid rgba(251,173,25,0.55);
-  color: var(--color-amber);
+  color: #16203B;
   font-size: 0.8rem;
   font-weight: bold;
   padding: 0.32rem 0.8rem;
@@ -4417,6 +4401,22 @@
   line-height: 1;
   position: absolute;
   bottom: 0.7rem;
+  right: 1rem;
+  cursor: pointer;
+}
+
+/* Edit button — muted recessive pill, anchored top-right of banner (rare action) */
+.edit-btn {
+  background: transparent;
+  border: 1px solid rgba(246,239,220,0.2);
+  color: rgba(246,239,220,0.35);
+  font-size: 0.8rem;
+  font-weight: normal;
+  padding: 0.32rem 0.8rem;
+  border-radius: 8px;
+  line-height: 1;
+  position: absolute;
+  top: 0.7rem;
   right: 1rem;
   cursor: pointer;
 }
