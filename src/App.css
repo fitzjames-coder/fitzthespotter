@@ -4906,3 +4906,131 @@
   background: #FBAD19;
   color: #16203B;
 }
+
+/* ── Sort/back mode buttons ────────────────────────────────── */
+.bookcand-mode-bar {
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem 1rem 0.25rem;
+}
+.bookcand-sort-btn {
+  background: #FBAD19;
+  color: #16203B;
+  border: none;
+  border-radius: 20px;
+  padding: 0.45rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+}
+.bookcand-back-btn {
+  background: transparent;
+  color: rgba(251, 173, 25, 0.8);
+  border: 1.5px solid rgba(251, 173, 25, 0.4);
+  border-radius: 20px;
+  padding: 0.4rem 1.1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ── Sorted view wrapper ───────────────────────────────────── */
+.bookcand-sorted {
+  padding: 0 1rem;
+}
+
+/* ── Tier block ────────────────────────────────────────────── */
+.bookcand-tier {
+  margin-bottom: 1rem;
+}
+.bookcand-tier__header {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0 0.45rem;
+}
+.bookcand-tier__badge {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #FBAD19;
+  color: #16203B;
+  font-size: 0.82rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.bookcand-tier__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(246, 239, 220, 0.65);
+  letter-spacing: 0.02em;
+}
+.bookcand-tier__label--unrated {
+  color: rgba(246, 239, 220, 0.38);
+}
+.bookcand-tier-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+/* ── Compact tier card ─────────────────────────────────────── */
+.bookcand-tier-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  background: rgba(44, 66, 123, 0.38);
+  border: 1px solid rgba(251, 173, 25, 0.12);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+}
+.bookcand-tier-card--picked {
+  border-color: #2e7d4f;
+  background: rgba(46, 125, 79, 0.12);
+}
+.bookcand-tier-card__left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
+}
+.bookcand-tier-card__thumb {
+  width: 56px;
+  height: 38px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+.bookcand-tier-card__thumb--placeholder {
+  background: rgba(22, 32, 59, 0.6);
+  border: 1px dashed rgba(246, 239, 220, 0.12);
+  border-radius: 6px;
+}
+
+/* ── Pick button ───────────────────────────────────────────── */
+.bookcand-pick-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1.5px solid rgba(251, 173, 25, 0.4);
+  color: rgba(251, 173, 25, 0.75);
+  border-radius: 14px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bookcand-pick-btn--on {
+  background: #2e7d4f;
+  border-color: #2e7d4f;
+  color: #fff;
+}
