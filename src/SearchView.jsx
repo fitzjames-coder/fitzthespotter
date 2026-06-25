@@ -8,6 +8,7 @@ import ManufacturersView from './ManufacturersView'
 import FlownInView from './FlownInView'
 import AirlinesGalleryView from './AirlinesGalleryView'
 import BookCandidatesView from './BookCandidatesView'
+import NotesView from './NotesView'
 
 function SearchTopBar() {
   const [showForm, setShowForm] = useState(false)
@@ -116,6 +117,16 @@ function BookCandidatesCard({ onOpen }) {
   )
 }
 
+function NotesCard({ onOpen }) {
+  return (
+    <button className="stats-card" onClick={onOpen}>
+      <span className="stats-card__title">Notes</span>
+      <span className="stats-card__sub">Your spotting notes</span>
+      <span className="stats-card__chevron" aria-hidden="true">›</span>
+    </button>
+  )
+}
+
 
 export default function SearchView() {
   const [allRegs, setAllRegs] = useState([])
@@ -129,6 +140,7 @@ export default function SearchView() {
   const [showFlownIn, setShowFlownIn] = useState(false)
   const [showAirlines, setShowAirlines] = useState(false)
   const [showBookCandidates, setShowBookCandidates] = useState(false)
+  const [showNotes, setShowNotes] = useState(false)
 
   function fetchAll() {
     if (!supabase) {
@@ -228,6 +240,10 @@ export default function SearchView() {
     )
   }
 
+  if (showNotes) {
+    return <NotesView onBack={() => setShowNotes(false)} />
+  }
+
   return (
     <div className="page search-page">
       <SearchTopBar />
@@ -308,6 +324,7 @@ export default function SearchView() {
           <AirlinesCard onOpen={() => setShowAirlines(true)} />
           <ManufacturersCard onOpen={() => setShowManufacturers(true)} />
           <BookCandidatesCard onOpen={() => setShowBookCandidates(true)} />
+          <NotesCard onOpen={() => setShowNotes(true)} />
         </div>
       </main>
     </div>
