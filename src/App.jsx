@@ -186,7 +186,13 @@ function AirlinesTab() {
     function jumpToBucket(b) {
       const el = document.getElementById(`ag-${b}`)
       if (!el) return
-      el.scrollIntoView({ block: 'start' })
+      let top = 0
+      let node = el
+      while (node) {
+        top += node.offsetTop
+        node = node.offsetParent
+      }
+      window.scrollTo({ top: top - 60 })
     }
 
     if (loading) {
