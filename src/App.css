@@ -4193,6 +4193,11 @@
   z-index: 1;
 }
 
+.airports-page > .top-bar {
+  position: sticky;
+  z-index: 10;
+}
+
 .airports-page .airport-row {
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(2px);
