@@ -622,6 +622,7 @@
      Nudge this value on device if the header tucks under the bar. */
   position: sticky;
   top: 54px;
+  scroll-margin-top: 60px;
   z-index: 5;
   background: #F6EFDC;
   color: #2C427B;

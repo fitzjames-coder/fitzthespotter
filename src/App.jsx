@@ -183,14 +183,10 @@ function AirlinesTab() {
   }
 
   function renderBody() {
-    // px: navy banner (~54px) + breathing room. Nudge on device if header lands hidden.
-    const STICKY_OFFSET = 60
-
     function jumpToBucket(b) {
       const el = document.getElementById(`ag-${b}`)
       if (!el) return
-      const y = el.getBoundingClientRect().top + window.scrollY - STICKY_OFFSET
-      window.scrollTo({ top: y, behavior: 'smooth' })
+      el.scrollIntoView({ block: 'start', behavior: 'smooth' })
     }
 
     if (loading) {
