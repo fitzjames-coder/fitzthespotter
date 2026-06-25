@@ -1,6 +1,20 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 
+const DRAMATIZE_INSTRUCTIONS = `You are helping me write evocative captions for an aviation photography project — a coffee-table book and social posts about plane spotting. I'll give you a raw spotting note I dictated in the field.
+
+Rewrite it into a vivid, atmospheric short paragraph in my first-person voice as the spotter — capturing the anticipation, the conditions, and why the catch mattered.
+
+Hard rules — these override everything:
+- Use ONLY the facts in my note. Do NOT add any aircraft detail, engine count, manufacturer, nationality, era, history, rarity, route, or technical spec from your own knowledge — not even if you are certain it is true. I add real facts myself; your job is mood, not facts.
+- Embellish the atmosphere and the moment only, never the facts. If a detail is not in my note, it cannot appear in the caption.
+- Keep the registration, aircraft type, and place names exactly as I wrote them.
+- If my note is short, keep the caption short. Do not pad length with outside facts — a tight two true sentences beat six with invented detail.
+- Evocative, not purple. Avoid clichés ("majestic bird", "kissed the runway").
+- Return only the rewritten paragraph, nothing else.
+
+Here is my note:`
+
 export default function NotesView({ onBack }) {
   const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(true)
@@ -9,6 +23,8 @@ export default function NotesView({ onBack }) {
   const [editingId, setEditingId] = useState(null)
   const [regInput, setRegInput] = useState('')
   const [bodyInput, setBodyInput] = useState('')
+  const [dramatizedInput, setDramatizedInput] = useState('')
+  const [copied, setCopied] = useState(null)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
   const [deleting, setDeleting] = useState(false)
@@ -32,6 +48,8 @@ export default function NotesView({ onBack }) {
     setEditingId(null)
     setRegInput('')
     setBodyInput('')
+    setDramatizedInput('')
+    setCopied(null)
     setSaveError(null)
     setMode('editor')
   }
@@ -40,6 +58,8 @@ export default function NotesView({ onBack }) {
     setEditingId(note.id)
     setRegInput(note.registration ?? '')
     setBodyInput(note.note_body ?? '')
+    setDramatizedInput(note.dramatized_body ?? '')
+    setCopied(null)
     setSaveError(null)
     setMode('editor')
   }
@@ -47,6 +67,16 @@ export default function NotesView({ onBack }) {
   function backToList() {
     setMode('list')
     setEditingId(null)
+  }
+
+  async function copyText(text, which) {
+    try {
+      await navigator.clipboard.writeText(text ?? '')
+      setCopied(which)
+      setTimeout(() => setCopied(null), 1500)
+    } catch {
+      setCopied(null)
+    }
   }
 
   async function handleSave() {
@@ -57,7 +87,12 @@ export default function NotesView({ onBack }) {
     if (editingId) {
       const { error: err } = await supabase
         .from('notes')
-        .update({ registration: reg, note_body: bodyInput, updated_at: new Date().toISOString() })
+        .update({
+          registration: reg,
+          note_body: bodyInput,
+          dramatized_body: dramatizedInput,
+          updated_at: new Date().toISOString(),
+        })
         .eq('id', editingId)
       setSaving(false)
       if (err) { setSaveError(err.message); return }
@@ -110,6 +145,33 @@ export default function NotesView({ onBack }) {
             placeholder="Type or dictate your note…"
             rows={10}
           />
+          {editingId && (
+            <div className="notes-dramatize">
+              <div className="notes-dramatize__bar">
+                <button
+                  className="notes-copybtn"
+                  onClick={() => copyText(DRAMATIZE_INSTRUCTIONS, 'instructions')}
+                >
+                  {copied === 'instructions' ? 'Copied!' : 'Copy Instructions'}
+                </button>
+                <button
+                  className="notes-copybtn"
+                  onClick={() => copyText(bodyInput, 'note')}
+                >
+                  {copied === 'note' ? 'Copied!' : 'Copy Note'}
+                </button>
+              </div>
+              <label className="notes-label" htmlFor="note-dramatized">Dramatized</label>
+              <textarea
+                id="note-dramatized"
+                className="notes-textarea"
+                value={dramatizedInput}
+                onChange={(e) => setDramatizedInput(e.target.value)}
+                placeholder="Paste the dramatized version here…"
+                rows={8}
+              />
+            </div>
+          )}
           {saveError && <p className="notes-error">{saveError}</p>}
           <div className="notes-actions">
             <button className="notes-save" onClick={handleSave} disabled={saving}>
