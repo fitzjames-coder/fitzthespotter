@@ -16,6 +16,9 @@
   position: sticky;
   top: 0;
   z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 /* Wordmark-as-button */
@@ -47,6 +50,17 @@
   vertical-align: super;
   line-height: 0;
   margin-left: 1px;
+}
+
+.top-bar__search {
+  flex: 1;
+  min-width: 0;
+  max-width: 440px;
+  margin-left: auto;
+}
+
+.top-bar__search .list-search__field {
+  padding: 6px 12px;
 }
 
 /* ── Registration form — bottom sheet ────────────────────────────── */

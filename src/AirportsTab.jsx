@@ -31,30 +31,30 @@ export default function AirportsTab({ onSelectAirport }) {
         <span className="top-bar__wordmark" style={{ cursor: 'default' }}>
           <span className="top-bar__title--cream">Airports</span>
         </span>
+        <div className="top-bar__search">
+          <div className="list-search__field">
+            <span className="list-search__icon" aria-hidden="true">🔍</span>
+            <input
+              className="list-search__input"
+              type="text"
+              placeholder="Search airports…"
+              value={airportQuery}
+              onChange={(e) => setAirportQuery(e.target.value)}
+              aria-label="Search this list"
+            />
+            {airportQuery && (
+              <button
+                className="list-search__clear"
+                aria-label="Clear search"
+                onClick={() => setAirportQuery('')}
+              >×</button>
+            )}
+          </div>
+        </div>
       </header>
       <main className="content">
         <div className="list-head">
           <p className="section-label">Airports Spotted</p>
-          <div className="list-search list-search--inline">
-            <div className="list-search__field">
-              <span className="list-search__icon" aria-hidden="true">🔍</span>
-              <input
-                className="list-search__input"
-                type="text"
-                placeholder="Search airports…"
-                value={airportQuery}
-                onChange={(e) => setAirportQuery(e.target.value)}
-                aria-label="Search this list"
-              />
-              {airportQuery && (
-                <button
-                  className="list-search__clear"
-                  aria-label="Clear search"
-                  onClick={() => setAirportQuery('')}
-                >×</button>
-              )}
-            </div>
-          </div>
         </div>
         {loading && <p className="state-message">Loading airports…</p>}
         {error && <p className="state-message state-message--error">{error}</p>}
