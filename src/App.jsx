@@ -186,7 +186,7 @@ function AirlinesTab() {
     function jumpToBucket(b) {
       const el = document.getElementById(`ag-${b}`)
       if (!el) return
-      el.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      el.scrollIntoView({ block: 'start' })
     }
 
     if (loading) {
