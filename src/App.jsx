@@ -27,7 +27,7 @@ function compareAirlineNames(a, b) {
   return an.localeCompare(bn, 'en', { numeric: true, sensitivity: 'base' })
 }
 
-export function TopBar() {
+export function TopBar({ searchValue, onSearchChange, searchPlaceholder, onSearchClear }) {
   const [showForm, setShowForm] = useState(false)
   return (
     <>
@@ -42,6 +42,28 @@ export function TopBar() {
           <span className="top-bar__title--cream">spotter</span>
           <sup className="top-bar__plus" aria-hidden="true">+</sup>
         </button>
+        {onSearchChange && (
+          <div className="top-bar__search">
+            <div className="list-search__field">
+              <span className="list-search__icon" aria-hidden="true">🔍</span>
+              <input
+                className="list-search__input"
+                type="text"
+                placeholder={searchPlaceholder}
+                value={searchValue}
+                onChange={(e) => onSearchChange(e.target.value)}
+                aria-label="Search this list"
+              />
+              {searchValue && (
+                <button
+                  className="list-search__clear"
+                  aria-label="Clear search"
+                  onClick={onSearchClear}
+                >×</button>
+              )}
+            </div>
+          </div>
+        )}
       </header>
       {showForm && <NewRegistrationForm onClose={() => setShowForm(false)} />}
     </>
@@ -257,30 +279,15 @@ function AirlinesTab() {
 
   return (
     <div className="page airlines-page">
-      <TopBar />
+      <TopBar
+        searchValue={airlineQuery}
+        onSearchChange={setAirlineQuery}
+        searchPlaceholder="Search airlines…"
+        onSearchClear={() => setAirlineQuery('')}
+      />
       <main className="content">
         <div className="list-head">
           <p className="section-label">Airlines Spotted</p>
-          <div className="list-search list-search--inline">
-            <div className="list-search__field">
-              <span className="list-search__icon" aria-hidden="true">🔍</span>
-              <input
-                className="list-search__input"
-                type="text"
-                placeholder="Search airlines…"
-                value={airlineQuery}
-                onChange={(e) => setAirlineQuery(e.target.value)}
-                aria-label="Search this list"
-              />
-              {airlineQuery && (
-                <button
-                  className="list-search__clear"
-                  aria-label="Clear search"
-                  onClick={() => setAirlineQuery('')}
-                >×</button>
-              )}
-            </div>
-          </div>
         </div>
         {renderBody()}
       </main>
