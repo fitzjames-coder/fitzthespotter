@@ -184,6 +184,8 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [sightingDate, setSightingDate] = useState('')
   const [sightingAirport, setSightingAirport] = useState('')
   const [sightingAirportKnown, setSightingAirportKnown] = useState(false)
+  const [sightingTimeBlock, setSightingTimeBlock] = useState('')
+  const [sightingSouthern, setSightingSouthern] = useState(false)
   const [sightingSaving, setSightingSaving] = useState(false)
 
   const [sightingsMgrOpen, setSightingsMgrOpen] = useState(false)
@@ -515,6 +517,8 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     const { error: sErr } = await supabase.from('sightings').insert({
       registration_id: targetId,
       spotted_on: sightingDate || null,
+      time_block: sightingTimeBlock || null,
+      southern_hemisphere: sightingSouthern,
       airport: sightingAirport.trim().toUpperCase() || null,
       special_livery: statusSpecialLivery,
       retro: statusRetro,
@@ -666,6 +670,18 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                       value={sightingDate}
                       onChange={(e) => setSightingDate(e.target.value)}
                     />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Time of day</label>
+                    <TimeBlockPicker value={sightingTimeBlock} onChange={setSightingTimeBlock} />
+                    <label className="timeblock-hemi">
+                      <input
+                        type="checkbox"
+                        checked={sightingSouthern}
+                        onChange={(e) => setSightingSouthern(e.target.checked)}
+                      />
+                      <span>Southern hemisphere (flips season)</span>
+                    </label>
                   </div>
                   <div className="form-group">
                     <label className="form-label">Airport *</label>
