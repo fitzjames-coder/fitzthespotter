@@ -5229,3 +5229,27 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+/* Country headers span all columns in the desktop airport grid */
+.desktop-mode .airport-list .airline-group-header {
+  grid-column: 1 / -1;
+}
+
+/* Re-assert sticky on the Airports top-bar (mirrors the .airlines-page fix);
+   .airports-page > * { position: relative } overrides the base sticky otherwise. */
+.airports-page > .top-bar {
+  position: sticky;
+  z-index: 10;
+}
+
+/* Airports country header: nudge below the banner so it doesn't tuck under, and
+   style the per-country count. Airports-scoped so the Airlines header is unaffected. */
+.airports-page .airline-group-header {
+  top: 60px;
+}
+.airport-group-count {
+  margin-left: 8px;
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: rgba(44, 66, 123, 0.55);
+}

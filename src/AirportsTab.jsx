@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Fragment } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { FlagIcon } from './App'
 
@@ -73,22 +73,41 @@ export default function AirportsTab({ onSelectAirport }) {
           if (q && filtered.length === 0) {
             return <p className="state-message">No airports match.</p>
           }
+          const byCountry = new Map()
+          for (const ap of filtered) {
+            const c = (ap.country && ap.country.trim()) ? ap.country : '—'
+            if (!byCountry.has(c)) byCountry.set(c, [])
+            byCountry.get(c).push(ap)
+          }
+          const countries = Array.from(byCountry.keys()).sort((a, b) => {
+            if (a === '—') return 1
+            if (b === '—') return -1
+            return a.localeCompare(b)
+          })
+          for (const c of countries) {
+            byCountry.get(c).sort((x, y) => (x.name ?? '').localeCompare(y.name ?? ''))
+          }
           return (
           <ul className="airport-list">
-            {filtered.map((ap) => (
-              <li key={ap.iata}>
-                <button className="airport-row" onClick={() => onSelectAirport(ap)}>
-                  <span className="airport-row__iata">{ap.iata}</span>
-                  <div className="airport-row__body">
-                    <span className="airport-row__name">{ap.name}</span>
-                    <span className="airport-row__country">
-                      <FlagIcon countryCode={ap.country_flag} />
-                      {ap.country}
-                    </span>
-                  </div>
-                  <span className="airport-row__chevron" aria-hidden="true">›</span>
-                </button>
-              </li>
+            {countries.map((country) => (
+              <Fragment key={country}>
+                <li className="airline-group-header">{country}<span className="airport-group-count">{byCountry.get(country).length}</span></li>
+                {byCountry.get(country).map((ap) => (
+                  <li key={ap.iata}>
+                    <button className="airport-row" onClick={() => onSelectAirport(ap)}>
+                      <span className="airport-row__iata">{ap.iata}</span>
+                      <div className="airport-row__body">
+                        <span className="airport-row__name">{ap.name}</span>
+                        <span className="airport-row__country">
+                          <FlagIcon countryCode={ap.country_flag} />
+                          {ap.country}
+                        </span>
+                      </div>
+                      <span className="airport-row__chevron" aria-hidden="true">›</span>
+                    </button>
+                  </li>
+                ))}
+              </Fragment>
             ))}
           </ul>
           )
