@@ -91,7 +91,7 @@ export default function AirportsTab({ onSelectAirport }) {
           <ul className="airport-list">
             {countries.map((country) => (
               <Fragment key={country}>
-                <li className="airline-group-header">{country}</li>
+                <li className="airline-group-header">{country}<span className="airport-group-count">{byCountry.get(country).length}</span></li>
                 {byCountry.get(country).map((ap) => (
                   <li key={ap.iata}>
                     <button className="airport-row" onClick={() => onSelectAirport(ap)}>
