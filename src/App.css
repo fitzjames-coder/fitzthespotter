@@ -5253,3 +5253,15 @@
   font-weight: normal;
   color: rgba(44, 66, 123, 0.55);
 }
+
+/* Time-of-day block picker (entry forms) */
+.timeblock-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+.timeblock-pill {
+  border: 1.5px solid #c9bfa6; background: #fff; color: #6b6354;
+  border-radius: 999px; padding: 7px 12px; font-size: 13px; font-weight: 600; cursor: pointer;
+  text-align: center; line-height: 1.1;
+}
+.timeblock-pill--on { background: var(--color-amber); border-color: var(--color-amber); color: var(--color-ink); }
+.timeblock-pill__range { display: block; font-size: 9px; font-weight: 600; opacity: 0.7; }
+.timeblock-hemi { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: #6b6354; cursor: pointer; }
+.timeblock-hemi input { width: 18px; height: 18px; accent-color: var(--color-navy); }
