@@ -6,6 +6,7 @@ import AirportForm from './AirportForm'
 import ManufacturerForm from './ManufacturerForm'
 import TypeForm from './TypeForm'
 import { AllianceBadge } from './StatusMarks'
+import TimeBlockPicker from './TimeBlockPicker'
 import markSpecialLiveryAsset from './assets/marks/mark-special-livery.png'
 import markRetroAsset from './assets/marks/mark-retro.png'
 import markFlownInAsset from './assets/marks/mark-flown-in.png'
@@ -161,6 +162,8 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     return at ? { id: at.id, label: at.name } : null
   })
   const [firstSpotted, setFirstSpotted] = useState(existingReg?.first_spotted ?? '')
+  const [firstTimeBlock, setFirstTimeBlock] = useState('')
+  const [firstSouthern, setFirstSouthern] = useState(false)
   const [airports, setAirports] = useState(
     Array.isArray(existingReg?.airports) ? existingReg.airports : []
   )
@@ -436,6 +439,8 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     const sightingRows = codes.map((code) => ({
       registration_id: newReg.id,
       spotted_on: firstSpotted || null,
+      time_block: firstTimeBlock || null,
+      southern_hemisphere: firstSouthern,
       airport: code,
       special_livery: statusSpecialLivery,
       retro: statusRetro,
@@ -778,6 +783,18 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                   value={firstSpotted}
                   onChange={(e) => setFirstSpotted(e.target.value)}
                 />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Time of day</label>
+                <TimeBlockPicker value={firstTimeBlock} onChange={setFirstTimeBlock} />
+                <label className="timeblock-hemi">
+                  <input
+                    type="checkbox"
+                    checked={firstSouthern}
+                    onChange={(e) => setFirstSouthern(e.target.checked)}
+                  />
+                  <span>Southern hemisphere (flips season)</span>
+                </label>
               </div>
               <div className="form-group">
                 <label className="form-label">Airport spotted at</label>
