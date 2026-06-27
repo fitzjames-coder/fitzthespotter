@@ -5234,3 +5234,10 @@
 .desktop-mode .airport-list .airline-group-header {
   grid-column: 1 / -1;
 }
+
+/* Re-assert sticky on the Airports top-bar (mirrors the .airlines-page fix);
+   .airports-page > * { position: relative } overrides the base sticky otherwise. */
+.airports-page > .top-bar {
+  position: sticky;
+  z-index: 10;
+}
