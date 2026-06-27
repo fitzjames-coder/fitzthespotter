@@ -5229,3 +5229,8 @@
   font-weight: 600;
   cursor: pointer;
 }
+
+/* Country headers span all columns in the desktop airport grid */
+.desktop-mode .airport-list .airline-group-header {
+  grid-column: 1 / -1;
+}
