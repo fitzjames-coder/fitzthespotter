@@ -9,6 +9,7 @@ import { AllianceBadge } from './StatusMarks'
 import TimeBlockPicker from './TimeBlockPicker'
 import markSpecialLiveryAsset from './assets/marks/mark-special-livery.png'
 import markRetroAsset from './assets/marks/mark-retro.png'
+import markOldLiveryAsset from './assets/marks/mark-old-livery.PNG'
 import markFlownInAsset from './assets/marks/mark-flown-in.png'
 
 function AirportTagsInput({ codes, onChange, onCommitCode, onMaxReached, max }) {
@@ -169,6 +170,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   )
   const [statusSpecialLivery, setStatusSpecialLivery] = useState(Boolean(s.special_livery))
   const [statusRetro, setStatusRetro] = useState(Boolean(s.retro))
+  const [statusOldLivery, setStatusOldLivery] = useState(Boolean(s.old_livery))
   const [liveryName, setLiveryName] = useState(s.livery_name ?? '')
   const [statusAlliance, setStatusAlliance] = useState(Boolean(s.alliance))
   const [allianceName, setAllianceName] = useState(s.alliance_name ?? '')
@@ -396,6 +398,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     const statuses = {}
     if (statusSpecialLivery) statuses.special_livery = true
     if (statusRetro) statuses.retro = true
+    if (statusOldLivery) statuses.old_livery = true
     if (showLiveryName && liveryName.trim()) statuses.livery_name = liveryName.trim()
     if (statusAlliance) {
       statuses.alliance = true
@@ -489,6 +492,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     const statuses = {}
     if (statusSpecialLivery) statuses.special_livery = true
     if (statusRetro) statuses.retro = true
+    if (statusOldLivery) statuses.old_livery = true
     if (showLiveryName && liveryName.trim()) statuses.livery_name = liveryName.trim()
     if (statusAlliance) {
       statuses.alliance = true
@@ -711,6 +715,12 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                     onChange={(v) => { setStatusRetro(v); if (v) { setStatusSpecialLivery(false); setStatusAlliance(false) } }}
                     markEl={<img src={markRetroAsset} width={24} height={24} alt="" className="status-switch__mark-img" />}
                   />
+                  <StatusSwitch
+                    label="Old livery"
+                    checked={statusOldLivery}
+                    onChange={setStatusOldLivery}
+                    markEl={<img src={markOldLiveryAsset} width={24} height={24} alt="" className="status-switch__mark-img" />}
+                  />
                   {showLiveryName && (
                     <div className="form-group status-revealed-field">
                       <label className="form-label" htmlFor="sighting-livery-name-input">Livery name (optional)</label>
@@ -845,6 +855,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               <>
                 <StatusSwitch label="Special livery" checked={statusSpecialLivery} onChange={setStatusSpecialLivery} markEl={<img src={markSpecialLiveryAsset} width={24} height={24} alt="" className="status-switch__mark-img" />} />
                 <StatusSwitch label="Retro" checked={statusRetro} onChange={setStatusRetro} markEl={<img src={markRetroAsset} width={24} height={24} alt="" className="status-switch__mark-img" />} />
+                <StatusSwitch label="Old livery" checked={statusOldLivery} onChange={setStatusOldLivery} markEl={<img src={markOldLiveryAsset} width={24} height={24} alt="" className="status-switch__mark-img" />} />
                 {showLiveryName && (
                   <div className="form-group status-revealed-field">
                     <label className="form-label" htmlFor="livery-name-input">Livery name (optional)</label>

@@ -1,6 +1,7 @@
 import markRemark from './assets/marks/mark-remark.png'
 import markSpecialLivery from './assets/marks/mark-special-livery.png'
 import markRetro from './assets/marks/mark-retro.png'
+import markOldLivery from './assets/marks/mark-old-livery.PNG'
 import markFlownIn from './assets/marks/mark-flown-in.png'
 import allianceStar from './assets/marks/mark-alliance-star.png'
 import allianceSkyteam from './assets/marks/mark-alliance-skyteam.png'
@@ -50,6 +51,7 @@ const SRCS = {
   remarks: markRemark,
   special_livery: markSpecialLivery,
   retro: markRetro,
+  old_livery: markOldLivery,
   flown_in: markFlownIn,
 }
 
@@ -57,10 +59,11 @@ const ALTS = {
   remarks: 'Remark',
   special_livery: 'Special livery',
   retro: 'Retro',
+  old_livery: 'Old livery',
   flown_in: 'Flown in',
 }
 
-const SLOT_KEYS = ['remarks', 'special_livery', 'retro', 'alliance', 'flown_in']
+const SLOT_KEYS = ['remarks', 'special_livery', 'retro', 'old_livery', 'alliance', 'flown_in']
 
 export default function StatusMarks({ statuses, size = 22, onRemarkClick, onFlownInClick }) {
   if (!statuses) return null
@@ -69,6 +72,7 @@ export default function StatusMarks({ statuses, size = 22, onRemarkClick, onFlow
     remarks: Boolean(statuses.remarks),
     special_livery: Boolean(statuses.special_livery),
     retro: Boolean(statuses.retro),
+    old_livery: Boolean(statuses.old_livery),
     alliance: Boolean(statuses.alliance),
     flown_in: Boolean(statuses.flown_in),
   }
