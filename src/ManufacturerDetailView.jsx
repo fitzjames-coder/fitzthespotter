@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import TypeaheadPicker from './TypeaheadPicker'
 import { supabase } from './lib/supabaseClient'
 import ManufacturerForm from './ManufacturerForm'
 
@@ -45,10 +46,83 @@ function HeroLogo({ manufacturer }) {
   )
 }
 
-function TypeTile({ type, count }) {
+async function fetchAirlinesForRetire(q) {
+  if (!supabase) return []
+  const { data } = await supabase
+    .from('airlines')
+    .select('id, name')
+    .ilike('name', `%${q}%`)
+    .order('name')
+    .limit(8)
+  return (data ?? []).map((a) => ({ id: a.id, label: a.name }))
+}
+
+function RetireTypeOverlay({ type, onClose }) {
+  const [airline, setAirline] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [flash, setFlash] = useState(null)
+
+  async function handlePick(opt) {
+    setAirline(opt)
+    if (!opt || !supabase) return
+    setSaving(true)
+    setFlash(null)
+    const existing = await supabase
+      .from('retired_types')
+      .select('id')
+      .eq('airline_id', opt.id)
+      .eq('aircraft_type_id', type.id)
+      .maybeSingle()
+    if (existing.data) {
+      setSaving(false)
+      setFlash({ kind: 'warn', text: `${type.name} is already marked as retired for ${opt.label}.` })
+      setAirline(null)
+      return
+    }
+    const { error } = await supabase
+      .from('retired_types')
+      .insert({ airline_id: opt.id, aircraft_type_id: type.id })
+    setSaving(false)
+    if (error) {
+      setFlash({ kind: 'warn', text: error.message })
+      setAirline(null)
+    } else {
+      setFlash({ kind: 'ok', text: `${type.name} marked retired for ${opt.label}.` })
+      setAirline(null)
+    }
+  }
+
+  return (
+    <div className="retire-overlay" onClick={onClose}>
+      <div className="retire-card" onClick={(e) => e.stopPropagation()}>
+        <div className="retire-card__head">
+          <span className="retire-card__title">Mark {type.name} retired</span>
+          <button className="retire-card__close" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        <p className="retire-card__hint">Search an airline you've logged. The type will be marked retired for that airline only.</p>
+        <TypeaheadPicker
+          placeholder="Airline name…"
+          value={airline}
+          onSelect={handlePick}
+          fetchOptions={fetchAirlinesForRetire}
+          disabled={saving}
+        />
+        {flash && (
+          <p className={`retire-flash retire-flash--${flash.kind}`}>{flash.text}</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function TypeTile({ type, count, onRetire }) {
   const isZero = count === 0
   return (
-    <div className={`type-tile-wrap${isZero ? ' type-tile-wrap--zero' : ''}`}>
+    <button
+      type="button"
+      className={`type-tile-wrap type-tile-wrap--btn${isZero ? ' type-tile-wrap--zero' : ''}`}
+      onClick={() => onRetire(type)}
+    >
       <div className="type-tile">
         {type.template_url ? (
           <img className="type-tile__img" src={type.template_url} alt="" aria-hidden="true" />
@@ -62,7 +136,7 @@ function TypeTile({ type, count }) {
         </div>
       </div>
       <span className="type-tile__name">{type.name}</span>
-    </div>
+    </button>
   )
 }
 
@@ -74,6 +148,7 @@ export default function ManufacturerDetailView({ manufacturerId, airlineId = nul
   const [error, setError] = useState(null)
   const [showEdit, setShowEdit] = useState(false)
   const [refreshNonce, setRefreshNonce] = useState(0)
+  const [retireType, setRetireType] = useState(null)
 
   useEffect(() => {
     if (!supabase) {
@@ -170,12 +245,16 @@ export default function ManufacturerDetailView({ manufacturerId, airlineId = nul
           {!loading && !error && types.length > 0 && (
             <div className="type-gallery">
               {types.map((type) => (
-                <TypeTile key={type.id} type={type} count={regCounts[type.id] ?? 0} />
+                <TypeTile key={type.id} type={type} count={regCounts[type.id] ?? 0} onRetire={setRetireType} />
               ))}
             </div>
           )}
         </main>
       </div>
+
+      {retireType && (
+        <RetireTypeOverlay type={retireType} onClose={() => setRetireType(null)} />
+      )}
 
       {showEdit && manufacturer && (
         <ManufacturerForm

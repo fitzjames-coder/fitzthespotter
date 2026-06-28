@@ -5316,3 +5316,20 @@
 
 .airline-card__flown { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
 .airline-hero__flown { width: 26px; height: 26px; object-fit: contain; vertical-align: middle; margin-left: 4px; }
+
+.type-tile-wrap--btn { background: none; border: none; padding: 0; cursor: pointer; font: inherit; text-align: inherit; }
+.retire-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(10,14,19,0.6); display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.retire-card {
+  width: 100%; max-width: 420px; background: var(--color-cream, #f6efdc);
+  border-radius: 16px; padding: 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+}
+.retire-card__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.retire-card__title { font-weight: 700; font-size: 1rem; color: var(--color-ink, #16203B); }
+.retire-card__close { background: none; border: none; font-size: 1.1rem; cursor: pointer; color: var(--color-ink, #16203B); }
+.retire-card__hint { font-size: 0.8rem; color: #5b5a52; margin: 0 0 12px; line-height: 1.4; }
+.retire-flash { margin: 12px 0 2px; font-size: 0.85rem; font-weight: 600; padding: 8px 10px; border-radius: 8px; }
+.retire-flash--ok { background: rgba(0,82,129,0.12); color: var(--color-deep-blue, #005281); }
+.retire-flash--warn { background: rgba(232,96,122,0.15); color: #b3344f; }
