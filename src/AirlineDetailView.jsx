@@ -4,6 +4,7 @@ import RegistrationProfileView from './RegistrationProfileView'
 import StatusMarks from './StatusMarks'
 import AirlineForm from './AirlineForm'
 import NewRegistrationForm from './NewRegistrationForm'
+import markFlownIn from './assets/marks/mark-flown-in.png'
 
 function heroInitials(name) {
   return name.split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 3)
@@ -69,6 +70,9 @@ function AirlineHero({ airline, regCount, loading, onBack, onEdit, onAddReg }) {
         <div className="airline-hero__text">
           <div className="airline-hero__name-row">
             <h1 className="airline-hero__name">{airline.name}</h1>
+            {airline.flown_in && (
+              <img className="airline-hero__flown" src={markFlownIn} alt="Flown" title="Flown this airline" />
+            )}
             {isClosed && <span className="airline-closed-chip">CLOSED</span>}
           </div>
           {airline.secondary_name && (

@@ -18,6 +18,7 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
   const [logoFile, setLogoFile] = useState(null)
   const [logoUrl, setLogoUrl] = useState(existing?.logo_url ?? null)
   const [isClosed, setIsClosed] = useState(existing?.is_closed ?? false)
+  const [flownIn, setFlownIn] = useState(existing?.flown_in ?? false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -71,9 +72,10 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
             country_flag: selectedCountry.code.toUpperCase(),
             logo_url: finalLogoUrl,
             is_closed: isClosed,
+            flown_in: flownIn,
           })
           .eq('id', existing.id)
-          .select('id, name, country, country_flag, logo_url, is_closed, secondary_name')
+          .select('id, name, country, country_flag, logo_url, is_closed, secondary_name, flown_in')
           .single()
         setSaving(false)
         if (err) { setSaveError(err.message); return }
@@ -88,8 +90,9 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
             country_flag: selectedCountry.code.toUpperCase(),
             logo_url: finalLogoUrl,
             is_closed: isClosed,
+            flown_in: flownIn,
           })
-          .select('id, name, country, country_flag, logo_url, is_closed, secondary_name')
+          .select('id, name, country, country_flag, logo_url, is_closed, secondary_name, flown_in')
           .single()
         setSaving(false)
         if (err) { setSaveError(err.message); return }
@@ -222,6 +225,21 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
               aria-checked={isClosed}
               className={`status-toggle${isClosed ? ' status-toggle--on' : ''}`}
               onClick={() => setIsClosed((v) => !v)}
+            >
+              <span className="status-toggle__knob" />
+            </button>
+          </div>
+
+          <div className="status-switch airline-form-closed-row">
+            <span className="status-switch__left">
+              <span className="status-switch__label">Flown this airline</span>
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={flownIn}
+              className={`status-toggle${flownIn ? ' status-toggle--on' : ''}`}
+              onClick={() => setFlownIn((v) => !v)}
             >
               <span className="status-toggle__knob" />
             </button>
