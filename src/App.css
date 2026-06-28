@@ -5267,7 +5267,7 @@
 .timeblock-hemi input { width: 18px; height: 18px; accent-color: var(--color-navy); }
 
 /* ── Spotting Through Time ─────────────────────── */
-.stp-page { background-color: #fbf7ec; }
+.stp-page { background-color: var(--color-ink); }
 .stp-heading { color: var(--color-cream); font-size: 1rem; font-weight: 600; }
 .stp-content { padding-bottom: 2rem; }
 .stp-chart {
@@ -5298,4 +5298,4 @@
 .stp-insight { font-size: 12.5px; color: var(--color-ink); background: var(--color-cream); border-radius: 9px; padding: 9px 11px; margin: 8px 0 0; line-height: 1.4; }
 .stp-insight b { color: var(--color-deep-blue); }
 .stp-insight--empty { color: #8a8270; }
-.stp-hint { font-size: 11px; color: #8a8270; text-align: center; margin: 14px 0 0; }
+.stp-hint { font-size: 11px; color: rgba(246, 239, 220, 0.55); text-align: center; margin: 14px 0 0; }
