@@ -1,6 +1,7 @@
 import { useEffect, useState, Fragment } from 'react'
 import './App.css'
 import { supabase } from './lib/supabaseClient'
+import markFlownIn from './assets/marks/mark-flown-in.png'
 import AirlineDetailView from './AirlineDetailView'
 import ManufacturerDetailView from './ManufacturerDetailView'
 import AirportsTab from './AirportsTab'
@@ -118,6 +119,9 @@ function AirlineCard({ airline, regCount, onSelect }) {
         </div>
       </div>
       <div className="airline-card__right">
+        {airline.flown_in && (
+          <img className="airline-card__flown" src={markFlownIn} alt="Flown" title="Flown this airline" />
+        )}
         {isClosed && (
           <img className="airline-card__closed-banner" src="/Closed.PNG"
                alt="Closed — ceased operations" />
@@ -151,7 +155,7 @@ function AirlinesTab() {
     Promise.all([
       supabase
         .from('airlines')
-        .select('id, name, country, country_flag, logo_url, is_closed, closed_date, parent_id, secondary_name')
+        .select('id, name, country, country_flag, logo_url, is_closed, closed_date, parent_id, secondary_name, flown_in')
         .order('name', { ascending: true }),
       supabase
         .from('registrations')

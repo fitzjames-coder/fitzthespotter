@@ -5307,3 +5307,6 @@
   color: rgba(246, 239, 220, 0.6);
   letter-spacing: 0.01em;
 }
+
+.airline-card__flown { width: 22px; height: 22px; object-fit: contain; flex-shrink: 0; }
+.airline-hero__flown { width: 26px; height: 26px; object-fit: contain; vertical-align: middle; margin-left: 4px; }
