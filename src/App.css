@@ -5299,3 +5299,11 @@
 .stp-insight b { color: var(--color-deep-blue); }
 .stp-insight--empty { color: #8a8270; }
 .stp-hint { font-size: 11px; color: rgba(246, 239, 220, 0.55); text-align: center; margin: 14px 0 0; }
+
+.airline-hero__secondary {
+  margin: 2px 0 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: rgba(246, 239, 220, 0.6);
+  letter-spacing: 0.01em;
+}
