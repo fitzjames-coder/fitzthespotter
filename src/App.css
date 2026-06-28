@@ -3573,6 +3573,12 @@
   flex-wrap: nowrap;
 }
 
+/* On reg cards, do not reserve empty columns for inactive statuses —
+   pack the active marks at the right edge so they never overlap the name. */
+.reg-card .status-marks__spacer {
+  display: none;
+}
+
 /* Profile header marks — slightly larger than cards */
 .top-bar__detail-info .status-marks {
   font-size: initial;
