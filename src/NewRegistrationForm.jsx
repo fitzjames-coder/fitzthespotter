@@ -419,6 +419,9 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     }
 
     if (isEdit) {
+      if (statusFlownIn && airline?.id) {
+        await supabase.from('airlines').update({ flown_in: true }).eq('id', airline.id)
+      }
       const { error: err } = await supabase
         .from('registrations')
         .update(payload)
@@ -458,6 +461,9 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     if (sErr) {
       setSaveError(sErr.message)
     } else {
+      if (statusFlownIn && airline?.id) {
+        await supabase.from('airlines').update({ flown_in: true }).eq('id', airline.id)
+      }
       onSaved?.()
       onClose()
     }
@@ -534,6 +540,9 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     if (sErr) {
       setSaveError(sErr.message)
     } else {
+      if (statusFlownIn && airline?.id) {
+        await supabase.from('airlines').update({ flown_in: true }).eq('id', airline.id)
+      }
       onSaved?.()
       onClose()
     }
