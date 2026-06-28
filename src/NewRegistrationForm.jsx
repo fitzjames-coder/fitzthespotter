@@ -9,7 +9,7 @@ import { AllianceBadge } from './StatusMarks'
 import TimeBlockPicker from './TimeBlockPicker'
 import markSpecialLiveryAsset from './assets/marks/mark-special-livery.png'
 import markRetroAsset from './assets/marks/mark-retro.png'
-import markOldLiveryAsset from './assets/marks/mark-old-livery.PNG'
+import markOldLiveryAsset from './assets/marks/mark-old-livery.png'
 import markFlownInAsset from './assets/marks/mark-flown-in.png'
 
 function AirportTagsInput({ codes, onChange, onCommitCode, onMaxReached, max }) {
