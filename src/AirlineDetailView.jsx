@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { supabase } from './lib/supabaseClient'
 import RegistrationProfileView from './RegistrationProfileView'
 import StatusMarks from './StatusMarks'
@@ -49,7 +49,36 @@ function AirlineHeroLogo({ airline }) {
   )
 }
 
-function AirlineHero({ airline, regCount, loading, onBack, onEdit, onAddReg }) {
+function RetiredPill({ item, onLongPress }) {
+  const timer = useRef(null)
+  const fired = useRef(false)
+
+  function start() {
+    fired.current = false
+    timer.current = setTimeout(() => {
+      fired.current = true
+      onLongPress(item)
+    }, 1500)
+  }
+  function cancel() {
+    if (timer.current) { clearTimeout(timer.current); timer.current = null }
+  }
+
+  return (
+    <span
+      className="retired-pill"
+      onPointerDown={start}
+      onPointerUp={cancel}
+      onPointerLeave={cancel}
+      onContextMenu={(e) => e.preventDefault()}
+      title="Press and hold to un-retire"
+    >
+      {item.type_name}
+    </span>
+  )
+}
+
+function AirlineHero({ airline, regCount, loading, onBack, onEdit, onAddReg, retiredTypes, onRetireLongPress }) {
   const isClosed = airline.is_closed
   const year = closedYear(airline)
 
@@ -92,6 +121,13 @@ function AirlineHero({ airline, regCount, loading, onBack, onEdit, onAddReg }) {
           )}
         </div>
       </div>
+      {retiredTypes && retiredTypes.length > 0 && (
+        <div className="airline-hero__retired">
+          {retiredTypes.map((rt) => (
+            <RetiredPill key={rt.id} item={rt} onLongPress={onRetireLongPress} />
+          ))}
+        </div>
+      )}
       {isClosed && (
         <img
           className="airline-hero__closed-banner"
@@ -225,6 +261,30 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   const [selectedReg, setSelectedReg] = useState(null)
   const [showEdit, setShowEdit] = useState(false)
   const [showRegForm, setShowRegForm] = useState(false)
+  const [retiredTypes, setRetiredTypes] = useState([])
+  const [unretireTarget, setUnretireTarget] = useState(null)
+
+  function loadRetiredTypes() {
+    if (!supabase) return
+    supabase
+      .from('retired_types')
+      .select('id, aircraft_types ( name )')
+      .eq('airline_id', airline.id)
+      .then(({ data }) => {
+        const rows = (data ?? [])
+          .map((r) => ({ id: r.id, type_name: r.aircraft_types?.name }))
+          .filter((r) => r.type_name)
+          .sort((a, b) => a.type_name.localeCompare(b.type_name))
+        setRetiredTypes(rows)
+      })
+  }
+
+  async function confirmUnretire() {
+    if (!unretireTarget || !supabase) return
+    await supabase.from('retired_types').delete().eq('id', unretireTarget.id)
+    setUnretireTarget(null)
+    loadRetiredTypes()
+  }
 
   function loadRegistrations() {
     if (!supabase) {
@@ -265,6 +325,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
 
   useEffect(() => {
     loadRegistrations()
+    loadRetiredTypes()
   }, [airline.id])
 
   if (selectedReg) {
@@ -315,11 +376,29 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
           onBack={onBack}
           onEdit={() => setShowEdit(true)}
           onAddReg={() => setShowRegForm(true)}
+          retiredTypes={retiredTypes}
+          onRetireLongPress={setUnretireTarget}
         />
         <main className="content">
           {renderBody()}
         </main>
       </div>
+
+      {unretireTarget && (
+        <div className="retire-overlay" onClick={() => setUnretireTarget(null)}>
+          <div className="retire-card" onClick={(e) => e.stopPropagation()}>
+            <div className="retire-card__head">
+              <span className="retire-card__title">Un-retire {unretireTarget.type_name}?</span>
+              <button className="retire-card__close" onClick={() => setUnretireTarget(null)} aria-label="Close">✕</button>
+            </div>
+            <p className="retire-card__hint">This removes the retired mark for {unretireTarget.type_name} on this airline and all its matching registrations.</p>
+            <div className="retire-confirm-row">
+              <button className="retire-confirm-cancel" onClick={() => setUnretireTarget(null)}>Cancel</button>
+              <button className="retire-confirm-go" onClick={confirmUnretire}>Un-retire</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showEdit && (
         <AirlineForm
