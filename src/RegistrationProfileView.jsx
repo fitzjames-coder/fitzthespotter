@@ -202,7 +202,7 @@ function PhotoGallery({ slides, onSlideClick }) {
   )
 }
 
-function InfoSection({ reg, lastSighting }) {
+function InfoSection({ reg, lastSighting, isRetiredType }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
   const model = reg.aircraft_types?.name
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
@@ -216,7 +216,10 @@ function InfoSection({ reg, lastSighting }) {
       {aircraftLabel && (
         <div className="info-row">
           <span className="info-row__label">Aircraft</span>
-          <span className="info-row__value">{aircraftLabel}</span>
+          <span className="info-row__value">
+            {aircraftLabel}
+            {isRetiredType && <span className="reg-retired-pill">Retired</span>}
+          </span>
         </div>
       )}
       {airports.length > 0 && (
@@ -323,6 +326,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const tapTimerRef = useRef(null)
   // incremented by onSaved so the effect re-runs without changing currentRegId
   const [reloadKey, setReloadKey] = useState(0)
+  const [isRetiredType, setIsRetiredType] = useState(false)
 
   useEffect(() => {
     return () => { if (tapTimerRef.current) clearTimeout(tapTimerRef.current) }
@@ -406,6 +410,18 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
         setSiblingIds((data ?? []).map((r) => r.id))
       })
   }, [reg?.airline_id])
+
+  useEffect(() => {
+    const typeId = reg?.aircraft_types?.id
+    if (!supabase || !reg?.airline_id || !typeId) { setIsRetiredType(false); return }
+    supabase
+      .from('retired_types')
+      .select('id')
+      .eq('airline_id', reg.airline_id)
+      .eq('aircraft_type_id', typeId)
+      .maybeSingle()
+      .then(({ data }) => setIsRetiredType(Boolean(data)))
+  }, [reg?.airline_id, reg?.aircraft_types?.id])
 
   const index = siblingIds.indexOf(currentRegId)
   const hasPrev = index > 0
@@ -597,7 +613,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
             </div>
           </div>
           {photoError && <p className="form-error" style={{ marginTop: '0.5rem' }}>{photoError}</p>}
-          <InfoSection reg={reg} lastSighting={lastSighting} />
+          <InfoSection reg={reg} lastSighting={lastSighting} isRetiredType={isRetiredType} />
           {deleteError && <p className="form-error" style={{ marginTop: '1rem' }}>{deleteError}</p>}
           <button
             className="btn-delete-reg"
