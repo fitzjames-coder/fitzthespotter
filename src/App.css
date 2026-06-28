@@ -5333,3 +5333,18 @@
 .retire-flash { margin: 12px 0 2px; font-size: 0.85rem; font-weight: 600; padding: 8px 10px; border-radius: 8px; }
 .retire-flash--ok { background: rgba(0,82,129,0.12); color: var(--color-deep-blue, #005281); }
 .retire-flash--warn { background: rgba(232,96,122,0.15); color: #b3344f; }
+
+.airline-hero__retired {
+  display: flex; flex-wrap: wrap; gap: 6px;
+  margin: 10px 0 2px; max-width: 100%;
+}
+.retired-pill {
+  display: inline-flex; align-items: center;
+  border: 1.5px solid #d2433f; color: var(--color-cream, #f6efdc);
+  border-radius: 999px; padding: 3px 11px;
+  font-size: 0.78rem; font-weight: 700; letter-spacing: 0.02em;
+  user-select: none; -webkit-user-select: none; touch-action: none; cursor: pointer;
+}
+.retire-confirm-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+.retire-confirm-cancel { background: none; border: 1.5px solid #b9b2a0; color: var(--color-ink, #16203B); border-radius: 8px; padding: 8px 14px; font-weight: 600; cursor: pointer; }
+.retire-confirm-go { background: #d2433f; border: none; color: #fff; border-radius: 8px; padding: 8px 16px; font-weight: 700; cursor: pointer; }
