@@ -9,6 +9,7 @@ import FlownInView from './FlownInView'
 import AirlinesGalleryView from './AirlinesGalleryView'
 import BookCandidatesView from './BookCandidatesView'
 import NotesView from './NotesView'
+import SpottingThroughTimeView from './SpottingThroughTimeView'
 
 function SearchTopBar() {
   const [showForm, setShowForm] = useState(false)
@@ -127,6 +128,16 @@ function NotesCard({ onOpen }) {
   )
 }
 
+function SpottingThroughTimeCard({ onOpen }) {
+  return (
+    <button className="stats-card" onClick={onOpen}>
+      <span className="stats-card__title">Spotting Through Time</span>
+      <span className="stats-card__sub">Chasing the Light</span>
+      <span className="stats-card__chevron" aria-hidden="true">›</span>
+    </button>
+  )
+}
+
 
 export default function SearchView() {
   const [allRegs, setAllRegs] = useState([])
@@ -141,6 +152,7 @@ export default function SearchView() {
   const [showAirlines, setShowAirlines] = useState(false)
   const [showBookCandidates, setShowBookCandidates] = useState(false)
   const [showNotes, setShowNotes] = useState(false)
+  const [showSpottingTime, setShowSpottingTime] = useState(false)
 
   function fetchAll() {
     if (!supabase) {
@@ -244,6 +256,10 @@ export default function SearchView() {
     return <NotesView onBack={() => setShowNotes(false)} />
   }
 
+  if (showSpottingTime) {
+    return <SpottingThroughTimeView onBack={() => setShowSpottingTime(false)} />
+  }
+
   return (
     <div className="page search-page">
       <SearchTopBar />
@@ -325,6 +341,7 @@ export default function SearchView() {
           <ManufacturersCard onOpen={() => setShowManufacturers(true)} />
           <BookCandidatesCard onOpen={() => setShowBookCandidates(true)} />
           <NotesCard onOpen={() => setShowNotes(true)} />
+          <SpottingThroughTimeCard onOpen={() => setShowSpottingTime(true)} />
         </div>
       </main>
     </div>
