@@ -151,7 +151,7 @@ function AirlinesTab() {
     Promise.all([
       supabase
         .from('airlines')
-        .select('id, name, country, country_flag, logo_url, is_closed, closed_date, parent_id')
+        .select('id, name, country, country_flag, logo_url, is_closed, closed_date, parent_id, secondary_name')
         .order('name', { ascending: true }),
       supabase
         .from('registrations')

@@ -11,6 +11,7 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
     : null
 
   const [name, setName] = useState(existing?.name ?? initialName ?? '')
+  const [secondaryName, setSecondaryName] = useState(existing?.secondary_name ?? '')
   const [countrySearch, setCountrySearch] = useState(existing?.country ?? '')
   const [selectedCountry, setSelectedCountry] = useState(initialCountry)
   const [pickerOpen, setPickerOpen] = useState(false)
@@ -65,13 +66,14 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
           .from('airlines')
           .update({
             name: name.trim(),
+            secondary_name: secondaryName.trim() || null,
             country: selectedCountry.name,
             country_flag: selectedCountry.code.toUpperCase(),
             logo_url: finalLogoUrl,
             is_closed: isClosed,
           })
           .eq('id', existing.id)
-          .select('id, name, country, country_flag, logo_url, is_closed')
+          .select('id, name, country, country_flag, logo_url, is_closed, secondary_name')
           .single()
         setSaving(false)
         if (err) { setSaveError(err.message); return }
@@ -81,12 +83,13 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
           .from('airlines')
           .insert({
             name: name.trim(),
+            secondary_name: secondaryName.trim() || null,
             country: selectedCountry.name,
             country_flag: selectedCountry.code.toUpperCase(),
             logo_url: finalLogoUrl,
             is_closed: isClosed,
           })
-          .select('id, name, country, country_flag, logo_url, is_closed')
+          .select('id, name, country, country_flag, logo_url, is_closed, secondary_name')
           .single()
         setSaving(false)
         if (err) { setSaveError(err.message); return }
@@ -127,6 +130,19 @@ export default function AirlineForm({ initialName, existing, onCancel, onCreated
                 placeholder="e.g. Lufthansa"
                 autoComplete="off"
                 autoFocus
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="airline-secondary-input">Secondary name</label>
+              <input
+                id="airline-secondary-input"
+                className="form-input"
+                type="text"
+                value={secondaryName}
+                onChange={(e) => setSecondaryName(e.target.value)}
+                placeholder="e.g. CityLine (optional)"
+                autoComplete="off"
               />
             </div>
 

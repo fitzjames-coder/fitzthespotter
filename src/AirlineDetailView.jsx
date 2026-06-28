@@ -71,6 +71,9 @@ function AirlineHero({ airline, regCount, loading, onBack, onEdit, onAddReg }) {
             <h1 className="airline-hero__name">{airline.name}</h1>
             {isClosed && <span className="airline-closed-chip">CLOSED</span>}
           </div>
+          {airline.secondary_name && (
+            <p className="airline-hero__secondary">{airline.secondary_name}</p>
+          )}
           {(airline.country_flag || meta) && (
             <p className="airline-hero__meta">
               <FlagIcon countryCode={airline.country_flag} />
