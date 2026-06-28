@@ -5348,3 +5348,12 @@
 .retire-confirm-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
 .retire-confirm-cancel { background: none; border: 1.5px solid #b9b2a0; color: var(--color-ink, #16203B); border-radius: 8px; padding: 8px 14px; font-weight: 600; cursor: pointer; }
 .retire-confirm-go { background: #d2433f; border: none; color: #fff; border-radius: 8px; padding: 8px 16px; font-weight: 700; cursor: pointer; }
+
+.reg-retired-pill {
+  display: inline-flex; align-items: center;
+  margin-left: 8px;
+  border: 1.5px solid #d2433f; color: #d2433f;
+  border-radius: 999px; padding: 1px 9px;
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em;
+  text-transform: uppercase; vertical-align: middle;
+}
