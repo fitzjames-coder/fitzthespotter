@@ -4,6 +4,9 @@ import { getAirportDiagram } from './lib/airportDiagram'
 import { FlagIcon } from './App'
 import AirportDiagram from './AirportDiagram'
 import AirportForm from './AirportForm'
+import AirportMap from './AirportMap'
+
+const SHOW_AIRPORT_DIAGRAM = false
 
 function LogoTile({ name, logoUrl }) {
   const initials = name.trim().split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 2)
@@ -25,6 +28,12 @@ export default function AirportDetailView({ airport, onBack, onUpdated, onDelete
   const [firstHere, setFirstHere] = useState(null)
   const [recentHere, setRecentHere] = useState(null)
   const [showEdit, setShowEdit] = useState(false)
+  const [showMap, setShowMap] = useState(false)
+  const [savedView, setSavedView] = useState(() =>
+    airport.view_lat != null && airport.view_lng != null
+      ? { lat: airport.view_lat, lng: airport.view_lng, zoom: airport.view_zoom }
+      : null
+  )
 
   const [showSkyline, setShowSkyline] = useState(false)
 
@@ -88,7 +97,7 @@ export default function AirportDetailView({ airport, onBack, onUpdated, onDelete
 
   return (
     <div className="page page--deep-blue">
-      <AirportDiagram geometry={diagramGeometry} status={diagramStatus} />
+      {SHOW_AIRPORT_DIAGRAM && <AirportDiagram geometry={diagramGeometry} status={diagramStatus} />}
       <header className="ap-top-bar">
         <button className="ap-top-bar__back" onClick={onBack} aria-label="Back to airports">
           ‹ Back
@@ -143,6 +152,10 @@ export default function AirportDetailView({ airport, onBack, onUpdated, onDelete
             </div>
           </div>
 
+          <button className="ap-map-reveal" onClick={() => setShowMap(true)}>
+            🗺 Show spotting map
+          </button>
+
           {gallery.length > 0 && (
             <div className="ap-gallery">
               {gallery.map((airline) => (
@@ -169,6 +182,15 @@ export default function AirportDetailView({ airport, onBack, onUpdated, onDelete
         <div className="ap-skyline-overlay" onClick={() => setShowSkyline(false)}>
           <img className="ap-skyline-overlay__img" src={skylineImage} alt={`${airport.name}`} />
         </div>
+      )}
+
+      {showMap && (
+        <AirportMap
+          airport={airport}
+          savedView={savedView}
+          onViewSaved={(v) => setSavedView(v)}
+          onClose={() => setShowMap(false)}
+        />
       )}
 
       {showEdit && (
