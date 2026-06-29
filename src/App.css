@@ -4436,7 +4436,8 @@
   border-radius: 8px;
   line-height: 1;
   position: absolute;
-  top: 0.7rem;
+  top: auto;
+  bottom: 0.7rem;
   right: 1rem;
   cursor: pointer;
 }
@@ -5427,3 +5428,27 @@
 @media (min-width: 1024px) {
   .airline-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 }
+
+.ap-map-reveal {
+  display: block; width: 100%; margin: 4px 0 14px;
+  background: var(--color-amber); color: var(--color-ink);
+  border: none; border-radius: 12px; padding: 13px;
+  font-weight: 800; font-size: 0.95rem; cursor: pointer;
+}
+.airport-map-layer { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; }
+.airport-map-layer__top {
+  background: #00305a; border-bottom: 3px solid var(--color-amber);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; color: var(--color-cream);
+}
+.airport-map-layer__title { font-family: Georgia, 'Times New Roman', Times, serif; font-weight: 700; font-size: 1rem; }
+.airport-map-layer__close { background: none; border: none; color: var(--color-cream); font-size: 1.6rem; line-height: 1; padding: 0 6px; cursor: pointer; }
+.airport-map { flex: 1; }
+.airport-map .leaflet-container { width: 100%; height: 100%; background: #0c1322; }
+.airport-map__controls { position: absolute; left: 10px; right: 10px; bottom: 16px; z-index: 1000; display: flex; justify-content: center; }
+.airport-map__ctl {
+  background: rgba(22,32,59,0.92); color: var(--color-cream);
+  border: 1px solid rgba(246,239,220,0.25); border-radius: 999px;
+  padding: 9px 16px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
+}
+.airport-map__ctl--on { background: var(--color-amber); color: var(--color-ink); border-color: var(--color-ink); }
