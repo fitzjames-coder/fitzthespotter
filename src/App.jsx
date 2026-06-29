@@ -7,6 +7,7 @@ import ManufacturerDetailView from './ManufacturerDetailView'
 import AirportsTab from './AirportsTab'
 import AirportDetailView from './AirportDetailView'
 import BottomNav from './BottomNav'
+import OpeningAnimation from './OpeningAnimation'
 import PlaceholderScreen from './PlaceholderScreen'
 import NewRegistrationForm from './NewRegistrationForm'
 import SearchView from './SearchView'
@@ -377,6 +378,9 @@ export default function App() {
     () => typeof window !== 'undefined' && window.innerWidth >= 1024
   )
   const [userToggled, setUserToggled] = useState(false)
+  const [showIntro, setShowIntro] = useState(
+    () => typeof window !== 'undefined' && window.innerWidth < 1024
+  )
 
   useEffect(() => {
     if (userToggled) return
@@ -401,6 +405,7 @@ export default function App() {
 
   return (
     <div className={`app-root${desktopMode ? ' desktop-mode' : ''}`}>
+      {showIntro && <OpeningAnimation onDone={() => setShowIntro(false)} />}
       {activeTab === 'airlines' && <AirlinesTab key={navNonce} />}
       {activeTab === 'airports' && !selectedAirport && (
         <AirportsTab key={navNonce} onSelectAirport={setSelectedAirport} />
