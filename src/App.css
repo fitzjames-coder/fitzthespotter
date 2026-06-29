@@ -5395,9 +5395,9 @@
 .airline-grid-tile__corner--tl { left: 9px; }
 .airline-grid-tile__corner--tr { right: 9px; }
 .airline-grid-tile__corner--tl .airline-card__flag-svg {
-  display: block; width: 30px; height: 38px;
+  display: block; width: 32px; height: 24px;
   background-size: cover; background-position: center;
-  border-radius: 3px 3px 0 0;
+  border-radius: 4px;
 }
 .airline-grid-tile__corner--tr .reg-count-pill {
   border-radius: 3px 3px 0 0;
