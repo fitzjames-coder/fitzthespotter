@@ -76,21 +76,38 @@ function blobToBase64(blob) {
   })
 }
 
-function SpotlightOverlay({ label = 'REMARK', remark, onClose }) {
+function SpotlightOverlay({ label = 'REMARK', remark, dramatized, onClose }) {
+  const [showDram, setShowDram] = useState(false)
+  const hasDram = Boolean(dramatized && dramatized.trim())
+  const text = hasDram && showDram ? dramatized : remark
   return (
     <div
       className="spotlight-backdrop"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
-      aria-label="Remark spotlight"
+      aria-label="Spotlight"
     >
       <div
         className="spotlight-card"
         onClick={(e) => e.stopPropagation()}
       >
         <p className="spotlight-label">{label}</p>
-        <p className="spotlight-text">{remark}</p>
+        {hasDram && (
+          <div className="spotlight-toggle">
+            <button
+              type="button"
+              className={`spotlight-toggle__btn${!showDram ? ' is-on' : ''}`}
+              onClick={() => setShowDram(false)}
+            >Note</button>
+            <button
+              type="button"
+              className={`spotlight-toggle__btn${showDram ? ' is-on' : ''}`}
+              onClick={() => setShowDram(true)}
+            >Dramatized</button>
+          </div>
+        )}
+        <p className="spotlight-text">{text}</p>
         <button className="spotlight-close" onClick={onClose}>
           Close
         </button>
@@ -101,7 +118,22 @@ function SpotlightOverlay({ label = 'REMARK', remark, onClose }) {
 
 function RegTopBar({ reg, onBack, onEdit }) {
   const [spotlight, setSpotlight] = useState(null)
+  const [note, setNote] = useState(null)
   const hasRemark = Boolean(reg.remark && reg.remark.trim())
+
+  useEffect(() => {
+    let active = true
+    if (!supabase || !reg.registration) return
+    supabase
+      .from('notes')
+      .select('note_body, dramatized_body')
+      .eq('registration', reg.registration)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (active) setNote(data && data.note_body && data.note_body.trim() ? data : null)
+      })
+    return () => { active = false }
+  }, [reg.registration])
 
   return (
     <>
@@ -120,6 +152,15 @@ function RegTopBar({ reg, onBack, onEdit }) {
                 setSpotlight({ label: 'FLOWN IN', text: dateStr || '—' })
               } : undefined}
             />
+            {note && (
+              <button
+                className="reg-note-indicator"
+                onClick={() => setSpotlight({ label: 'NOTE', text: note.note_body, dramatized: note.dramatized_body })}
+                aria-label="View note"
+              >
+                📝 Note
+              </button>
+            )}
           </div>
           <button className="top-bar__edit" onClick={onEdit} aria-label="Edit registration">
             Edit
@@ -130,6 +171,7 @@ function RegTopBar({ reg, onBack, onEdit }) {
         <SpotlightOverlay
           label={spotlight.label}
           remark={spotlight.text}
+          dramatized={spotlight.dramatized}
           onClose={() => setSpotlight(null)}
         />
       )}
