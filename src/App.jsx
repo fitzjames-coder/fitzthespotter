@@ -132,6 +132,40 @@ function AirlineCard({ airline, regCount, onSelect }) {
   )
 }
 
+function AirlineGridTile({ airline, regCount, onSelect }) {
+  const isClosed = airline.is_closed
+  return (
+    <button className="airline-grid-tile" onClick={() => onSelect(airline)}>
+      <div className="airline-grid-tile__top">
+        <div className="airline-grid-tile__logo">
+          {airline.logo_url
+            ? <img className="airline-grid-tile__logo-img" src={airline.logo_url} alt="" />
+            : <span className="airline-grid-tile__logo-initials">{cardInitials(airline.name)}</span>}
+        </div>
+        <span className="airline-grid-tile__name">{airline.name}</span>
+      </div>
+      <div className="airline-grid-tile__row">
+        {airline.country_flag && <FlagIcon countryCode={airline.country_flag} />}
+        {regCount !== undefined && <RegCountPill count={regCount} />}
+      </div>
+      {(airline.flown_in || isClosed) && (
+        <div className="airline-grid-tile__row">
+          {airline.flown_in && (
+            <span className="airline-grid-tile__badge airline-grid-tile__badge--flown">
+              <img className="airline-grid-tile__flown-icon" src={markFlownIn} alt="" />Flown
+            </span>
+          )}
+          {isClosed && (
+            <span className="airline-grid-tile__badge airline-grid-tile__badge--closed">Closed</span>
+          )}
+        </div>
+      )}
+    </button>
+  )
+}
+
+let airlinesViewMode = 'list'
+
 function AirlinesTab() {
   const [airlines, setAirlines] = useState([])
   const [regCounts, setRegCounts] = useState({})
@@ -142,6 +176,9 @@ function AirlinesTab() {
   const [manufacturerAirline, setManufacturerAirline] = useState(null)
   const [reloadNonce, setReloadNonce] = useState(0)
   const [airlineQuery, setAirlineQuery] = useState('')
+  const [viewMode, setViewMode] = useState(airlinesViewMode)
+
+  function changeViewMode(mode) { airlinesViewMode = mode; setViewMode(mode) }
 
   function reloadAirlines() { setReloadNonce((n) => n + 1) }
 
@@ -248,22 +285,40 @@ function AirlinesTab() {
 
     return (
       <>
-        <ul className="airline-list">
-          {groups.map((bucket) => (
-            <Fragment key={bucket}>
-              <li className="airline-group-header" id={`ag-${bucket}`}>{bucket}</li>
-              {bucketMap.get(bucket).map((airline) => (
-                <li key={airline.id}>
-                  <AirlineCard
+        {viewMode === 'list' ? (
+          <ul className="airline-list">
+            {groups.map((bucket) => (
+              <Fragment key={bucket}>
+                <li className="airline-group-header" id={`ag-${bucket}`}>{bucket}</li>
+                {bucketMap.get(bucket).map((airline) => (
+                  <li key={airline.id}>
+                    <AirlineCard
+                      airline={airline}
+                      regCount={regCounts[airline.id] ?? 0}
+                      onSelect={setSelectedAirline}
+                    />
+                  </li>
+                ))}
+              </Fragment>
+            ))}
+          </ul>
+        ) : (
+          <div className="airline-grid">
+            {groups.map((bucket) => (
+              <Fragment key={bucket}>
+                <div className="airline-group-header airline-grid__header" id={`ag-${bucket}`}>{bucket}</div>
+                {bucketMap.get(bucket).map((airline) => (
+                  <AirlineGridTile
+                    key={airline.id}
                     airline={airline}
                     regCount={regCounts[airline.id] ?? 0}
                     onSelect={setSelectedAirline}
                   />
-                </li>
-              ))}
-            </Fragment>
-          ))}
-        </ul>
+                ))}
+              </Fragment>
+            ))}
+          </div>
+        )}
         {groups.length > 1 && (
           <nav className="az-rail" aria-label="Jump to letter">
             {groups.map((b) => (
@@ -292,6 +347,20 @@ function AirlinesTab() {
       <main className="content">
         <div className="list-head">
           <p className="section-label">Airlines Spotted</p>
+          <div className="airlines-view-toggle" role="group" aria-label="View mode">
+            <button
+              type="button"
+              className={`airlines-view-toggle__btn${viewMode === 'list' ? ' is-on' : ''}`}
+              onClick={() => changeViewMode('list')}
+              aria-label="List view"
+            >☰</button>
+            <button
+              type="button"
+              className={`airlines-view-toggle__btn${viewMode === 'grid' ? ' is-on' : ''}`}
+              onClick={() => changeViewMode('grid')}
+              aria-label="Grid view"
+            >▦</button>
+          </div>
         </div>
         {renderBody()}
       </main>
