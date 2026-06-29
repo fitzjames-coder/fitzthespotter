@@ -5375,35 +5375,39 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  padding: 0 2px;
+  padding: 0 24px 0 4px;
 }
 .airline-grid__header { grid-column: 1 / -1; }
 .airline-grid-tile {
-  display: flex; flex-direction: column;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
   background: #fff; border: 1px solid #e7ddc6; border-radius: 13px;
-  padding: 11px 10px; text-align: left; cursor: pointer; font: inherit;
+  padding: 9px 9px 11px; cursor: pointer; font: inherit;
 }
-.airline-grid-tile__top { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 7px; }
+.airline-grid-tile__ears {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; min-height: 22px;
+}
+.airline-grid-tile__ear-spacer { width: 1px; }
+.airline-grid-tile__flag-pill {
+  display: inline-flex; align-items: center;
+  background: var(--color-cream); border-radius: 999px; padding: 3px 7px;
+}
 .airline-grid-tile__logo {
-  width: 38px; height: 38px; border-radius: 9px; background: #fff;
+  width: 56px; height: 56px; border-radius: 12px; background: #fff;
   border: 1px solid #e7ddc6; display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; overflow: hidden;
+  overflow: hidden; margin: 8px 0 7px;
 }
 .airline-grid-tile__logo-img { max-width: 100%; max-height: 100%; object-fit: contain; }
-.airline-grid-tile__logo-initials { font-weight: 800; color: var(--color-navy); font-size: 0.85rem; }
+.airline-grid-tile__logo-initials { font-weight: 800; color: var(--color-navy); font-size: 1.05rem; }
 .airline-grid-tile__name {
-  font-weight: 600; font-size: 0.78rem; line-height: 1.15; color: var(--color-ink);
-  flex: 1; min-width: 0;
+  font-weight: 600; font-size: 0.8rem; line-height: 1.18; color: var(--color-ink);
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.airline-grid-tile__row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
-.airline-grid-tile__badge {
-  font-size: 0.62rem; font-weight: 800; padding: 1px 7px; border-radius: 999px;
-  display: inline-flex; align-items: center; gap: 3px;
+.airline-grid-tile__marks {
+  display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 7px;
 }
-.airline-grid-tile__badge--flown { background: rgba(0,82,129,0.12); color: var(--color-deep-blue); }
-.airline-grid-tile__badge--closed { background: rgba(232,96,122,0.15); color: #b3344f; }
-.airline-grid-tile__flown-icon { width: 12px; height: 12px; object-fit: contain; }
+.airline-grid-tile__mark { width: 22px; height: 22px; object-fit: contain; }
+.airline-grid-tile__mark--closed { width: auto; height: 18px; }
 @media (min-width: 1024px) {
   .airline-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
 }

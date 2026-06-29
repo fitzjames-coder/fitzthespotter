@@ -136,27 +136,25 @@ function AirlineGridTile({ airline, regCount, onSelect }) {
   const isClosed = airline.is_closed
   return (
     <button className="airline-grid-tile" onClick={() => onSelect(airline)}>
-      <div className="airline-grid-tile__top">
-        <div className="airline-grid-tile__logo">
-          {airline.logo_url
-            ? <img className="airline-grid-tile__logo-img" src={airline.logo_url} alt="" />
-            : <span className="airline-grid-tile__logo-initials">{cardInitials(airline.name)}</span>}
-        </div>
-        <span className="airline-grid-tile__name">{airline.name}</span>
+      <div className="airline-grid-tile__ears">
+        {airline.country_flag
+          ? <span className="airline-grid-tile__flag-pill"><FlagIcon countryCode={airline.country_flag} /></span>
+          : <span className="airline-grid-tile__ear-spacer" />}
+        <RegCountPill count={regCount} />
       </div>
-      <div className="airline-grid-tile__row">
-        {airline.country_flag && <FlagIcon countryCode={airline.country_flag} />}
-        {regCount !== undefined && <RegCountPill count={regCount} />}
+      <div className="airline-grid-tile__logo">
+        {airline.logo_url
+          ? <img className="airline-grid-tile__logo-img" src={airline.logo_url} alt="" />
+          : <span className="airline-grid-tile__logo-initials">{cardInitials(airline.name)}</span>}
       </div>
+      <span className="airline-grid-tile__name">{airline.name}</span>
       {(airline.flown_in || isClosed) && (
-        <div className="airline-grid-tile__row">
+        <div className="airline-grid-tile__marks">
           {airline.flown_in && (
-            <span className="airline-grid-tile__badge airline-grid-tile__badge--flown">
-              <img className="airline-grid-tile__flown-icon" src={markFlownIn} alt="" />Flown
-            </span>
+            <img className="airline-grid-tile__mark" src={markFlownIn} alt="Flown" title="Flown this airline" />
           )}
           {isClosed && (
-            <span className="airline-grid-tile__badge airline-grid-tile__badge--closed">Closed</span>
+            <img className="airline-grid-tile__mark airline-grid-tile__mark--closed" src="/Closed.PNG" alt="Closed" title="Ceased operations" />
           )}
         </div>
       )}
