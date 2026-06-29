@@ -5452,3 +5452,17 @@
   padding: 9px 16px; font-size: 0.82rem; font-weight: 700; cursor: pointer;
 }
 .airport-map__ctl--on { background: var(--color-amber); color: var(--color-ink); border-color: var(--color-ink); }
+
+.airport-map__controls { gap: 7px; flex-wrap: wrap; }
+.airport-map__ctl--add { background: var(--color-deep-blue); color: #fff; border-color: var(--color-deep-blue); }
+.airport-map__ctl:disabled { opacity: 0.45; }
+.ap-pin {
+  background: var(--color-amber); color: var(--color-ink);
+  width: 26px; height: 26px; border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg); border: 2px solid var(--color-ink);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+.ap-pin b { transform: rotate(45deg); font-size: 0.78rem; font-weight: 800; }
+.ap-pin-pop { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.ap-pin-del { background: var(--color-coral); color: #fff; border: none; border-radius: 7px; padding: 4px 10px; font-weight: 700; cursor: pointer; }
