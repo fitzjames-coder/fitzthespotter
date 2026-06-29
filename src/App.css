@@ -4436,8 +4436,7 @@
   border-radius: 8px;
   line-height: 1;
   position: absolute;
-  top: auto;
-  bottom: 0.7rem;
+  top: 0.7rem;
   right: 1rem;
   cursor: pointer;
 }
@@ -5508,4 +5507,11 @@
 }
 .spotlight-toggle__btn.is-on {
   background: var(--color-amber); color: var(--color-ink); opacity: 1;
+}
+
+/* Airport page only: Edit button sits bottom-right of the banner so it
+   doesn't overlap the airport photo thumbnail in the top-right. */
+.ap-top-bar .edit-btn {
+  top: auto;
+  bottom: 0.7rem;
 }
