@@ -5515,3 +5515,20 @@
   top: auto;
   bottom: 0.7rem;
 }
+
+/* ── Legend page ─────────────────────────────────────────────────── */
+.legend-page { padding-bottom: 90px; }
+.legend-title { font-family: Georgia, serif; font-size: 1.5rem; color: var(--color-cream); margin: 0; }
+.legend-main { padding: 16px 18px; }
+.legend-intro { color: #6b6757; font-size: 0.9rem; margin: 0 0 18px; }
+.legend-section {
+  font-family: Georgia, serif; font-size: 1.05rem; color: var(--color-navy);
+  margin: 22px 0 10px; padding-bottom: 6px; border-bottom: 2px solid rgba(44,66,123,0.12);
+}
+.legend-row { display: flex; align-items: flex-start; gap: 14px; padding: 10px 0; border-bottom: 1px solid #efe7d0; }
+.legend-row__icon {
+  flex: 0 0 56px; min-height: 44px; display: flex; align-items: center; justify-content: center;
+}
+.legend-row__icon img { max-width: 44px; max-height: 44px; object-fit: contain; }
+.legend-row__name { font-weight: 800; color: var(--color-ink); margin: 0 0 3px; font-size: 0.92rem; }
+.legend-row__desc { color: #5a5444; margin: 0; font-size: 0.84rem; line-height: 1.4; }
