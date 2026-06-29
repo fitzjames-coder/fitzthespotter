@@ -5398,7 +5398,6 @@
   display: block; width: 30px; height: 38px;
   background-size: cover; background-position: center;
   border-radius: 3px 3px 0 0;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
 }
 .airline-grid-tile__corner--tr .reg-count-pill {
   border-radius: 3px 3px 0 0;
