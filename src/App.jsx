@@ -136,12 +136,14 @@ function AirlineGridTile({ airline, regCount, onSelect }) {
   const isClosed = airline.is_closed
   return (
     <button className="airline-grid-tile" onClick={() => onSelect(airline)}>
-      <div className="airline-grid-tile__ears">
-        {airline.country_flag
-          ? <span className="airline-grid-tile__flag-pill"><FlagIcon countryCode={airline.country_flag} /></span>
-          : <span className="airline-grid-tile__ear-spacer" />}
+      {airline.country_flag && (
+        <span className="airline-grid-tile__corner airline-grid-tile__corner--tl">
+          <FlagIcon countryCode={airline.country_flag} />
+        </span>
+      )}
+      <span className="airline-grid-tile__corner airline-grid-tile__corner--tr">
         <RegCountPill count={regCount} />
-      </div>
+      </span>
       <div className="airline-grid-tile__logo">
         {airline.logo_url
           ? <img className="airline-grid-tile__logo-img" src={airline.logo_url} alt="" />

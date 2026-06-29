@@ -5379,19 +5379,20 @@
 }
 .airline-grid__header { grid-column: 1 / -1; }
 .airline-grid-tile {
+  position: relative;
   display: flex; flex-direction: column; align-items: center; text-align: center;
   background: #fff; border: 1px solid #e7ddc6; border-radius: 13px;
-  padding: 9px 9px 11px; cursor: pointer; font: inherit;
+  padding: 36px 9px 11px; cursor: pointer; font: inherit;
 }
-.airline-grid-tile__ears {
-  display: flex; align-items: center; justify-content: space-between;
-  width: 100%; min-height: 22px;
-}
-.airline-grid-tile__ear-spacer { width: 1px; }
-.airline-grid-tile__flag-pill {
+.airline-grid-tile__corner {
+  position: absolute; top: 6px; z-index: 2;
   display: inline-flex; align-items: center;
+}
+.airline-grid-tile__corner--tl {
+  left: 6px;
   background: var(--color-cream); border-radius: 999px; padding: 3px 7px;
 }
+.airline-grid-tile__corner--tr { right: 6px; }
 .airline-grid-tile__logo {
   width: 56px; height: 56px; border-radius: 12px; background: #fff;
   border: 1px solid #e7ddc6; display: flex; align-items: center; justify-content: center;
