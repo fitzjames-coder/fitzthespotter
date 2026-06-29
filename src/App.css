@@ -5381,24 +5381,40 @@
 .airline-grid-tile {
   position: relative;
   display: flex; flex-direction: column; align-items: center; text-align: center;
-  background: #fff; border: 1px solid #e7ddc6; border-radius: 13px;
-  padding: 36px 9px 11px; cursor: pointer; font: inherit;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(231, 221, 198, 0.9);
+  border-radius: 13px;
+  box-shadow: 0 1px 4px rgba(22, 32, 59, 0.10);
+  padding: 34px 9px 11px; cursor: pointer; font: inherit;
 }
 .airline-grid-tile__corner {
-  position: absolute; top: 6px; z-index: 2;
-  display: inline-flex; align-items: center;
+  position: absolute; top: 0; z-index: 3;
+  display: inline-flex; align-items: flex-start;
+  filter: drop-shadow(0 2px 2px rgba(22, 32, 59, 0.28));
 }
-.airline-grid-tile__corner--tl {
-  left: 6px;
-  background: var(--color-cream); border-radius: 999px; padding: 3px 7px;
+.airline-grid-tile__corner--tl { left: 9px; }
+.airline-grid-tile__corner--tr { right: 9px; }
+.airline-grid-tile__corner--tl .airline-card__flag-svg {
+  display: block; width: 30px; height: 38px;
+  background-size: cover; background-position: center;
+  border-radius: 3px 3px 0 0;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
 }
-.airline-grid-tile__corner--tr { right: 6px; }
+.airline-grid-tile__corner--tr .reg-count-pill {
+  border-radius: 3px 3px 0 0;
+  padding: 4px 9px 9px;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+}
 .airline-grid-tile__logo {
-  width: 56px; height: 56px; border-radius: 12px; background: #fff;
-  border: 1px solid #e7ddc6; display: flex; align-items: center; justify-content: center;
+  width: 56px; height: 56px; border-radius: 12px;
+  background: rgba(44, 66, 123, 0.08);
+  display: flex; align-items: center; justify-content: center;
   overflow: hidden; margin: 8px 0 7px;
 }
-.airline-grid-tile__logo-img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.airline-grid-tile__logo-img {
+  width: 100%; height: 100%; object-fit: contain;
+  background: var(--color-cream);
+}
 .airline-grid-tile__logo-initials { font-weight: 800; color: var(--color-navy); font-size: 1.05rem; }
 .airline-grid-tile__name {
   font-weight: 600; font-size: 0.8rem; line-height: 1.18; color: var(--color-ink);
