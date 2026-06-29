@@ -5466,3 +5466,25 @@
 .ap-pin b { transform: rotate(45deg); font-size: 0.78rem; font-weight: 800; }
 .ap-pin-pop { display: flex; align-items: center; gap: 8px; font-weight: 700; }
 .ap-pin-del { background: var(--color-coral); color: #fff; border: none; border-radius: 7px; padding: 4px 10px; font-weight: 700; cursor: pointer; }
+
+.intro { position: fixed; inset: 0; z-index: 99999; pointer-events: none; }
+.intro__door {
+  position: absolute; left: 0; width: 100%; height: 50%;
+  overflow: hidden; background: #2C427B;
+}
+.intro__door--top { top: 0; }
+.intro__door--bottom { bottom: 0; }
+.intro__half { position: absolute; left: 50%; width: 280px; max-width: 76vw; }
+.intro__door--top .intro__half { bottom: 0; transform: translate(-50%, 50%); }
+.intro__door--bottom .intro__half { top: 0; transform: translate(-50%, -50%); }
+.intro__logo {
+  position: fixed; left: 50%; top: 50%; width: 280px; max-width: 76vw; z-index: 2;
+  transform: translate(-50%, -50%) scale(1);
+}
+.intro--play .intro__door--top { transform: translateY(-100%); transition: transform 1.5s cubic-bezier(.7,0,.2,1); }
+.intro--play .intro__door--bottom { transform: translateY(100%); transition: transform 1.5s cubic-bezier(.7,0,.2,1); }
+.intro--play .intro__logo {
+  transform: translate(-50%, calc(50vh - 92px)) scale(0.3);
+  opacity: 0;
+  transition: transform 1.5s cubic-bezier(.7,0,.2,1), opacity 0.4s ease 1.5s;
+}
