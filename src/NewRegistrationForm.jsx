@@ -1116,11 +1116,16 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
             type="button"
             className="btn-primary"
             onClick={handleSave}
-            disabled={saving || (!isEdit && Boolean(existingMatch))}
+            disabled={saving || (!isEdit && Boolean(existingMatch)) || sightingOpen}
           >
             {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Save'}
           </button>
         </div>
+        {sightingOpen && (
+          <p className="save-locked-note">
+            Finish or close the sighting form above before saving the registration.
+          </p>
+        )}
       </div>
     </div>
   )
