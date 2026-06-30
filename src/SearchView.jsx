@@ -11,6 +11,7 @@ import BookCandidatesView from './BookCandidatesView'
 import NotesView from './NotesView'
 import SpottingThroughTimeView from './SpottingThroughTimeView'
 import LegendView from './LegendView'
+import GuideView from './GuideView'
 
 function SearchTopBar() {
   const [showForm, setShowForm] = useState(false)
@@ -150,6 +151,16 @@ function LegendCard({ onOpen }) {
   )
 }
 
+function GuideCard({ onOpen }) {
+  return (
+    <button className="stats-card" onClick={onOpen}>
+      <span className="stats-card__title">Guide</span>
+      <span className="stats-card__sub">How everything works</span>
+      <span className="stats-card__chevron" aria-hidden="true">›</span>
+    </button>
+  )
+}
+
 export default function SearchView() {
   const [allRegs, setAllRegs] = useState([])
   const [loading, setLoading] = useState(true)
@@ -165,6 +176,7 @@ export default function SearchView() {
   const [showNotes, setShowNotes] = useState(false)
   const [showSpottingTime, setShowSpottingTime] = useState(false)
   const [showLegend, setShowLegend] = useState(false)
+  const [showGuide, setShowGuide] = useState(false)
 
   function fetchAll() {
     if (!supabase) {
@@ -276,6 +288,10 @@ export default function SearchView() {
     return <LegendView onBack={() => setShowLegend(false)} />
   }
 
+  if (showGuide) {
+    return <GuideView onBack={() => setShowGuide(false)} />
+  }
+
   return (
     <div className="page search-page">
       <SearchTopBar />
@@ -359,6 +375,7 @@ export default function SearchView() {
           <NotesCard onOpen={() => setShowNotes(true)} />
           <SpottingThroughTimeCard onOpen={() => setShowSpottingTime(true)} />
           <LegendCard onOpen={() => setShowLegend(true)} />
+          <GuideCard onOpen={() => setShowGuide(true)} />
         </div>
       </main>
     </div>

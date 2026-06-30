@@ -5555,3 +5555,18 @@
   color: var(--color-coral);
   text-align: center;
 }
+
+/* ── Guide page ──────────────────────────────────────────────────── */
+.guide-page { padding-bottom: 90px; }
+.guide-item { border-bottom: 1px solid #efe7d0; }
+.guide-item__head {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; background: transparent; border: none; cursor: pointer;
+  padding: 14px 2px; text-align: left;
+}
+.guide-item__title { font-weight: 800; color: var(--color-navy); font-size: 0.96rem; }
+.guide-item__chevron { color: var(--color-amber); font-size: 1.3rem; font-weight: 800; flex: 0 0 auto; }
+.guide-item--open .guide-item__title { color: var(--color-ink); }
+.guide-item__body { padding: 0 2px 14px; }
+.guide-item__p { color: #4a443a; font-size: 0.86rem; line-height: 1.5; margin: 0 0 9px; }
+.guide-item__p:last-child { margin-bottom: 0; }
