@@ -5546,3 +5546,12 @@
   margin-right: 0.4rem;
 }
 .sighting-edit-btn:disabled { opacity: 0.5; cursor: default; }
+
+/* ── Save-locked note (sighting panel open) ─────────────────────── */
+.save-locked-note {
+  margin: 0.5rem 0 0;
+  padding: 0 1rem;
+  font-size: 0.78rem;
+  color: var(--color-coral);
+  text-align: center;
+}
