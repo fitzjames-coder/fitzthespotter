@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState, useRef } from 'react'
 import { supabase } from './lib/supabaseClient'
 import RegistrationProfileView from './RegistrationProfileView'
 import StatusMarks from './StatusMarks'
+
+let regViewMode = 'list'
 import AirlineForm from './AirlineForm'
 import NewRegistrationForm from './NewRegistrationForm'
 import markFlownIn from './assets/marks/mark-flown-in.png'
@@ -254,6 +256,19 @@ function RegistrationCard({ reg, onSelect }) {
   )
 }
 
+function RegistrationGridTile({ reg, onSelect }) {
+  const typeName = reg.aircraft_types?.name ?? null
+  return (
+    <button className="reg-grid-tile" onClick={() => onSelect(reg)}>
+      <span className="reg-grid-tile__reg">{reg.registration}</span>
+      {typeName && <span className="reg-grid-tile__type">{typeName}</span>}
+      <div className="reg-grid-tile__marks">
+        <StatusMarks statuses={reg.statuses} />
+      </div>
+    </button>
+  )
+}
+
 export default function AirlineDetailView({ airline, onBack, onSelectManufacturer, onUpdated, onDeleted }) {
   const [registrations, setRegistrations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -340,6 +355,8 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   }
 
   const regCount = registrations.length
+  const [viewMode, setViewMode] = useState(regViewMode)
+  function changeRegViewMode(mode) { regViewMode = mode; setViewMode(mode) }
 
   function renderBody() {
     if (loading) {
@@ -354,14 +371,38 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
     return (
       <>
         <ManufacturerBreakdown registrations={registrations} onSelectManufacturer={onSelectManufacturer} />
-        <p className="section-label">Registrations</p>
-        <ul className="reg-list">
-          {registrations.map((reg) => (
-            <li key={reg.id}>
-              <RegistrationCard reg={reg} onSelect={setSelectedReg} />
-            </li>
-          ))}
-        </ul>
+        <div className="list-head">
+          <p className="section-label">Registrations</p>
+          <div className="airlines-view-toggle" role="group" aria-label="View mode">
+            <button
+              type="button"
+              className={`airlines-view-toggle__btn${viewMode === 'list' ? ' is-on' : ''}`}
+              onClick={() => changeRegViewMode('list')}
+              aria-label="List view"
+            >☰</button>
+            <button
+              type="button"
+              className={`airlines-view-toggle__btn${viewMode === 'grid' ? ' is-on' : ''}`}
+              onClick={() => changeRegViewMode('grid')}
+              aria-label="Grid view"
+            >▦</button>
+          </div>
+        </div>
+        {viewMode === 'list' ? (
+          <ul className="reg-list">
+            {registrations.map((reg) => (
+              <li key={reg.id}>
+                <RegistrationCard reg={reg} onSelect={setSelectedReg} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="reg-grid">
+            {registrations.map((reg) => (
+              <RegistrationGridTile key={reg.id} reg={reg} onSelect={setSelectedReg} />
+            ))}
+          </div>
+        )}
       </>
     )
   }
