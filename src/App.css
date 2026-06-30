@@ -5570,3 +5570,10 @@
 .guide-item__body { padding: 0 2px 14px; }
 .guide-item__p { color: #4a443a; font-size: 0.86rem; line-height: 1.5; margin: 0 0 9px; }
 .guide-item__p:last-child { margin-bottom: 0; }
+
+/* Desktop mode: the left (previous) registration arrow must clear the
+   fixed 210px sidebar, otherwise it sits hidden underneath it.
+   Mobile keeps the default left:14px. */
+.desktop-mode .reg-nav--prev {
+  left: 224px;
+}
