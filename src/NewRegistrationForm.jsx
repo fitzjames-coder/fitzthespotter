@@ -183,6 +183,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const dupTimerRef = useRef(null)
 
   const [sightingOpen, setSightingOpen] = useState(false)
+  const [editingSightingId, setEditingSightingId] = useState(null)
   const [sightingDate, setSightingDate] = useState('')
   const [sightingAirport, setSightingAirport] = useState('')
   const [sightingAirportKnown, setSightingAirportKnown] = useState(false)
@@ -291,7 +292,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     setSightingsMgrError(null)
     const { data, error: err } = await supabase
       .from('sightings')
-      .select('id, spotted_on, airport, is_book_candidate, book_story')
+      .select('id, spotted_on, airport, is_book_candidate, book_story, time_block, southern_hemisphere, special_livery, retro, livery_name, alliance')
       .eq('registration_id', existingReg.id)
       .order('spotted_on', { ascending: true, nullsFirst: false })
     setSightingsLoading(false)
@@ -469,6 +470,31 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     }
   }
 
+  function beginEditSighting(s) {
+    setEditingSightingId(s.id)
+    setSightingDate(s.spotted_on ?? '')
+    setSightingTimeBlock(s.time_block ?? '')
+    setSightingSouthern(Boolean(s.southern_hemisphere))
+    setSightingAirport(s.airport ?? '')
+    setSightingAirportKnown(Boolean(s.airport))
+    setStatusSpecialLivery(Boolean(s.special_livery))
+    setStatusRetro(Boolean(s.retro))
+    setStatusAlliance(Boolean(s.alliance))
+    setLiveryName(s.livery_name ?? '')
+    setSightingOpen(true)
+    if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  function startNewSighting() {
+    setEditingSightingId(null)
+    setSightingDate('')
+    setSightingTimeBlock('')
+    setSightingSouthern(false)
+    setSightingAirport('')
+    setSightingAirportKnown(false)
+    setSightingOpen((o) => !o)
+  }
+
   async function handleLogSighting() {
     if (!supabase) { setSaveError('Supabase is not configured.'); return }
     const targetId = existingReg?.id ?? existingMatch?.id
@@ -524,8 +550,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       return
     }
 
-    const { error: sErr } = await supabase.from('sightings').insert({
-      registration_id: targetId,
+    const sightingPayload = {
       spotted_on: sightingDate || null,
       time_block: sightingTimeBlock || null,
       southern_hemisphere: sightingSouthern,
@@ -534,7 +559,10 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       retro: statusRetro,
       alliance: statusAlliance,
       livery_name: (showLiveryName && liveryName.trim()) ? liveryName.trim() : null,
-    })
+    }
+    const { error: sErr } = editingSightingId
+      ? await supabase.from('sightings').update(sightingPayload).eq('id', editingSightingId)
+      : await supabase.from('sightings').insert({ registration_id: targetId, ...sightingPayload })
 
     setSightingSaving(false)
     if (sErr) {
@@ -543,6 +571,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       if (statusFlownIn && airline?.id) {
         await supabase.from('airlines').update({ flown_in: true }).eq('id', airline.id)
       }
+      setEditingSightingId(null)
       onSaved?.()
       onClose()
     }
@@ -664,13 +693,13 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               <button
                 type="button"
                 className="new-sighting-toggle"
-                onClick={() => setSightingOpen((o) => !o)}
+                onClick={startNewSighting}
                 aria-expanded={sightingOpen}
               >
                 <span className="new-sighting-toggle__icon" aria-hidden="true">
                   {sightingOpen ? '▾' : '+'}
                 </span>
-                New Sighting
+                {editingSightingId ? 'Editing sighting' : 'New Sighting'}
               </button>
               {sightingOpen && (
                 <div className="new-sighting-body">
@@ -772,7 +801,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                     onClick={handleLogSighting}
                     disabled={sightingSaving || !sightingAirport || !sightingAirportKnown}
                   >
-                    {sightingSaving ? 'Logging…' : 'Log sighting'}
+                    {sightingSaving ? 'Saving…' : (editingSightingId ? 'Save sighting changes' : 'Log sighting')}
                   </button>
                 </div>
               )}
@@ -974,6 +1003,15 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                                 onChange={(e) => handleSightingDateChange(s.id, e.target.value)}
                                 aria-label={`Date for sighting at ${s.airport ?? 'unknown airport'}`}
                               />
+                              <button
+                                type="button"
+                                className="sighting-edit-btn"
+                                onClick={() => beginEditSighting(s)}
+                                disabled={!!deletingSightingId || !!savingDateId}
+                                aria-label={`Edit sighting at ${s.airport ?? 'unknown airport'}`}
+                              >
+                                Edit
+                              </button>
                               <button
                                 type="button"
                                 className="type-mgmt-trash-btn"
