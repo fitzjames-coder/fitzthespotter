@@ -5595,3 +5595,66 @@
   color: rgba(246, 239, 220, 0.82);
   margin-top: 4px;
 }
+
+/* ── Sighting Stats page ─────────────────────────────────────────── */
+.sight-reg-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  padding: 4px 0 2px;
+}
+.sight-reg-pill {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(44, 66, 123, 0.16);
+  border-radius: 8px;
+  padding: 6px 3px 5px;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(22, 32, 59, 0.07);
+}
+.sight-reg-pill__reg {
+  font-family: 'SF Mono', Menlo, monospace;
+  font-weight: 800;
+  font-size: 0.6rem;
+  color: var(--color-navy);
+  text-align: center;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sight-reg-pill__airline {
+  font-size: 0.48rem;
+  color: #6a6250;
+  text-align: center;
+  line-height: 1.1;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sight-reg-pill__count {
+  margin-top: 2px;
+  font-size: 0.5rem;
+  font-weight: 700;
+  color: var(--color-amber);
+}
+
+.sight-reg-pill--static { cursor: default; }
+.sight-reg-pill__name {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--color-navy);
+  text-align: center;
+  line-height: 1.15;
+  width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}

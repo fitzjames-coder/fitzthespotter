@@ -3,6 +3,7 @@ import { supabase } from './lib/supabaseClient'
 import { exportBackupCsv } from './exportBackup'
 import NewRegistrationForm from './NewRegistrationForm'
 import RegistrationProfileView from './RegistrationProfileView'
+import SightingStatsView from './SightingStatsView'
 import StatsView from './StatsView'
 import ManufacturersView from './ManufacturersView'
 import FlownInView from './FlownInView'
@@ -86,8 +87,18 @@ function ResultCard({ reg, onSelect }) {
 function StatsCard({ onOpen }) {
   return (
     <button className="stats-card" onClick={onOpen}>
-      <span className="stats-card__title">Stats</span>
-      <span className="stats-card__sub">Your numbers</span>
+      <span className="stats-card__title">Spotting Stats</span>
+      <span className="stats-card__sub">Your numbers, by aircraft</span>
+      <span className="stats-card__chevron" aria-hidden="true">›</span>
+    </button>
+  )
+}
+
+function SightingStatsCard({ onOpen }) {
+  return (
+    <button className="stats-card" onClick={onOpen}>
+      <span className="stats-card__title">Sighting Stats</span>
+      <span className="stats-card__sub">Your numbers, by sighting</span>
       <span className="stats-card__chevron" aria-hidden="true">›</span>
     </button>
   )
@@ -169,6 +180,7 @@ export default function SearchView() {
   const [activeFilters, setActiveFilters] = useState(new Set())
   const [selectedReg, setSelectedReg] = useState(null)
   const [showStats, setShowStats] = useState(false)
+  const [showSightingStats, setShowSightingStats] = useState(false)
   const [showManufacturers, setShowManufacturers] = useState(false)
   const [showFlownIn, setShowFlownIn] = useState(false)
   const [showAirlines, setShowAirlines] = useState(false)
@@ -248,6 +260,10 @@ export default function SearchView() {
 
   if (showStats) {
     return <StatsView onBack={() => setShowStats(false)} />
+  }
+
+  if (showSightingStats) {
+    return <SightingStatsView onBack={() => setShowSightingStats(false)} onSelectReg={setSelectedReg} />
   }
 
   if (showManufacturers) {
@@ -369,6 +385,7 @@ export default function SearchView() {
             <span className="stats-flownin-card__chevron" aria-hidden="true">›</span>
           </button>
           <StatsCard onOpen={() => setShowStats(true)} />
+          <SightingStatsCard onOpen={() => setShowSightingStats(true)} />
           <AirlinesCard onOpen={() => setShowAirlines(true)} />
           <ManufacturersCard onOpen={() => setShowManufacturers(true)} />
           <BookCandidatesCard onOpen={() => setShowBookCandidates(true)} />

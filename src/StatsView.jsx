@@ -334,7 +334,7 @@ export default function StatsView({ onBack }) {
         <button className="stats-top-bar__back" onClick={onBack} aria-label="Back to search">
           ‹ Back
         </button>
-        <h1 className="stats-top-bar__title">Stats</h1>
+        <h1 className="stats-top-bar__title">Spotting Stats</h1>
       </header>
 
       <main className="content stats-content">
