@@ -141,9 +141,28 @@ export default function SightingStatsView({ onBack, onSelectReg }) {
               </div>
             </StatCard>
 
-            <StatCard title="Most-Sighted">
-              <MostRow label="Airline" top1={stats.topAirlines[0] ?? null} top3={stats.topAirlines.slice(0, 3)} />
-              <MostRow label="Airport" top1={stats.topAirports[0] ?? null} top3={stats.topAirports.slice(0, 3)} />
+            <StatCard title="Most-Sighted Airlines">
+              <div className="sight-reg-grid">
+                {stats.topAirlines.slice(0, 5).map((a) => (
+                  <div key={a.name} className="sight-reg-pill sight-reg-pill--static">
+                    <span className="sight-reg-pill__name">{a.name}</span>
+                    <span className="sight-reg-pill__count">{a.count}</span>
+                  </div>
+                ))}
+                {stats.topAirlines.length === 0 && <p className="search-state">No sightings yet.</p>}
+              </div>
+            </StatCard>
+
+            <StatCard title="Most-Sighted Airports">
+              <div className="sight-reg-grid">
+                {stats.topAirports.slice(0, 5).map((a) => (
+                  <div key={a.name} className="sight-reg-pill sight-reg-pill--static">
+                    <span className="sight-reg-pill__name">{a.name}</span>
+                    <span className="sight-reg-pill__count">{a.count}</span>
+                  </div>
+                ))}
+                {stats.topAirports.length === 0 && <p className="search-state">No sightings yet.</p>}
+              </div>
             </StatCard>
           </>
         )}
