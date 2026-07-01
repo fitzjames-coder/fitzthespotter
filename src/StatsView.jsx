@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import InfoButton from './InfoButton'
 
 function computeStats(regs, airportCountryByIata = {}) {
   if (!regs.length) {
@@ -335,6 +336,15 @@ export default function StatsView({ onBack }) {
           ‹ Back
         </button>
         <h1 className="stats-top-bar__title">Spotting Stats</h1>
+        <InfoButton
+          title="Spotting Stats"
+          lead="Your numbers counted by aircraft — how many unique registrations you've logged, and the leaders across your logbook."
+          points={[
+            'Headline shows your total unique registrations.',
+            'Most-spotted airline, type and airport — tap a row to expand its top 3.',
+            'Manufacturers, special-status tallies, milestones and a per-year graph round it out.',
+          ]}
+        />
       </header>
 
       <main className="content stats-content">

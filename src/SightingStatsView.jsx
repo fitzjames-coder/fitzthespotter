@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import InfoButton from './InfoButton'
 
 function StatCard({ title, children }) {
   return (
@@ -111,6 +112,15 @@ export default function SightingStatsView({ onBack, onSelectReg }) {
       <header className="stats-top-bar">
         <button className="stats-top-bar__back" onClick={onBack} aria-label="Back to search">‹ Back</button>
         <h1 className="stats-top-bar__title">Sighting Stats</h1>
+        <InfoButton
+          title="Sighting Stats"
+          lead="Your numbers counted by sightings — every time you spotted a tail, not just how many aircraft."
+          points={[
+            'Headline flips the page: total sightings big, registrations below.',
+            'Most-Sighted Registrations — your top 10 tails. Tap one to open it.',
+            'Most-Sighted Airlines and Airports — ranked by sightings.',
+          ]}
+        />
       </header>
 
       <main className="content stats-content">
