@@ -1843,6 +1843,7 @@
 /* ── Quiet stat ──────────────────────────────────────────────────── */
 .airline-hero__stats {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   gap: 0.4rem;
   margin-top: 0.2rem;
@@ -5581,6 +5582,7 @@
 /* ── Sightings sub-count ─────────────────────────────────────────── */
 .airline-regs-logged__sub {
   display: block;
+  width: 100%;
   font-size: 0.8rem;
   font-weight: 600;
   color: rgba(246, 239, 220, 0.6);
@@ -5588,8 +5590,8 @@
 }
 .stats-headline__sub {
   display: block;
-  font-size: 0.9rem;
+  font-size: 1.9rem;
   font-weight: 600;
-  color: rgba(22, 32, 59, 0.5);
-  margin-top: 2px;
+  color: rgba(246, 239, 220, 0.82);
+  margin-top: 4px;
 }

@@ -266,6 +266,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   const [showRegForm, setShowRegForm] = useState(false)
   const [retiredTypes, setRetiredTypes] = useState([])
   const [unretireTarget, setUnretireTarget] = useState(null)
+  const [sightingCount, setSightingCount] = useState(null)
 
   function loadRetiredTypes() {
     if (!supabase) return
@@ -349,7 +350,6 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   }
 
   const regCount = registrations.length
-  const [sightingCount, setSightingCount] = useState(null)
 
   function renderBody() {
     if (loading) {
