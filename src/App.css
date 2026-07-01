@@ -5595,3 +5595,46 @@
   color: rgba(246, 239, 220, 0.82);
   margin-top: 4px;
 }
+
+/* ── Sighting Stats page ─────────────────────────────────────────── */
+.sight-reg-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(94px, 1fr));
+  gap: 8px;
+  padding: 4px 0 2px;
+}
+@media (min-width: 640px) {
+  .sight-reg-grid { grid-template-columns: repeat(5, 1fr); }
+}
+.sight-reg-pill {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(44, 66, 123, 0.16);
+  border-radius: 11px;
+  padding: 9px 6px 8px;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(22, 32, 59, 0.08);
+}
+.sight-reg-pill__reg {
+  font-family: 'SF Mono', Menlo, monospace;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: var(--color-navy);
+  text-align: center;
+}
+.sight-reg-pill__airline {
+  font-size: 0.62rem;
+  color: #6a6250;
+  text-align: center;
+  line-height: 1.15;
+}
+.sight-reg-pill__count {
+  margin-top: 3px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--color-amber);
+}
