@@ -78,7 +78,7 @@ function RetiredPill({ item, onLongPress }) {
   )
 }
 
-function AirlineHero({ airline, regCount, loading, onBack, onEdit, onAddReg, retiredTypes, onRetireLongPress }) {
+function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit, onAddReg, retiredTypes, onRetireLongPress }) {
   const isClosed = airline.is_closed
   const year = closedYear(airline)
 
@@ -117,6 +117,9 @@ function AirlineHero({ airline, regCount, loading, onBack, onEdit, onAddReg, ret
             <div className="airline-hero__stats">
               <span className="airline-regs-logged__number">{regCount}</span>
               <span className="airline-regs-logged__label">REGS LOGGED</span>
+              {typeof sightingCount === 'number' && (
+                <span className="airline-regs-logged__sub">{sightingCount} sightings</span>
+              )}
             </div>
           )}
         </div>
@@ -263,6 +266,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   const [showRegForm, setShowRegForm] = useState(false)
   const [retiredTypes, setRetiredTypes] = useState([])
   const [unretireTarget, setUnretireTarget] = useState(null)
+  const [sightingCount, setSightingCount] = useState(null)
 
   function loadRetiredTypes() {
     if (!supabase) return
@@ -320,6 +324,12 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
           setRegistrations(data)
         }
         setLoading(false)
+
+        supabase
+          .from('sightings')
+          .select('id, registrations!inner(airline_id)', { count: 'exact', head: true })
+          .eq('registrations.airline_id', airline.id)
+          .then(({ count }) => setSightingCount(count ?? 0))
       })
   }
 
@@ -372,6 +382,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
         <AirlineHero
           airline={airline}
           regCount={regCount}
+          sightingCount={sightingCount}
           loading={loading}
           onBack={onBack}
           onEdit={() => setShowEdit(true)}
