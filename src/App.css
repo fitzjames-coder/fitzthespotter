@@ -5577,3 +5577,19 @@
 .desktop-mode .reg-nav--prev {
   left: 224px;
 }
+
+/* ── Sightings sub-count ─────────────────────────────────────────── */
+.airline-regs-logged__sub {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(246, 239, 220, 0.6);
+  margin-top: 2px;
+}
+.stats-headline__sub {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(22, 32, 59, 0.5);
+  margin-top: 2px;
+}

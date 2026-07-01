@@ -345,6 +345,7 @@ export default function StatsView({ onBack }) {
             <div className="stats-headline">
               <span className="stats-headline__number">{stats.total}</span>
               <span className="stats-headline__label">Total Unique Registrations</span>
+              <span className="stats-headline__sub">{sightings.length} sightings</span>
             </div>
 
             <StatCard title="Counts">
