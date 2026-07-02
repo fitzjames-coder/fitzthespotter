@@ -5682,3 +5682,52 @@
 .reg-override__choice.is-on { border-color: var(--color-amber); background: rgba(251, 173, 25, 0.12); }
 .reg-override__note { font-size: 0.78rem; color: #4a443a; line-height: 1.45; margin: 4px 2px 0; }
 .reg-override__warn { font-size: 0.8rem; color: var(--color-coral); font-weight: 600; line-height: 1.45; margin: 4px 2px 0; }
+.secondlife-lead { font-size: 0.85rem; color: rgba(246, 239, 220, 0.85); line-height: 1.5; margin: 6px 0 0; }
+.secondlife-empty { font-size: 0.88rem; color: rgba(246, 239, 220, 0.85); line-height: 1.55; margin: 0; }
+.secondlife-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+.secondlife-frame { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(44, 66, 123, 0.1); overflow: hidden; }
+.secondlife-frame__header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+.secondlife-frame__msn { font-family: Georgia, 'Times New Roman', Times, serif; font-weight: bold; font-size: 1rem; color: var(--color-deep-blue); }
+.secondlife-frame__count { font-size: 0.75rem; color: #8a8374; }
+.secondlife-frame__tag {
+  margin-left: auto;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(0, 82, 129, 0.12);
+  color: var(--color-deep-blue);
+}
+.secondlife-frame__tag--rereg { background: rgba(251, 173, 25, 0.18); color: #9a6a00; }
+.secondlife-frame__chevron { color: var(--color-navy); font-size: 1.1rem; transition: transform 0.15s ease; }
+.secondlife-frame__chevron--open { transform: rotate(90deg); }
+.secondlife-frame__body { border-top: 1px solid #eee4cf; }
+.secondlife-wearing {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #f2ead7;
+  cursor: pointer;
+  text-align: left;
+}
+.secondlife-wearing:last-child { border-bottom: none; }
+.secondlife-wearing__airline { font-weight: 700; font-size: 0.85rem; color: var(--color-navy); }
+.secondlife-wearing__reg { font-family: 'Courier New', monospace; font-size: 0.8rem; color: var(--color-deep-blue); }
+.secondlife-wearing__dates { font-size: 0.74rem; color: #8a8374; }

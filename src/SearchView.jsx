@@ -4,6 +4,7 @@ import { exportBackupCsv } from './exportBackup'
 import NewRegistrationForm from './NewRegistrationForm'
 import RegistrationProfileView from './RegistrationProfileView'
 import SightingStatsView from './SightingStatsView'
+import SecondLifeView from './SecondLifeView'
 import StatsView from './StatsView'
 import ManufacturersView from './ManufacturersView'
 import FlownInView from './FlownInView'
@@ -104,6 +105,16 @@ function SightingStatsCard({ onOpen }) {
   )
 }
 
+function SecondLifeCard({ onOpen }) {
+  return (
+    <button className="stats-card" onClick={onOpen}>
+      <span className="stats-card__title">Second Life</span>
+      <span className="stats-card__sub">Airframes across airlines</span>
+      <span className="stats-card__chevron" aria-hidden="true">›</span>
+    </button>
+  )
+}
+
 function AirlinesCard({ onOpen }) {
   return (
     <button className="stats-card" onClick={onOpen}>
@@ -181,6 +192,7 @@ export default function SearchView() {
   const [selectedReg, setSelectedReg] = useState(null)
   const [showStats, setShowStats] = useState(false)
   const [showSightingStats, setShowSightingStats] = useState(false)
+  const [showSecondLife, setShowSecondLife] = useState(false)
   const [showManufacturers, setShowManufacturers] = useState(false)
   const [showFlownIn, setShowFlownIn] = useState(false)
   const [showAirlines, setShowAirlines] = useState(false)
@@ -264,6 +276,10 @@ export default function SearchView() {
 
   if (showSightingStats) {
     return <SightingStatsView onBack={() => setShowSightingStats(false)} onSelectReg={setSelectedReg} />
+  }
+
+  if (showSecondLife) {
+    return <SecondLifeView onBack={() => setShowSecondLife(false)} onSelectReg={setSelectedReg} />
   }
 
   if (showManufacturers) {
@@ -386,6 +402,7 @@ export default function SearchView() {
           </button>
           <StatsCard onOpen={() => setShowStats(true)} />
           <SightingStatsCard onOpen={() => setShowSightingStats(true)} />
+          <SecondLifeCard onOpen={() => setShowSecondLife(true)} />
           <AirlinesCard onOpen={() => setShowAirlines(true)} />
           <ManufacturersCard onOpen={() => setShowManufacturers(true)} />
           <BookCandidatesCard onOpen={() => setShowBookCandidates(true)} />
