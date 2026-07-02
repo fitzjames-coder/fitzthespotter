@@ -181,6 +181,8 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
   const [existingMatch, setExistingMatch] = useState(null)
+  const [overrideOn, setOverrideOn] = useState(false)
+  const [overrideChoice, setOverrideChoice] = useState(null)
   const dupTimerRef = useRef(null)
 
   const [sightingOpen, setSightingOpen] = useState(false)
@@ -216,6 +218,28 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   useEffect(() => () => clearTimeout(airportHintTimer.current), [])
 
   const showLiveryName = statusSpecialLivery || statusRetro
+  const overrideReady =
+    overrideOn &&
+    Boolean(overrideChoice) &&
+    !(overrideChoice === 'same' && !existingMatch?.msn)
+
+  function toggleOverride(next) {
+    setOverrideOn(next)
+    if (next) {
+      setStatusSpecialLivery(false)
+      setStatusRetro(false)
+      setStatusOldLivery(false)
+      setStatusAlliance(false)
+      setLiveryName('')
+      setAllianceName('')
+      setStatusFlownIn(false)
+      setFlownInDate('')
+      setRemark('')
+      origLivery.current = { wasSpecial: false, wasRetro: false, wasAlliance: false, liveryName: '', allianceName: '' }
+    } else {
+      setOverrideChoice(null)
+    }
+  }
 
   async function checkAirportExists(code) {
     if (!supabase) return true
@@ -244,15 +268,16 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     if (isEdit) return
     const trimmed = regNumber.trim().toUpperCase()
     clearTimeout(dupTimerRef.current)
-    if (!trimmed) { setExistingMatch(null); return }
+    if (!trimmed) { setExistingMatch(null); setOverrideOn(false); setOverrideChoice(null); return }
     dupTimerRef.current = setTimeout(async () => {
       if (!supabase) return
       const { data } = await supabase
         .from('registrations')
-        .select('id, registration, statuses, remark')
+        .select('id, registration, statuses, remark, msn, airline_id, airlines ( name )')
         .eq('registration', trimmed)
         .maybeSingle()
       setExistingMatch(data ?? null)
+      if (!data) { setOverrideOn(false); setOverrideChoice(null) }
       if (data) {
         const ms = data.statuses ?? {}
         setStatusSpecialLivery(Boolean(ms.special_livery))
@@ -381,7 +406,8 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     const trimmed = regNumber.trim().toUpperCase()
     if (!trimmed) { setSaveError('Registration number is required.'); return }
     if (!airline) { setSaveError('Select or add an airline.'); return }
-    if (!isEdit && existingMatch) { setSaveError('This registration already exists.'); return }
+    if (!isEdit && existingMatch && !overrideReady) { setSaveError('This registration already exists.'); return }
+    if (overrideReady && !type) { setSaveError('Select the aircraft manufacturer and type for the new airline.'); return }
 
     setSaving(true)
     setSaveError(null)
@@ -416,7 +442,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       registration: trimmed,
       airline_id: airline?.id ?? null,
       aircraft_type_id: type?.id ?? null,
-      msn: msn.trim() || null,
+      msn: (overrideReady && overrideChoice === 'same') ? existingMatch.msn : (msn.trim() || null),
       remark: finalRemark || null,
       statuses: Object.keys(statuses).length > 0 ? statuses : null,
     }
@@ -688,7 +714,49 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               />
             </div>
             {!isEdit && existingMatch && (
-              <p className="reg-exists-banner">This registration is already logged.</p>
+              <div className="reg-override">
+                <p className="reg-exists-banner">
+                  Already exists under {existingMatch.airlines?.name ?? 'another airline'} (MSN {existingMatch.msn || '—'}).
+                </p>
+                <StatusSwitch
+                  label="Override — log this tail under a different airline"
+                  checked={overrideOn}
+                  onChange={toggleOverride}
+                />
+                {overrideOn && (
+                  <div className="reg-override__choices">
+                    <button
+                      type="button"
+                      className={`reg-override__choice${overrideChoice === 'same' ? ' is-on' : ''}`}
+                      onClick={() => setOverrideChoice('same')}
+                    >
+                      Same airframe, different airline
+                    </button>
+                    <button
+                      type="button"
+                      className={`reg-override__choice${overrideChoice === 'reused' ? ' is-on' : ''}`}
+                      onClick={() => setOverrideChoice('reused')}
+                    >
+                      Different airframe, reused tail
+                    </button>
+                    {overrideChoice === 'same' && !existingMatch.msn && (
+                      <p className="reg-override__warn">
+                        The original record has no MSN. Add the MSN to the original registration first, then come back and try again.
+                      </p>
+                    )}
+                    {overrideChoice === 'same' && existingMatch.msn && (
+                      <p className="reg-override__note">
+                        Links to the same airframe via MSN {existingMatch.msn}. Set the new airline, manufacturer and type below.
+                      </p>
+                    )}
+                    {overrideChoice === 'reused' && (
+                      <p className="reg-override__note">
+                        Creates a separate airframe. Set the new airline, manufacturer, type — and MSN if known — below.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             )}
             <div className="form-group">
               <label className="form-label">Airline *</label>
@@ -703,7 +771,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
             </div>
           </div>
 
-          {(isEdit || existingMatch) && (
+          {(isEdit || (existingMatch && !overrideOn)) && (
             <div className="new-sighting-panel">
               <button
                 type="button"
@@ -1131,7 +1199,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
             type="button"
             className="btn-primary"
             onClick={handleSave}
-            disabled={saving || (!isEdit && Boolean(existingMatch)) || sightingOpen}
+            disabled={saving || (!isEdit && Boolean(existingMatch) && !overrideReady) || sightingOpen}
           >
             {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Save'}
           </button>
