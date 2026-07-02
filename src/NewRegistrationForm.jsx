@@ -138,6 +138,23 @@ function makeFetchTypes(manufacturerId) {
   }
 }
 
+function buildDateToInput(d) {
+  if (!d) return ''
+  const parts = d.split('-')
+  if (parts.length < 2) return ''
+  return `${parts[1]}${parts[0]}`
+}
+
+function inputToBuildDate(v) {
+  const digits = (v || '').replace(/\D/g, '')
+  if (digits.length !== 6) return null
+  const mm = digits.slice(0, 2)
+  const yyyy = digits.slice(2)
+  const m = parseInt(mm, 10)
+  if (m < 1 || m > 12) return null
+  return `${yyyy}-${mm}-01`
+}
+
 export default function NewRegistrationForm({ onClose, onSaved, existingReg, initialAirline }) {
   const isEdit = Boolean(existingReg)
   const s = existingReg?.statuses ?? {}
@@ -178,6 +195,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [flownInDate, setFlownInDate] = useState(s.flown_in_date ?? '')
   const [remark, setRemark] = useState(existingReg?.remark ?? '')
   const [msn, setMsn] = useState(existingReg?.msn ?? '')
+  const [buildDate, setBuildDate] = useState(() => buildDateToInput(existingReg?.build_date))
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
   const [existingMatch, setExistingMatch] = useState(null)
@@ -408,6 +426,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     if (!airline) { setSaveError('Select or add an airline.'); return }
     if (!isEdit && existingMatch && !overrideReady) { setSaveError('This registration already exists.'); return }
     if (overrideReady && !type) { setSaveError('Select the aircraft manufacturer and type for the new airline.'); return }
+    if (buildDate && !inputToBuildDate(buildDate)) { setSaveError('Build date must be MMYYYY, e.g. 112025 for Nov 2025.'); return }
 
     setSaving(true)
     setSaveError(null)
@@ -443,6 +462,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       airline_id: airline?.id ?? null,
       aircraft_type_id: type?.id ?? null,
       msn: (overrideReady && overrideChoice === 'same') ? existingMatch.msn : (msn.trim() || null),
+      build_date: inputToBuildDate(buildDate),
       remark: finalRemark || null,
       statuses: Object.keys(statuses).length > 0 ? statuses : null,
     }
@@ -712,6 +732,21 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 autoComplete="off"
                 maxLength={20}
               />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="build-date-input">Built (month &amp; year)</label>
+              <input
+                id="build-date-input"
+                className="form-input form-input--mono"
+                type="text"
+                inputMode="numeric"
+                value={buildDate}
+                onChange={(e) => setBuildDate(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="Optional — e.g. 112025"
+                autoComplete="off"
+                maxLength={6}
+              />
+              <p className="form-hint">Format MMYYYY — e.g. 112025 = Nov 2025</p>
             </div>
             {!isEdit && existingMatch && (
               <div className="reg-override">

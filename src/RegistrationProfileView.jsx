@@ -248,6 +248,8 @@ function InfoSection({ reg, lastSighting, isRetiredType }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
   const model = reg.aircraft_types?.name
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
+  const buildYear = reg.build_date ? parseInt(reg.build_date.slice(0, 4), 10) : null
+  const age = buildYear ? new Date().getFullYear() - buildYear : null
   const airports = Array.isArray(reg.airports) ? reg.airports : []
   const firstAirport = airports[0] ?? null
   const lastDate = lastSighting?.spotted_on ?? null
@@ -261,6 +263,15 @@ function InfoSection({ reg, lastSighting, isRetiredType }) {
           <span className="info-row__value">
             {aircraftLabel}
             {isRetiredType && <span className="reg-retired-pill">Retired</span>}
+          </span>
+        </div>
+      )}
+      {(reg.msn || age != null) && (
+        <div className="info-row">
+          <span className="info-row__label">MSN</span>
+          <span className="info-row__value reg-msn-age-value">
+            <span>{reg.msn || '—'}</span>
+            {age != null && <span className="reg-age">{age} yrs</span>}
           </span>
         </div>
       )}
@@ -399,6 +410,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           flagged,
           photo_urls,
           msn,
+          build_date,
           aircraft_types (
             id,
             name,
