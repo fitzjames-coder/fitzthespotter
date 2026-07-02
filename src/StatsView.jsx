@@ -100,8 +100,17 @@ function computeStats(regs, airportCountryByIata = {}) {
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count)
 
+  const airframeMsns = new Set()
+  let noMsnCount = 0
+  for (const reg of regs) {
+    const m = (reg.msn ?? '').trim()
+    if (m) airframeMsns.add(m)
+    else noMsnCount++
+  }
+  const uniqueAirframeCount = airframeMsns.size + noMsnCount
+
   return {
-    total: regs.length,
+    total: uniqueAirframeCount,
     airlines: airlineIds.size,
     manufacturers: mfrIds.size,
     types: typeIds.size,
@@ -302,7 +311,7 @@ export default function StatsView({ onBack }) {
       supabase
         .from('registrations')
         .select(`
-          id, registration, first_spotted, airports, statuses,
+          id, registration, msn, first_spotted, airports, statuses,
           airlines ( id, name, country, logo_url ),
           aircraft_types ( id, name, manufacturers ( id, name, logo_url ) )
         `),
