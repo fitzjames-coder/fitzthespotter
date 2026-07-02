@@ -5682,8 +5682,8 @@
 .reg-override__choice.is-on { border-color: var(--color-amber); background: rgba(251, 173, 25, 0.12); }
 .reg-override__note { font-size: 0.78rem; color: #4a443a; line-height: 1.45; margin: 4px 2px 0; }
 .reg-override__warn { font-size: 0.8rem; color: var(--color-coral); font-weight: 600; line-height: 1.45; margin: 4px 2px 0; }
-.secondlife-lead { font-size: 0.82rem; color: #4a443a; line-height: 1.5; margin: 6px 0 0; }
-.secondlife-empty { font-size: 0.85rem; color: #4a443a; line-height: 1.55; margin: 0; }
+.secondlife-lead { font-size: 0.85rem; color: rgba(246, 239, 220, 0.85); line-height: 1.5; margin: 6px 0 0; }
+.secondlife-empty { font-size: 0.88rem; color: rgba(246, 239, 220, 0.85); line-height: 1.55; margin: 0; }
 .secondlife-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
 .secondlife-frame { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(44, 66, 123, 0.1); overflow: hidden; }
 .secondlife-frame__header {
