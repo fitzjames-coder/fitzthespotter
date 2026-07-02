@@ -177,6 +177,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [statusFlownIn, setStatusFlownIn] = useState(Boolean(s.flown_in))
   const [flownInDate, setFlownInDate] = useState(s.flown_in_date ?? '')
   const [remark, setRemark] = useState(existingReg?.remark ?? '')
+  const [msn, setMsn] = useState(existingReg?.msn ?? '')
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
   const [existingMatch, setExistingMatch] = useState(null)
@@ -415,6 +416,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       registration: trimmed,
       airline_id: airline?.id ?? null,
       aircraft_type_id: type?.id ?? null,
+      msn: msn.trim() || null,
       remark: finalRemark || null,
       statuses: Object.keys(statuses).length > 0 ? statuses : null,
     }
@@ -670,6 +672,19 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 autoCapitalize="characters"
                 autoComplete="off"
                 maxLength={10}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="msn-input">MSN (serial number)</label>
+              <input
+                id="msn-input"
+                className="form-input form-input--mono"
+                type="text"
+                value={msn}
+                onChange={(e) => setMsn(e.target.value.toUpperCase())}
+                placeholder="Optional — e.g. 29984"
+                autoComplete="off"
+                maxLength={20}
               />
             </div>
             {!isEdit && existingMatch && (
