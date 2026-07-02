@@ -398,6 +398,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           statuses,
           flagged,
           photo_urls,
+          msn,
           aircraft_types (
             id,
             name,
