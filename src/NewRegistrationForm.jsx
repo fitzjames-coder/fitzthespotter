@@ -181,6 +181,8 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState(null)
   const [existingMatch, setExistingMatch] = useState(null)
+  const [overrideOn, setOverrideOn] = useState(false)
+  const [overrideChoice, setOverrideChoice] = useState(null)
   const dupTimerRef = useRef(null)
 
   const [sightingOpen, setSightingOpen] = useState(false)
@@ -216,6 +218,28 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   useEffect(() => () => clearTimeout(airportHintTimer.current), [])
 
   const showLiveryName = statusSpecialLivery || statusRetro
+  const overrideReady =
+    overrideOn &&
+    Boolean(overrideChoice) &&
+    !(overrideChoice === 'same' && !existingMatch?.msn)
+
+  function toggleOverride(next) {
+    setOverrideOn(next)
+    if (next) {
+      setStatusSpecialLivery(false)
+      setStatusRetro(false)
+      setStatusOldLivery(false)
+      setStatusAlliance(false)
+      setLiveryName('')
+      setAllianceName('')
+      setStatusFlownIn(false)
+      setFlownInDate('')
+      setRemark('')
+      origLivery.current = { wasSpecial: false, wasRetro: false, wasAlliance: false, liveryName: '', allianceName: '' }
+    } else {
+      setOverrideChoice(null)
+    }
+  }
 
   async function checkAirportExists(code) {
     if (!supabase) return true
@@ -244,15 +268,16 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     if (isEdit) return
     const trimmed = regNumber.trim().toUpperCase()
     clearTimeout(dupTimerRef.current)
-    if (!trimmed) { setExistingMatch(null); return }
+    if (!trimmed) { setExistingMatch(null); setOverrideOn(false); setOverrideChoice(null); return }
     dupTimerRef.current = setTimeout(async () => {
       if (!supabase) return
       const { data } = await supabase
         .from('registrations')
-        .select('id, registration, statuses, remark')
+        .select('id, registration, statuses, remark, msn, airline_id, airlines ( name )')
         .eq('registration', trimmed)
         .maybeSingle()
       setExistingMatch(data ?? null)
+      if (!data) { setOverrideOn(false); setOverrideChoice(null) }
       if (data) {
         const ms = data.statuses ?? {}
         setStatusSpecialLivery(Boolean(ms.special_livery))
@@ -381,7 +406,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     const trimmed = regNumber.trim().toUpperCase()
     if (!trimmed) { setSaveError('Registration number is required.'); return }
     if (!airline) { setSaveError('Select or add an airline.'); return }
-    if (!isEdit && existingMatch) { setSaveError('This registration already exists.'); return }
+    if (!isEdit && existingMatch && !overrideReady) { setSaveError('This registration already exists.'); return }
 
     setSaving(true)
     setSaveError(null)
@@ -416,7 +441,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       registration: trimmed,
       airline_id: airline?.id ?? null,
       aircraft_type_id: type?.id ?? null,
-      msn: msn.trim() || null,
+      msn: (overrideReady && overrideChoice === 'same') ? existingMatch.msn : (msn.trim() || null),
       remark: finalRemark || null,
       statuses: Object.keys(statuses).length > 0 ? statuses : null,
     }
@@ -431,6 +456,36 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
         .eq('id', existingReg.id)
       setSaving(false)
       if (err) { setSaveError(err.message) } else { onSaved?.(); onClose() }
+      return
+    }
+
+    if (!isEdit && existingMatch && overrideReady) {
+      const { error: err } = await supabase
+        .from('registrations')
+        .update(payload)
+        .eq('id', existingMatch.id)
+      if (err) { setSaving(false); setSaveError(err.message); return }
+      const codes = airports.length > 0 ? airports : [null]
+      const sightingRows = codes.map((code) => ({
+        registration_id: existingMatch.id,
+        spotted_on: firstSpotted || null,
+        time_block: firstTimeBlock || null,
+        southern_hemisphere: firstSouthern,
+        airport: code,
+        special_livery: statusSpecialLivery,
+        retro: statusRetro,
+        alliance: statusAlliance,
+        livery_name: (showLiveryName && liveryName.trim()) ? liveryName.trim() : null,
+      }))
+      const { error: sErr } = await supabase.from('sightings').insert(sightingRows)
+      setSaving(false)
+      if (sErr) { setSaveError(sErr.message) } else {
+        if (statusFlownIn && airline?.id) {
+          await supabase.from('airlines').update({ flown_in: true }).eq('id', airline.id)
+        }
+        onSaved?.()
+        onClose()
+      }
       return
     }
 
@@ -688,7 +743,52 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               />
             </div>
             {!isEdit && existingMatch && (
-              <p className="reg-exists-banner">This registration is already logged.</p>
+              <div className="reg-override">
+                <p className="reg-exists-banner">
+                  {existingMatch.airlines?.name
+                    ? `${existingMatch.registration} is already logged under ${existingMatch.airlines.name}.`
+                    : `${existingMatch.registration} is already logged.`}
+                </p>
+                <StatusSwitch
+                  label="Log a sighting or update this registration"
+                  checked={overrideOn}
+                  onChange={toggleOverride}
+                  markEl={null}
+                />
+                {overrideOn && (
+                  <div className="reg-override__choices">
+                    <button
+                      type="button"
+                      className={`reg-override__choice${overrideChoice === 'same' ? ' reg-override__choice--active' : ''}`}
+                      onClick={() => setOverrideChoice('same')}
+                    >
+                      Same airframe
+                    </button>
+                    <button
+                      type="button"
+                      className={`reg-override__choice${overrideChoice === 'reused' ? ' reg-override__choice--active' : ''}`}
+                      onClick={() => setOverrideChoice('reused')}
+                    >
+                      Reused registration
+                    </button>
+                  </div>
+                )}
+                {overrideOn && overrideChoice === 'same' && !existingMatch.msn && (
+                  <p className="reg-override__warn">
+                    The existing record has no MSN — can't confirm it's the same airframe. Add an MSN above first, or choose "Reused registration".
+                  </p>
+                )}
+                {overrideOn && overrideChoice === 'same' && existingMatch.msn && (
+                  <p className="reg-override__note">
+                    MSN {existingMatch.msn} — a new sighting will be logged against the existing record.
+                  </p>
+                )}
+                {overrideOn && overrideChoice === 'reused' && (
+                  <p className="reg-override__note">
+                    The existing record will be updated with the new airline and type.
+                  </p>
+                )}
+              </div>
             )}
             <div className="form-group">
               <label className="form-label">Airline *</label>
@@ -703,7 +803,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
             </div>
           </div>
 
-          {(isEdit || existingMatch) && (
+          {(isEdit || (existingMatch && overrideOn)) && (
             <div className="new-sighting-panel">
               <button
                 type="button"
@@ -1131,7 +1231,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
             type="button"
             className="btn-primary"
             onClick={handleSave}
-            disabled={saving || (!isEdit && Boolean(existingMatch)) || sightingOpen}
+            disabled={saving || (!isEdit && Boolean(existingMatch) && !overrideReady) || sightingOpen}
           >
             {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Save'}
           </button>
