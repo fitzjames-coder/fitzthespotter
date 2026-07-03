@@ -172,15 +172,9 @@ function ddmmyyyyToISO(digits) {
   const m = parseInt(mm, 10)
   const y = parseInt(yyyy, 10)
   if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900 || y > 2100) return null
-  const date = new Date(`${yyyy}-${mm}-${dd}`)
-  if (isNaN(date.getTime())) return null
-  const [ry, rm, rd] = [
-    date.getFullYear().toString().padStart(4, '0'),
-    (date.getMonth() + 1).toString().padStart(2, '0'),
-    date.getDate().toString().padStart(2, '0'),
-  ]
-  if (rd !== dd || rm !== mm) return null
-  return `${ry}-${rm}-${rd}`
+  const date = new Date(Date.UTC(y, m - 1, d))
+  if (date.getUTCFullYear() !== y || date.getUTCMonth() !== m - 1 || date.getUTCDate() !== d) return null
+  return `${yyyy}-${mm}-${dd}`
 }
 
 function DateFastField({ id, value, onChange }) {
