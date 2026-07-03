@@ -156,6 +156,64 @@ function inputToBuildDate(v) {
   return `${yyyy}-${mm}-01`
 }
 
+function dateToDDMMYYYY(iso) {
+  if (!iso) return ''
+  const [yyyy, mm, dd] = iso.split('-')
+  if (!yyyy || !mm || !dd) return ''
+  return `${dd}${mm}${yyyy}`
+}
+
+function ddmmyyyyToISO(digits) {
+  if (!digits || digits.length !== 8) return null
+  const dd = digits.slice(0, 2)
+  const mm = digits.slice(2, 4)
+  const yyyy = digits.slice(4)
+  const d = parseInt(dd, 10)
+  const m = parseInt(mm, 10)
+  const y = parseInt(yyyy, 10)
+  if (m < 1 || m > 12 || d < 1 || d > 31 || y < 1900 || y > 2100) return null
+  const date = new Date(Date.UTC(y, m - 1, d))
+  if (date.getUTCFullYear() !== y || date.getUTCMonth() !== m - 1 || date.getUTCDate() !== d) return null
+  return `${yyyy}-${mm}-${dd}`
+}
+
+function DateFastField({ id, value, onChange }) {
+  const [text, setText] = useState(() => dateToDDMMYYYY(value))
+  useEffect(() => {
+    setText(dateToDDMMYYYY(value))
+  }, [value])
+  function handleText(e) {
+    const raw = e.target.value.replace(/\D/g, '').slice(0, 8)
+    setText(raw)
+    if (raw.length === 8) {
+      const iso = ddmmyyyyToISO(raw)
+      if (iso) onChange(iso)
+    }
+  }
+  return (
+    <div className="date-fast">
+      <input
+        className="date-fast__text form-input"
+        type="text"
+        inputMode="numeric"
+        placeholder="DDMMYYYY"
+        maxLength={8}
+        value={text}
+        onChange={handleText}
+        aria-label="Date (DDMMYYYY)"
+      />
+      <input
+        id={id}
+        className="date-fast__picker form-input"
+        type="date"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label="Date picker"
+      />
+    </div>
+  )
+}
+
 export default function NewRegistrationForm({ onClose, onSaved, existingReg, initialAirline }) {
   const isEdit = Boolean(existingReg)
   const s = existingReg?.statuses ?? {}
@@ -837,13 +895,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 <div className="new-sighting-body">
                   <div className="form-group">
                     <label className="form-label" htmlFor="sighting-date-input">Date</label>
-                    <input
-                      id="sighting-date-input"
-                      className="form-input"
-                      type="date"
-                      value={sightingDate}
-                      onChange={(e) => setSightingDate(e.target.value)}
-                    />
+                    <DateFastField id="sighting-date-input" value={sightingDate} onChange={setSightingDate} />
                   </div>
                   <div className="form-group">
                     <label className="form-label">Time of day</label>
@@ -972,13 +1024,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               <p className="form-section__label">Sighting</p>
               <div className="form-group">
                 <label className="form-label" htmlFor="first-spotted-input">First spotted</label>
-                <input
-                  id="first-spotted-input"
-                  className="form-input"
-                  type="date"
-                  value={firstSpotted}
-                  onChange={(e) => setFirstSpotted(e.target.value)}
-                />
+                <DateFastField id="first-spotted-input" value={firstSpotted} onChange={setFirstSpotted} />
               </div>
               <div className="form-group">
                 <label className="form-label">Time of day</label>
