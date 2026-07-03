@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { fetchAllRows } from './lib/fetchAllRows'
 
 function computeStats(regs, airportCountryByIata = {}) {
   if (!regs.length) {
@@ -308,16 +309,22 @@ export default function StatsView({ onBack }) {
       return
     }
     Promise.all([
-      supabase
-        .from('registrations')
-        .select(`
+      fetchAllRows(() =>
+        supabase
+          .from('registrations')
+          .select(`
           id, registration, msn, first_spotted, airports, statuses,
           airlines ( id, name, country, logo_url ),
           aircraft_types ( id, name, manufacturers ( id, name, logo_url ) )
-        `),
-      supabase
-        .from('sightings')
-        .select('spotted_on'),
+        `)
+          .order('id', { ascending: true })
+      ),
+      fetchAllRows(() =>
+        supabase
+          .from('sightings')
+          .select('spotted_on')
+          .order('id', { ascending: true })
+      ),
       supabase
         .from('airports')
         .select('iata, country'),
