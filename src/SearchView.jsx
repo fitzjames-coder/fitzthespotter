@@ -65,6 +65,7 @@ const QUICK_FILTERS = [
   { id: 'flown_in',       label: 'Flown-in'       },
   { id: 'flagged',        label: 'Flagged'        },
   { id: 'closed',         label: 'Closed'         },
+  { id: 'rs',             label: 'R/S'            },
 ]
 
 function ResultCard({ reg, onSelect }) {

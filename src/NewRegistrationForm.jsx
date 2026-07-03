@@ -254,6 +254,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   const [statusAlliance, setStatusAlliance] = useState(Boolean(s.alliance))
   const [allianceName, setAllianceName] = useState(s.alliance_name ?? '')
   const [statusFlownIn, setStatusFlownIn] = useState(Boolean(s.flown_in))
+  const [statusRs, setStatusRs] = useState(Boolean(s.rs))
   const [flownInDate, setFlownInDate] = useState(s.flown_in_date ?? '')
   const [remark, setRemark] = useState(existingReg?.remark ?? '')
   const [msn, setMsn] = useState(existingReg?.msn ?? '')
@@ -505,6 +506,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     const finalRemark = [remark.trim(), ...sinceLines].filter(Boolean).join('\n')
 
     const statuses = {}
+    if (statusRs) statuses.rs = true
     if (statusSpecialLivery) statuses.special_livery = true
     if (statusRetro) statuses.retro = true
     if (statusOldLivery) statuses.old_livery = true
@@ -632,6 +634,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
     setRemark(newRemark)
 
     const statuses = {}
+    if (statusRs) statuses.rs = true
     if (statusSpecialLivery) statuses.special_livery = true
     if (statusRetro) statuses.retro = true
     if (statusOldLivery) statuses.old_livery = true
@@ -1070,6 +1073,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
           {(isEdit || !existingMatch) && (
           <div className="form-section">
             <p className="form-section__label">Status</p>
+            <StatusSwitch label="R/S — removed / stored / scrapped" checked={statusRs} onChange={setStatusRs} markEl={<span className="status-switch__rs">R/S</span>} />
             {!isEdit && (
               <>
                 <StatusSwitch label="Special livery" checked={statusSpecialLivery} onChange={setStatusSpecialLivery} markEl={<img src={markSpecialLiveryAsset} width={24} height={24} alt="" className="status-switch__mark-img" />} />
