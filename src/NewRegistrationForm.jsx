@@ -152,8 +152,11 @@ function inputToBuildDate(v) {
   const mm = digits.slice(0, 2)
   const yyyy = digits.slice(2)
   const m = parseInt(mm, 10)
-  if (m < 1 || m > 12) return null
-  return `${yyyy}-${mm}-01`
+  const y = parseInt(yyyy, 10)
+  if (m < 0 || m > 12) return null
+  if (y < 1900 || y > 2100) return null
+  const monthForDate = m === 0 ? '01' : mm
+  return `${yyyy}-${monthForDate}-01`
 }
 
 function dateToDDMMYYYY(iso) {
@@ -815,7 +818,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                 autoComplete="off"
                 maxLength={6}
               />
-              <p className="form-hint">Format MMYYYY — e.g. 112025 = Nov 2025</p>
+              <p className="form-hint">Format MMYYYY — e.g. 112025 = Nov 2025. Use 00 for the month if unknown (002015 = 2015 only).</p>
             </div>
             {!isEdit && existingMatch && (
               <div className="reg-override">
