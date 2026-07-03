@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { fetchAllRows } from './lib/fetchAllRows'
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
 
@@ -82,9 +83,12 @@ export default function SecondLifeView({ onBack, onSelectReg }) {
       setLoading(false)
       return
     }
-    supabase
-      .from('registrations')
-      .select('id, registration, msn, airlines ( id, name, country, country_flag ), sightings ( spotted_on )')
+    fetchAllRows(() =>
+      supabase
+        .from('registrations')
+        .select('id, registration, msn, airlines ( id, name, country, country_flag ), sightings ( spotted_on )')
+        .order('id', { ascending: true })
+    )
       .then(({ data, error: err }) => {
         if (err) setError(err.message)
         else setRegs(data ?? [])

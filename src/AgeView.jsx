@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { fetchAllRows } from './lib/fetchAllRows'
 
 const BANDS = [
   { key: 0, label: '0s' },
@@ -53,9 +54,12 @@ export default function AgeView({ onBack, onSelectReg }) {
 
   useEffect(() => {
     if (!supabase) { setError('Supabase is not configured.'); setLoading(false); return }
-    supabase
-      .from('registrations')
-      .select('id, registration, build_date, airlines ( id, name )')
+    fetchAllRows(() =>
+      supabase
+        .from('registrations')
+        .select('id, registration, build_date, airlines ( id, name )')
+        .order('id', { ascending: true })
+    )
       .then(({ data, error: err }) => {
         if (err) setError(err.message)
         else setRegs(data ?? [])
