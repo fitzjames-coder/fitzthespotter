@@ -246,7 +246,7 @@ function PhotoGallery({ slides, onSlideClick }) {
   )
 }
 
-function InfoSection({ reg, lastSighting, isRetiredType }) {
+function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
   const model = reg.aircraft_types?.name
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
@@ -300,6 +300,10 @@ function InfoSection({ reg, lastSighting, isRetiredType }) {
           </div>
         </div>
       )}
+      <div className="info-row">
+        <span className="info-row__label">Sightings</span>
+        <span className="info-row__value">{sightingCount}</span>
+      </div>
       {reg.first_spotted && (
         <div className="info-row">
           <span className="info-row__label">First spotted</span>
@@ -360,6 +364,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [currentRegId, setCurrentRegId] = useState(regId)
   const [reg, setReg] = useState(null)
   const [lastSighting, setLastSighting] = useState(null)
+  const [sightingCount, setSightingCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [showEdit, setShowEdit] = useState(false)
@@ -449,6 +454,13 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
       if (!active) return
 
       setLastSighting(ls ?? null)
+
+      const { count: sc } = await supabase
+        .from('sightings')
+        .select('id', { count: 'exact', head: true })
+        .eq('registration_id', currentRegId)
+      if (active) setSightingCount(sc ?? 0)
+
       setLoading(false)
     }
     loadReg()
@@ -670,7 +682,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
             </div>
           </div>
           {photoError && <p className="form-error" style={{ marginTop: '0.5rem' }}>{photoError}</p>}
-          <InfoSection reg={reg} lastSighting={lastSighting} isRetiredType={isRetiredType} />
+          <InfoSection reg={reg} lastSighting={lastSighting} sightingCount={sightingCount} isRetiredType={isRetiredType} />
           {deleteError && <p className="form-error" style={{ marginTop: '1rem' }}>{deleteError}</p>}
           <button
             className="btn-delete-reg"
