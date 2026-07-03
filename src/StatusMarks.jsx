@@ -75,12 +75,16 @@ export default function StatusMarks({ statuses, size = 22, onRemarkClick, onFlow
     old_livery: Boolean(statuses.old_livery),
     alliance: Boolean(statuses.alliance),
     flown_in: Boolean(statuses.flown_in),
+    rs: Boolean(statuses.rs),
   }
 
   if (!Object.values(active).some(Boolean)) return null
 
   return (
     <span className="status-marks">
+      {active.rs && (
+        <span className="status-marks__rs" style={{ width: size, height: size }} title="Removed / stored / scrapped">R/S</span>
+      )}
       {SLOT_KEYS.map((key) => {
         if (!active[key]) {
           return <span key={key} className="status-marks__spacer" />

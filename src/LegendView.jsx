@@ -51,6 +51,13 @@ export default function LegendView({ onBack }) {
         <ImgRow src={markRetro} name="Retro livery" desc="The aircraft wore a historic or retro livery." />
         <ImgRow src={markOldLivery} name="Old livery" desc="The aircraft wore a previous (now superseded) livery." />
         <ImgRow src={markFlownIn} name="Flown in" desc="You have personally flown aboard this exact registration. Tap it on the profile to see the date." />
+        <div className="legend-row">
+          <div className="legend-row__icon"><span className="status-marks__rs">R/S</span></div>
+          <div className="legend-row__text">
+            <p className="legend-row__name">R/S — removed / stored / scrapped</p>
+            <p className="legend-row__desc">This airframe is no longer in service with the airline — removed, retired, stored, or scrapped. If the same airframe (by MSN) reappears under another airline, the Second Life card surfaces that.</p>
+          </div>
+        </div>
 
         <h2 className="legend-section">Alliance badges</h2>
         <ImgRow src={allianceStar} name="Star Alliance" desc="The airline is a member of Star Alliance." />
