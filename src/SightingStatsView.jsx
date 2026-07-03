@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { fetchAllRows } from './lib/fetchAllRows'
 
 function StatCard({ title, children }) {
   return (
@@ -90,9 +91,12 @@ export default function SightingStatsView({ onBack, onSelectReg }) {
       return
     }
     Promise.all([
-      supabase
-        .from('sightings')
-        .select('id, airport, registrations!inner ( id, registration, airlines ( id, name, country, country_flag ) )'),
+      fetchAllRows(() =>
+        supabase
+          .from('sightings')
+          .select('id, airport, registrations!inner ( id, registration, airlines ( id, name, country, country_flag ) )')
+          .order('id', { ascending: true })
+      ),
       supabase
         .from('registrations')
         .select('id', { count: 'exact', head: true }),
