@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import TypeaheadPicker from './TypeaheadPicker'
 import AirlineForm from './AirlineForm'
+import CopyButton from './CopyButton'
 import AirportForm from './AirportForm'
 import ManufacturerForm from './ManufacturerForm'
 import TypeForm from './TypeForm'
@@ -707,7 +708,10 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               </button>
             </div>
             <div className="form-group">
-              <label className="form-label" htmlFor="reg-number-input">Reg number *</label>
+              <div className="form-label-row">
+                <label className="form-label" htmlFor="reg-number-input">Reg number *</label>
+                <CopyButton value={regNumber} label="Copy registration" />
+              </div>
               <input
                 id="reg-number-input"
                 className="form-input form-input--mono"
@@ -721,7 +725,10 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               />
             </div>
             <div className="form-group">
-              <label className="form-label" htmlFor="msn-input">MSN (serial number)</label>
+              <div className="form-label-row">
+                <label className="form-label" htmlFor="msn-input">MSN (serial number)</label>
+                <CopyButton value={msn} label="Copy MSN" />
+              </div>
               <input
                 id="msn-input"
                 className="form-input form-input--mono"
@@ -794,7 +801,10 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               </div>
             )}
             <div className="form-group">
-              <label className="form-label">Airline *</label>
+              <div className="form-label-row">
+                <label className="form-label">Airline *</label>
+                <CopyButton value={airline?.label} label="Copy airline" />
+              </div>
               <TypeaheadPicker
                 placeholder="Search airlines…"
                 value={airline}
