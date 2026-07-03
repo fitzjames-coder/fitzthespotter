@@ -5763,3 +5763,16 @@
   align-items: center;
   gap: 0.4rem;
 }
+
+.date-fast {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.date-fast__text {
+  flex: 0 0 7.5rem;
+  letter-spacing: 0.05em;
+}
+.date-fast__picker {
+  flex: 1 1 auto;
+}
