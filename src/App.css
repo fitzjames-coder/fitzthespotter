@@ -5740,3 +5740,26 @@
 .reg-msn-age-value .reg-age { margin-left: auto; color: var(--color-amber); font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
 .age-band-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .age-band-pill__count { margin-left: 6px; opacity: 0.65; font-size: 0.85em; }
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  opacity: 0.5;
+  cursor: pointer;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+.copy-btn:hover, .copy-btn:focus { opacity: 0.9; }
+.copy-btn--done { color: var(--color-amber); opacity: 1; }
+.form-label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}

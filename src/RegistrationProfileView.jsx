@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import NewRegistrationForm from './NewRegistrationForm'
+import CopyButton from './CopyButton'
 import StatusMarks from './StatusMarks'
 import cameraIcon from './assets/marks/mark-camera.png'
 import cameraOffIcon from './assets/marks/mark-camera-off.png'
@@ -162,6 +163,7 @@ function RegTopBar({ reg, onBack, onEdit }) {
               </button>
             )}
           </div>
+          <CopyButton value={reg.registration} label="Copy registration" />
           <button className="top-bar__edit" onClick={onEdit} aria-label="Edit registration">
             Edit
           </button>
