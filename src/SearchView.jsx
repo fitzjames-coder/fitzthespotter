@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { stripTypeParens } from './lib/typeGrouping'
 import { exportBackupCsv } from './exportBackup'
 import NewRegistrationForm from './NewRegistrationForm'
 import RegistrationProfileView from './RegistrationProfileView'
@@ -69,7 +70,7 @@ const QUICK_FILTERS = [
 ]
 
 function ResultCard({ reg, onSelect }) {
-  const typeName = reg.aircraft_types?.name ?? null
+  const typeName = reg.aircraft_types?.name ? stripTypeParens(reg.aircraft_types.name) : null
   const abbrev = typeName ? thumbAbbrev(typeName) : ''
   const airlineName = reg.airlines?.name ?? null
   const subtitle = [airlineName, typeName].filter(Boolean).join(' · ')

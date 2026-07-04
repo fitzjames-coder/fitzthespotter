@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { stripTypeParens } from './lib/typeGrouping'
 import RegistrationProfileView from './RegistrationProfileView'
 import StatusMarks from './StatusMarks'
 import AirlineForm from './AirlineForm'
@@ -146,7 +147,7 @@ function deriveManufacturerBreakdown(registrations) {
   const mfrMap = new Map()
   for (const reg of registrations) {
     const mfr = reg.aircraft_types?.manufacturers
-    const model = reg.aircraft_types?.name
+    const model = reg.aircraft_types?.name ? stripTypeParens(reg.aircraft_types.name) : null
     if (!mfr?.name || !model) continue
     if (!mfrMap.has(mfr.id)) mfrMap.set(mfr.id, { id: mfr.id, name: mfr.name, count: 0, models: new Map() })
     const entry = mfrMap.get(mfr.id)
@@ -240,7 +241,7 @@ function ManufacturerBreakdown({ registrations, onSelectManufacturer }) {
 }
 
 function RegistrationCard({ reg, onSelect }) {
-  const typeName = reg.aircraft_types?.name ?? null
+  const typeName = reg.aircraft_types?.name ? stripTypeParens(reg.aircraft_types.name) : null
   const abbrev = typeName ? thumbAbbrev(typeName) : ''
 
   return (
