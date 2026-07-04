@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { stripTypeParens } from './lib/typeGrouping'
 import NewRegistrationForm from './NewRegistrationForm'
 import CopyButton from './CopyButton'
 import StatusMarks from './StatusMarks'
@@ -248,7 +249,7 @@ function PhotoGallery({ slides, onSlideClick }) {
 
 function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
-  const model = reg.aircraft_types?.name
+  const model = stripTypeParens(reg.aircraft_types?.name ?? '')
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
   const buildYear = reg.build_date ? parseInt(reg.build_date.slice(0, 4), 10) : null
   const age = buildYear ? new Date().getFullYear() - buildYear : null

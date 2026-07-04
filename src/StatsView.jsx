@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { typeGroupKey, typeGroupLabel, stripTypeParens } from './lib/typeGrouping'
 import { fetchAllRows } from './lib/fetchAllRows'
 
 function computeStats(regs, airportCountryByIata = {}) {
@@ -24,6 +25,7 @@ function computeStats(regs, airportCountryByIata = {}) {
 
   const airlineCounts = {}
   const typeCounts = {}
+  const typeLabels = {}
   const airportCounts = {}
 
   const airlineMap = new Map()
@@ -53,9 +55,12 @@ function computeStats(regs, airportCountryByIata = {}) {
       mfrMap.get(mid).count++
     }
     if (reg.aircraft_types?.id) {
-      typeIds.add(String(reg.aircraft_types.id))
-      const tid = String(reg.aircraft_types.id)
-      typeCounts[tid] = (typeCounts[tid] ?? 0) + 1
+      const t = reg.aircraft_types
+      const mid = String(t.manufacturers?.id ?? 'none')
+      const gkey = typeGroupKey(t.name, mid) ?? `id:${String(t.id)}`
+      typeIds.add(gkey)
+      typeCounts[gkey] = (typeCounts[gkey] ?? 0) + 1
+      if (!typeLabels[gkey]) typeLabels[gkey] = typeGroupLabel(t.name) || stripTypeParens(t.name)
     }
     const aps = Array.isArray(reg.airports) ? reg.airports : []
     for (const code of aps) {
@@ -91,10 +96,7 @@ function computeStats(regs, airportCountryByIata = {}) {
     .sort((a, b) => b.count - a.count)
 
   const sortedTypes = Object.entries(typeCounts)
-    .map(([id, count]) => {
-      const name = regs.find((r) => String(r.aircraft_types?.id) === id)?.aircraft_types?.name ?? '—'
-      return { name, count }
-    })
+    .map(([key, count]) => ({ name: typeLabels[key] ?? '—', count }))
     .sort((a, b) => b.count - a.count)
 
   const sortedAirports = Object.entries(airportCounts)

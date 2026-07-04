@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import TypeaheadPicker from './TypeaheadPicker'
 import { supabase } from './lib/supabaseClient'
+import { stripTypeParens } from './lib/typeGrouping'
 import ManufacturerForm from './ManufacturerForm'
 
 const CURRENT_YEAR = new Date().getFullYear()
@@ -135,7 +136,7 @@ function TypeTile({ type, count, onRetire }) {
           <span className="type-tile__count">{count}</span>
         </div>
       </div>
-      <span className="type-tile__name">{type.name}</span>
+      <span className="type-tile__name">{stripTypeParens(type.name)}</span>
     </button>
   )
 }
