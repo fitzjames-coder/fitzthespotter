@@ -39,6 +39,16 @@ export default function ManufacturerForm({ initialName, existing, onCancel, onCr
   const [uploadingTypeId, setUploadingTypeId] = useState(null)
   const [deletingTypeId, setDeletingTypeId] = useState(null)
   const [confirmDeleteTypeId, setConfirmDeleteTypeId] = useState(null)
+
+  async function handleRenameType(type) {
+    const next = window.prompt('Rename type (any parentheses grouping code stays but is hidden on display)', type.name)
+    if (next == null) return
+    const trimmed = next.trim()
+    if (!trimmed || trimmed === type.name) return
+    const { error: renameErr } = await supabase.from('aircraft_types').update({ name: trimmed }).eq('id', type.id)
+    if (renameErr) { window.alert('Rename failed: ' + renameErr.message); return }
+    setTypes((prev) => prev.map((t) => (t.id === type.id ? { ...t, name: trimmed } : t)))
+  }
   const [newTypeName, setNewTypeName] = useState('')
   const [addingType, setAddingType] = useState(false)
 
@@ -384,6 +394,14 @@ export default function ManufacturerForm({ initialName, existing, onCancel, onCr
                                 }}
                               />
                             </label>
+                            <button
+                              type="button"
+                              className="type-mgmt-edit-btn"
+                              onClick={() => handleRenameType(type)}
+                              aria-label={`Rename ${type.name}`}
+                            >
+                              Edit
+                            </button>
                             <button
                               type="button"
                               className="type-mgmt-trash-btn"
