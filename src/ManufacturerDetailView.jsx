@@ -115,28 +115,38 @@ function RetireTypeOverlay({ type, onClose }) {
   )
 }
 
-function TypeTile({ type, count, onRetire }) {
+function TypeTile({ type, count, onRetire, onEdit }) {
   const isZero = count === 0
   return (
-    <button
-      type="button"
-      className={`type-tile-wrap type-tile-wrap--btn${isZero ? ' type-tile-wrap--zero' : ''}`}
-      onClick={() => onRetire(type)}
-    >
-      <div className="type-tile">
-        {type.template_url ? (
-          <img className="type-tile__img" src={type.template_url} alt="" aria-hidden="true" />
-        ) : (
-          <div className="type-tile__placeholder" aria-hidden="true">
-            {thumbAbbrev(type.name)}
+    <div className="type-tile-cell">
+      <button
+        type="button"
+        className={`type-tile-wrap type-tile-wrap--btn${isZero ? ' type-tile-wrap--zero' : ''}`}
+        onClick={() => onRetire(type)}
+      >
+        <div className="type-tile">
+          {type.template_url ? (
+            <img className="type-tile__img" src={type.template_url} alt="" aria-hidden="true" />
+          ) : (
+            <div className="type-tile__placeholder" aria-hidden="true">
+              {thumbAbbrev(type.name)}
+            </div>
+          )}
+          <div className="type-tile__overlay">
+            <span className="type-tile__count">{count}</span>
           </div>
-        )}
-        <div className="type-tile__overlay">
-          <span className="type-tile__count">{count}</span>
         </div>
-      </div>
-      <span className="type-tile__name">{type.name}</span>
-    </button>
+        <span className="type-tile__name">{type.name}</span>
+      </button>
+      <button
+        type="button"
+        className="type-tile__edit"
+        onClick={() => onEdit(type)}
+        aria-label={`Rename ${type.name}`}
+      >
+        ✎
+      </button>
+    </div>
   )
 }
 
@@ -149,6 +159,16 @@ export default function ManufacturerDetailView({ manufacturerId, airlineId = nul
   const [showEdit, setShowEdit] = useState(false)
   const [refreshNonce, setRefreshNonce] = useState(0)
   const [retireType, setRetireType] = useState(null)
+
+  async function handleRenameType(type) {
+    const next = window.prompt('Rename type (any parentheses grouping code stays but is hidden on display)', type.name)
+    if (next == null) return
+    const trimmed = next.trim()
+    if (!trimmed || trimmed === type.name) return
+    const { error } = await supabase.from('aircraft_types').update({ name: trimmed }).eq('id', type.id)
+    if (error) { window.alert('Rename failed: ' + error.message); return }
+    setTypes((prev) => prev.map((t) => (t.id === type.id ? { ...t, name: trimmed } : t)))
+  }
 
   useEffect(() => {
     if (!supabase) {
@@ -245,7 +265,7 @@ export default function ManufacturerDetailView({ manufacturerId, airlineId = nul
           {!loading && !error && types.length > 0 && (
             <div className="type-gallery">
               {types.map((type) => (
-                <TypeTile key={type.id} type={type} count={regCounts[type.id] ?? 0} onRetire={setRetireType} />
+                <TypeTile key={type.id} type={type} count={regCounts[type.id] ?? 0} onRetire={setRetireType} onEdit={handleRenameType} />
               ))}
             </div>
           )}

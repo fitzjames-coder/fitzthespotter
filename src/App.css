@@ -5806,3 +5806,24 @@
   letter-spacing: -0.03em;
   line-height: 1;
 }
+
+.type-tile-cell { position: relative; }
+.type-tile__edit {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(22, 32, 59, 0.55);
+  color: #fff;
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.type-tile__edit:hover { background: var(--color-navy); }
