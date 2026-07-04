@@ -944,7 +944,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
                     markEl={<img src={markRetroAsset} width={24} height={24} alt="" className="status-switch__mark-img" />}
                   />
                   <StatusSwitch
-                    label="Old livery"
+                    label="Livery change"
                     checked={statusOldLivery}
                     onChange={setStatusOldLivery}
                     markEl={<img src={markOldLiveryAsset} width={24} height={24} alt="" className="status-switch__mark-img" />}
@@ -1078,7 +1078,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
               <>
                 <StatusSwitch label="Special livery" checked={statusSpecialLivery} onChange={setStatusSpecialLivery} markEl={<img src={markSpecialLiveryAsset} width={24} height={24} alt="" className="status-switch__mark-img" />} />
                 <StatusSwitch label="Retro" checked={statusRetro} onChange={setStatusRetro} markEl={<img src={markRetroAsset} width={24} height={24} alt="" className="status-switch__mark-img" />} />
-                <StatusSwitch label="Old livery" checked={statusOldLivery} onChange={setStatusOldLivery} markEl={<img src={markOldLiveryAsset} width={24} height={24} alt="" className="status-switch__mark-img" />} />
+                <StatusSwitch label="Livery change" checked={statusOldLivery} onChange={setStatusOldLivery} markEl={<img src={markOldLiveryAsset} width={24} height={24} alt="" className="status-switch__mark-img" />} />
                 {showLiveryName && (
                   <div className="form-group status-revealed-field">
                     <label className="form-label" htmlFor="livery-name-input">Livery name (optional)</label>

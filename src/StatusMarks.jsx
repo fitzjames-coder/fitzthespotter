@@ -59,7 +59,7 @@ const ALTS = {
   remarks: 'Remark',
   special_livery: 'Special livery',
   retro: 'Retro',
-  old_livery: 'Old livery',
+  old_livery: 'Livery change',
   flown_in: 'Flown in',
 }
 

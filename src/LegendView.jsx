@@ -49,7 +49,7 @@ export default function LegendView({ onBack }) {
         <ImgRow src={markRemark} name="Remark" desc="A written remark exists for this registration. Tap it on the profile to read it." />
         <ImgRow src={markSpecialLivery} name="Special livery" desc="The aircraft wore a special or promotional livery when spotted." />
         <ImgRow src={markRetro} name="Retro livery" desc="The aircraft wore a historic or retro livery." />
-        <ImgRow src={markOldLivery} name="Old livery" desc="The aircraft wore a previous (now superseded) livery." />
+        <ImgRow src={markOldLivery} name="Livery change" desc="The aircraft's base livery changed — a new or previous scheme, not the current one." />
         <ImgRow src={markFlownIn} name="Flown in" desc="You have personally flown aboard this exact registration. Tap it on the profile to see the date." />
         <div className="legend-row">
           <div className="legend-row__icon"><span className="status-marks__rs">R/S</span></div>

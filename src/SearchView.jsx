@@ -59,7 +59,7 @@ function thumbAbbrev(model) {
 const QUICK_FILTERS = [
   { id: 'special_livery', label: 'Special Livery' },
   { id: 'retro',          label: 'Retro'          },
-  { id: 'old_livery',     label: 'Old Livery'     },
+  { id: 'old_livery',     label: 'Livery change'  },
   { id: 'alliance',       label: 'Alliance'       },
   { id: 'remarks',        label: 'Remarks'        },
   { id: 'flown_in',       label: 'Flown-in'       },
