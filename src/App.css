@@ -5806,3 +5806,15 @@
   letter-spacing: -0.03em;
   line-height: 1;
 }
+
+.type-mgmt-edit-btn {
+  border: 1px solid rgba(44, 66, 123, 0.35);
+  background: #fff;
+  color: var(--color-navy);
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.type-mgmt-edit-btn:hover { background: rgba(44, 66, 123, 0.08); }
