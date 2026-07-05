@@ -5740,6 +5740,7 @@
 .reg-msn-age-value .reg-age { color: var(--color-amber); font-weight: 700; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
 .reg-age-block { display: flex; flex-direction: column; align-items: center; line-height: 1.1; }
 .reg-age-block:last-child { margin-left: auto; }
+.reg-age-block--first .reg-age { color: var(--color-deep-blue); }
 .reg-age-caption { font-size: 0.6rem; color: rgba(22, 32, 59, 0.5); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin-top: 1px; }
 .age-band-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .age-band-pill__count { margin-left: 6px; opacity: 0.65; font-size: 0.85em; }
