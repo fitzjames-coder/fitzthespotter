@@ -253,6 +253,8 @@ function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
   const buildYear = reg.build_date ? parseInt(reg.build_date.slice(0, 4), 10) : null
   const age = buildYear ? new Date().getFullYear() - buildYear : null
+  const firstSpottedYear = reg.first_spotted ? parseInt(reg.first_spotted.slice(0, 4), 10) : null
+  const firstSpottedAge = buildYear && firstSpottedYear ? firstSpottedYear - buildYear : null
   const airports = Array.isArray(reg.airports) ? reg.airports : []
   const firstAirport = airports[0] ?? null
   const lastDate = lastSighting?.spotted_on ?? null
@@ -274,7 +276,18 @@ function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
           <span className="info-row__label">MSN</span>
           <span className="info-row__value reg-msn-age-value">
             <span>{reg.msn || '—'}</span>
-            {age != null && <span className="reg-age">{age} yrs</span>}
+            {firstSpottedAge != null && (
+              <span className="reg-age-block reg-age-block--first">
+                <span className="reg-age">{firstSpottedAge} yrs</span>
+                <span className="reg-age-caption">(1st Spotted Age)</span>
+              </span>
+            )}
+            {age != null && (
+              <span className="reg-age-block">
+                <span className="reg-age">{age} yrs</span>
+                <span className="reg-age-caption">(Current Age)</span>
+              </span>
+            )}
           </span>
         </div>
       )}
