@@ -11,6 +11,7 @@ import OpeningAnimation from './OpeningAnimation'
 import PlaceholderScreen from './PlaceholderScreen'
 import NewRegistrationForm from './NewRegistrationForm'
 import SearchView from './SearchView'
+import { offlineAirlinesTab } from './lib/offlineData'
 
 function airlineBucket(name) {
   const c = (name || '').trim().charAt(0)
@@ -190,6 +191,24 @@ function AirlinesTab() {
       return
     }
 
+    async function loadFromOffline() {
+      const data = await offlineAirlinesTab()
+      if (!data) {
+        setError('You are offline and no offline copy is saved yet. Open the Offline card (Search/Stats) and download while connected.')
+        setLoading(false)
+        return
+      }
+      setAirlines([...data.airlines].sort(compareAirlineNames))
+      setRegCounts(data.counts)
+      setError(null)
+      setLoading(false)
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      loadFromOffline()
+      return
+    }
+
     Promise.all([
       supabase
         .from('airlines')
@@ -218,6 +237,7 @@ function AirlinesTab() {
 
       setLoading(false)
     })
+      .catch(() => { loadFromOffline() })
   }, [reloadNonce])
 
   if (selectedManufacturer) {
