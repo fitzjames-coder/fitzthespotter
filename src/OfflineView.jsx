@@ -85,7 +85,7 @@ export default function OfflineView({ onBack }) {
         <div className="offline-stat"><span>Last downloaded</span><b>{fmtDate(meta?.downloaded_at)}</b></div>
         <div className="offline-stat">
           <span>Since then</span>
-          <b>{!meta ? '—' : !online ? 'Offline — can't check' : delta == null ? '—' : delta > 0 ? `${delta} new entries added` : 'Up to date'}</b>
+          <b>{!meta ? '—' : !online ? 'Offline — cannot check' : delta == null ? '—' : delta > 0 ? `${delta} new entries added` : 'Up to date'}</b>
         </div>
         <div className="offline-stat"><span>Space used (approx.)</span><b>{fmtMB(bytes) ?? 'Unavailable'}</b></div>
 
