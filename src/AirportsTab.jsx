@@ -1,5 +1,6 @@
 import { useEffect, useState, Fragment } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { offlineAirports } from './lib/offlineData'
 import { FlagIcon } from './App'
 
 export default function AirportsTab({ onSelectAirport }) {
@@ -14,6 +15,23 @@ export default function AirportsTab({ onSelectAirport }) {
       setLoading(false)
       return
     }
+    async function loadFromOffline() {
+      const data = await offlineAirports()
+      if (!data) {
+        setError('You are offline and no offline copy is saved yet. Download from the Offline card while connected.')
+        setLoading(false)
+        return
+      }
+      setAirports(data)
+      setError(null)
+      setLoading(false)
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      loadFromOffline()
+      return
+    }
+
     supabase
       .from('airports')
       .select('iata, icao, name, country, country_flag, header_image_url, view_lat, view_lng, view_zoom')
@@ -23,6 +41,7 @@ export default function AirportsTab({ onSelectAirport }) {
         else setAirports(data ?? [])
         setLoading(false)
       })
+      .catch(() => { loadFromOffline() })
   }, [])
 
   return (
