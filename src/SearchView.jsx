@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { stripTypeParens } from './lib/typeGrouping'
+import { offlineAllRegs } from './lib/offlineData'
 import { exportBackupCsv } from './exportBackup'
 import NewRegistrationForm from './NewRegistrationForm'
 import RegistrationProfileView from './RegistrationProfileView'
@@ -234,6 +235,23 @@ export default function SearchView() {
       setLoading(false)
       return
     }
+    async function loadFromOffline() {
+      const data = await offlineAllRegs()
+      if (!data) {
+        setError('You are offline and no offline copy is saved yet. Download from the Offline card while connected.')
+        setLoading(false)
+        return
+      }
+      setAllRegs(data)
+      setError(null)
+      setLoading(false)
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      loadFromOffline()
+      return
+    }
+
     supabase
       .from('registrations')
       .select(`
@@ -249,6 +267,7 @@ export default function SearchView() {
         }
         setLoading(false)
       })
+      .catch(() => { loadFromOffline() })
   }
 
   useEffect(() => { fetchAll() }, [])
