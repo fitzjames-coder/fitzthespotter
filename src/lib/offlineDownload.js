@@ -14,6 +14,21 @@ export async function tableCounts() {
   return counts
 }
 
+async function waitForServiceWorker() {
+  if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return
+  try {
+    await navigator.serviceWorker.ready
+    if (navigator.serviceWorker.controller) return
+    await new Promise((resolve) => {
+      const done = () => resolve()
+      navigator.serviceWorker.addEventListener('controllerchange', done, { once: true })
+      setTimeout(done, 3000)
+    })
+  } catch (e) {
+    /* ignore */
+  }
+}
+
 export async function downloadAll(onProgress) {
   const totals = await tableCounts()
   const grandTotal = Object.values(totals).reduce((a, b) => a + b, 0)
@@ -47,6 +62,7 @@ export async function downloadAll(onProgress) {
     img.onerror = () => resolve()
     img.src = url
   })
+  await waitForServiceWorker()
   const BATCH = 6
   for (let i = 0; i < imageList.length; i += BATCH) {
     const chunk = imageList.slice(i, i + BATCH)
