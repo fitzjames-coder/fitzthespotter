@@ -57,7 +57,10 @@ export default function OfflineView({ onBack }) {
     setDelta(null)
   }
 
-  const pct = progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0
+  const isImg = progress.phase === 'images'
+  const curCount = isImg ? (progress.imgDone || 0) : (progress.done || 0)
+  const totCount = isImg ? (progress.imgTotal || 0) : (progress.total || 0)
+  const pct = totCount > 0 ? Math.round((curCount / totCount) * 100) : 0
 
   return (
     <div className="offline-view">
@@ -72,7 +75,7 @@ export default function OfflineView({ onBack }) {
         {running ? (
           <div className="offline-progress">
             <div className="offline-progress__bar"><div className="offline-progress__fill" style={{ width: pct + '%' }} /></div>
-            <div className="offline-progress__label">Downloading… {progress.done} / {progress.total} records ({pct}%)</div>
+            <div className="offline-progress__label">{isImg ? 'Caching images' : 'Downloading'}… {curCount} / {totCount} {isImg ? 'images' : 'records'} ({pct}%)</div>
           </div>
         ) : (
           <button className="offline-btn offline-btn--primary" onClick={handleDownload} disabled={!online}>
