@@ -41,10 +41,16 @@ export async function downloadAll(onProgress) {
   const imageList = Array.from(urls)
   const imgTotal = imageList.length
   let imgDone = 0
+  const cacheImage = (url) => new Promise((resolve) => {
+    const img = new Image()
+    img.onload = () => resolve()
+    img.onerror = () => resolve()
+    img.src = url
+  })
   const BATCH = 6
   for (let i = 0; i < imageList.length; i += BATCH) {
     const chunk = imageList.slice(i, i + BATCH)
-    await Promise.all(chunk.map((u) => fetch(u, { mode: 'no-cors' }).catch(() => {})))
+    await Promise.all(chunk.map((u) => cacheImage(u)))
     imgDone += chunk.length
     if (onProgress) onProgress({ phase: 'images', imgDone, imgTotal })
   }
