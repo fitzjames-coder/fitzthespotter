@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { stripTypeParens } from './lib/typeGrouping'
+import { offlineAirlineRegs } from './lib/offlineData'
 import RegistrationProfileView from './RegistrationProfileView'
 import StatusMarks from './StatusMarks'
 import AirlineForm from './AirlineForm'
@@ -298,6 +299,24 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
       return
     }
 
+    async function loadFromOffline() {
+      const data = await offlineAirlineRegs(airline.id)
+      if (!data) {
+        setError('You are offline and no offline copy is saved yet. Download from the Offline card while connected.')
+        setLoading(false)
+        return
+      }
+      setRegistrations(data.regs)
+      setSightingCount(data.sightingCount)
+      setError(null)
+      setLoading(false)
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      loadFromOffline()
+      return
+    }
+
     supabase
       .from('registrations')
       .select(`
@@ -332,6 +351,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
           .eq('registrations.airline_id', airline.id)
           .then(({ count }) => setSightingCount(count ?? 0))
       })
+      .catch(() => { loadFromOffline() })
   }
 
   useEffect(() => {
