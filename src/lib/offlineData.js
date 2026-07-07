@@ -38,3 +38,37 @@ export async function offlineAirlineRegs(airlineId) {
   const sightingCount = sightings.filter((s) => regIds.has(s.registration_id)).length
   return { regs, sightingCount }
 }
+
+export async function offlineRegProfile(regId) {
+  const registrations = await idbGet('registrations')
+  if (!registrations) return null
+  const raw = registrations.find((r) => r.id === regId)
+  if (!raw) return { notFound: true }
+  const types = (await idbGet('aircraft_types')) || []
+  const mfrs = (await idbGet('manufacturers')) || []
+  const sightings = (await idbGet('sightings')) || []
+  const t = types.find((ty) => ty.id === raw.aircraft_type_id) || null
+  const mfr = t ? (mfrs.find((m) => m.id === t.manufacturer_id) || null) : null
+  const aircraft_types = t
+    ? { id: t.id, name: t.name, template_url: t.template_url, manufacturers: mfr ? { id: mfr.id, name: mfr.name } : null }
+    : null
+  const reg = {
+    id: raw.id,
+    registration: raw.registration,
+    airline_id: raw.airline_id,
+    first_spotted: raw.first_spotted,
+    airports: raw.airports,
+    remark: raw.remark,
+    statuses: raw.statuses,
+    flagged: raw.flagged,
+    photo_urls: raw.photo_urls,
+    msn: raw.msn,
+    build_date: raw.build_date,
+    aircraft_types,
+  }
+  const regSightings = sightings.filter((s) => s.registration_id === regId)
+  const dated = regSightings.filter((s) => s.spotted_on).sort((a, b) => (b.spotted_on || '').localeCompare(a.spotted_on || ''))
+  const src = dated[0] || regSightings[0] || null
+  const lastSighting = src ? { airport: src.airport, spotted_on: src.spotted_on } : null
+  return { reg, lastSighting, sightingCount: regSightings.length }
+}
