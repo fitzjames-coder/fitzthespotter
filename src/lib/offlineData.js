@@ -125,3 +125,29 @@ export async function offlineAllRegs() {
     }
   })
 }
+
+export async function offlineStatsData() {
+  const registrations = await idbGet('registrations')
+  if (!registrations) return null
+  const airlines = (await idbGet('airlines')) || []
+  const types = (await idbGet('aircraft_types')) || []
+  const mfrs = (await idbGet('manufacturers')) || []
+  const sightingsRaw = (await idbGet('sightings')) || []
+  const airportsRaw = (await idbGet('airports')) || []
+  const airlineById = new Map(airlines.map((a) => [a.id, a]))
+  const typeById = new Map(types.map((t) => [t.id, t]))
+  const mfrById = new Map(mfrs.map((m) => [m.id, m]))
+  const regData = registrations.map((r) => {
+    const al = airlineById.get(r.airline_id) || null
+    const t = typeById.get(r.aircraft_type_id) || null
+    const m = t ? (mfrById.get(t.manufacturer_id) || null) : null
+    return {
+      id: r.id, registration: r.registration, msn: r.msn, first_spotted: r.first_spotted, airports: r.airports, statuses: r.statuses,
+      airlines: al ? { id: al.id, name: al.name, country: al.country, logo_url: al.logo_url } : null,
+      aircraft_types: t ? { id: t.id, name: t.name, manufacturers: m ? { id: m.id, name: m.name, logo_url: m.logo_url } : null } : null,
+    }
+  })
+  const sightData = sightingsRaw.map((s) => ({ spotted_on: s.spotted_on }))
+  const apData = airportsRaw.map((a) => ({ iata: a.iata, country: a.country }))
+  return { regData, sightData, apData }
+}
