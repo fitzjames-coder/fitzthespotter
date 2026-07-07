@@ -99,3 +99,29 @@ export async function offlineAirportStats(iata) {
   const gallery = Array.from(airlineMap.values()).sort((a, b) => a.name.localeCompare(b.name))
   return { sightingCount: rows.length, firstHere: dates[0] ?? null, recentHere: dates[dates.length - 1] ?? null, gallery }
 }
+
+export async function offlineAllRegs() {
+  const registrations = await idbGet('registrations')
+  if (!registrations) return null
+  const airlines = (await idbGet('airlines')) || []
+  const types = (await idbGet('aircraft_types')) || []
+  const mfrs = (await idbGet('manufacturers')) || []
+  const airlineById = new Map(airlines.map((a) => [a.id, a]))
+  const typeById = new Map(types.map((t) => [t.id, t]))
+  const mfrById = new Map(mfrs.map((m) => [m.id, m]))
+  return registrations.map((r) => {
+    const al = airlineById.get(r.airline_id) || null
+    const t = typeById.get(r.aircraft_type_id) || null
+    const m = t ? (mfrById.get(t.manufacturer_id) || null) : null
+    return {
+      id: r.id,
+      registration: r.registration,
+      airports: r.airports,
+      remark: r.remark,
+      statuses: r.statuses,
+      flagged: r.flagged,
+      airlines: al ? { id: al.id, name: al.name, country: al.country, country_flag: al.country_flag, is_closed: al.is_closed } : null,
+      aircraft_types: t ? { id: t.id, name: t.name, manufacturers: m ? { id: m.id, name: m.name } : null } : null,
+    }
+  })
+}
