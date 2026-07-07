@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { offlineRegProfile } from './lib/offlineData'
 import { stripTypeParens } from './lib/typeGrouping'
 import NewRegistrationForm from './NewRegistrationForm'
 import CopyButton from './CopyButton'
@@ -418,6 +419,35 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
         setLoading(false)
         return
       }
+
+      async function loadFromOffline() {
+        const res = await offlineRegProfile(currentRegId)
+        if (!active) return
+        if (!res) {
+          setError('You are offline and no offline copy is saved yet. Download from the Offline card while connected.')
+          setLoading(false)
+          return
+        }
+        if (res.notFound) {
+          setError('This registration is not in your offline copy.')
+          setLoading(false)
+          return
+        }
+        setReg(res.reg)
+        setFlagged(Boolean(res.reg.flagged))
+        setPhotoUrls(Array.isArray(res.reg.photo_urls) ? res.reg.photo_urls : [])
+        setLastSighting(res.lastSighting)
+        setSightingCount(res.sightingCount)
+        setError(null)
+        setLoading(false)
+      }
+
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+        await loadFromOffline()
+        return
+      }
+
+      try {
       const { data, error: fetchError } = await supabase
         .from('registrations')
         .select(`
@@ -476,6 +506,9 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
       if (active) setSightingCount(sc ?? 0)
 
       setLoading(false)
+      } catch (e) {
+        await loadFromOffline()
+      }
     }
     loadReg()
     return () => { active = false }
