@@ -78,3 +78,24 @@ export async function offlineAirports() {
   if (!airports) return null
   return [...airports].sort((a, b) => (a.iata || '').localeCompare(b.iata || ''))
 }
+
+export async function offlineAirportStats(iata) {
+  const sightings = await idbGet('sightings')
+  if (!sightings) return null
+  const registrations = (await idbGet('registrations')) || []
+  const airlines = (await idbGet('airlines')) || []
+  const regById = new Map(registrations.map((r) => [r.id, r]))
+  const airlineById = new Map(airlines.map((a) => [a.id, a]))
+  const rows = sightings.filter((s) => s.airport === iata)
+  const dates = rows.map((r) => r.spotted_on).filter(Boolean).sort()
+  const airlineMap = new Map()
+  for (const row of rows) {
+    const reg = regById.get(row.registration_id)
+    const al = reg ? airlineById.get(reg.airline_id) : null
+    if (al && al.id && !airlineMap.has(al.id)) {
+      airlineMap.set(al.id, { id: al.id, name: al.name, logo_url: al.logo_url ?? null })
+    }
+  }
+  const gallery = Array.from(airlineMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+  return { sightingCount: rows.length, firstHere: dates[0] ?? null, recentHere: dates[dates.length - 1] ?? null, gallery }
+}

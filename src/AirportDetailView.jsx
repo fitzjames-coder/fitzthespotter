@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { offlineAirportStats } from './lib/offlineData'
 import { getAirportDiagram } from './lib/airportDiagram'
 import { FlagIcon } from './App'
 import AirportDiagram from './AirportDiagram'
@@ -55,6 +56,26 @@ export default function AirportDetailView({ airport, onBack, onUpdated, onDelete
       setLoading(false)
       return
     }
+    async function loadFromOffline() {
+      const s = await offlineAirportStats(airport.iata)
+      if (!s) {
+        setError('You are offline and no offline copy is saved yet. Download from the Offline card while connected.')
+        setLoading(false)
+        return
+      }
+      setSightingCount(s.sightingCount)
+      setFirstHere(s.firstHere)
+      setRecentHere(s.recentHere)
+      setGallery(s.gallery)
+      setError(null)
+      setLoading(false)
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      loadFromOffline()
+      return
+    }
+
     supabase
       .from('sightings')
       .select('spotted_on, registrations ( airlines ( id, name, logo_url ) )')
@@ -84,6 +105,7 @@ export default function AirportDetailView({ airport, onBack, onUpdated, onDelete
         )
         setLoading(false)
       })
+      .catch(() => { loadFromOffline() })
   }, [airport.iata])
 
   const codes = [airport.icao, airport.iata].filter(Boolean).join(' / ')
