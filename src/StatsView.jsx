@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { typeGroupKey, typeGroupLabel, stripTypeParens } from './lib/typeGrouping'
 import { fetchAllRows } from './lib/fetchAllRows'
+import { offlineStatsData } from './lib/offlineData'
 
 function computeStats(regs, airportCountryByIata = {}) {
   if (!regs.length) {
@@ -310,27 +311,37 @@ export default function StatsView({ onBack }) {
       setLoading(false)
       return
     }
-    Promise.all([
-      fetchAllRows(() =>
-        supabase
-          .from('registrations')
-          .select(`
+    const offlineResult = async () => {
+      const d = await offlineStatsData()
+      if (!d) return [{ data: null, error: { message: 'You are offline and no offline copy is saved yet. Download from the Offline card while connected.' } }, { data: [] }, { data: [] }]
+      return [{ data: d.regData, error: null }, { data: d.sightData }, { data: d.apData }]
+    }
+
+    const source = (typeof navigator !== 'undefined' && navigator.onLine === false)
+      ? offlineResult()
+      : Promise.all([
+          fetchAllRows(() =>
+            supabase
+              .from('registrations')
+              .select(`
           id, registration, msn, first_spotted, airports, statuses,
           airlines ( id, name, country, logo_url ),
           aircraft_types ( id, name, manufacturers ( id, name, logo_url ) )
         `)
-          .order('id', { ascending: true })
-      ),
-      fetchAllRows(() =>
-        supabase
-          .from('sightings')
-          .select('spotted_on')
-          .order('id', { ascending: true })
-      ),
-      supabase
-        .from('airports')
-        .select('iata, country'),
-    ]).then(([{ data: regData, error: regErr }, { data: sightData }, { data: apData }]) => {
+              .order('id', { ascending: true })
+          ),
+          fetchAllRows(() =>
+            supabase
+              .from('sightings')
+              .select('spotted_on')
+              .order('id', { ascending: true })
+          ),
+          supabase
+            .from('airports')
+            .select('iata, country'),
+        ]).catch(() => offlineResult())
+
+    source.then(([{ data: regData, error: regErr }, { data: sightData }, { data: apData }]) => {
       if (regErr) setError(regErr.message)
       else setRegs(regData ?? [])
       setSightings(sightData ?? [])
