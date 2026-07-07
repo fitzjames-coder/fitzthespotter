@@ -72,3 +72,9 @@ export async function offlineRegProfile(regId) {
   const lastSighting = src ? { airport: src.airport, spotted_on: src.spotted_on } : null
   return { reg, lastSighting, sightingCount: regSightings.length }
 }
+
+export async function offlineAirports() {
+  const airports = await idbGet('airports')
+  if (!airports) return null
+  return [...airports].sort((a, b) => (a.iata || '').localeCompare(b.iata || ''))
+}
