@@ -273,7 +273,10 @@ function AirlinesTab() {
     function jumpToBucket(b) {
       const el = document.getElementById(`ag-${b}`)
       if (!el) return
+      const prevPosition = el.style.position
+      el.style.position = 'static'
       const y = el.getBoundingClientRect().top + window.scrollY - STICKY_OFFSET
+      el.style.position = prevPosition
       window.scrollTo({ top: y, behavior: 'smooth' })
     }
 
