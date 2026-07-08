@@ -86,6 +86,17 @@ const SECTIONS = [
     ],
   },
   {
+    title: 'Feature index — everything the app can do',
+    body: [
+      'BROWSE: Airlines tab (list or grid, A-Z rail, country flags, closed-airline banners), Airports tab with per-airport stats and a satellite map, full-text Search across every registration with quick filters.',
+      'EVERY REGISTRATION: profile with airline, type template, MSN, build date, age (first-spotted and current), statuses (R/S, special livery, retro, livery change, flown-in, alliances), airports, photos, remark and dramatize flow, plus how long since you last saw it.',
+      'STATS CARDS: Spotting Stats (totals, most-populous, top airlines/airports), Sighting Stats (most-sighted registrations/airlines/airports and Longest Reunions), Second Life (reused registrations by MSN), Age (fleet age breakdown), Coffee Table candidates, Notes, Manufacturers, Flown-in airlines, Spotting Through Time graphs.',
+      'ON THIS DAY: up to 3 picks a week from past years (blurred teasers until their day), with Airfleets / FR24 / JetPhotos links preloaded for each pick.',
+      'OFFLINE: download the whole logbook (data + images) to the device, browse everything with no signal, log NEW registrations offline into a pending queue, then Sync when back online. Guide and Legend also work offline.',
+      'DATA CARE: CSV backup of the whole logbook (cargo-container icon in the Search top bar), aircraft-type grouping via parentheses in type names, duplicate protection on sync.',
+    ],
+  },
+  {
     title: 'Offline — what works and what needs a connection',
     body: [
       'First, download your logbook: Search/Stats tab, Offline card, Download for offline. Wait for both phases (records, then images) to finish. Refresh it before a trip — the card shows how many entries were added since your last download.',
