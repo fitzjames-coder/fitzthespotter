@@ -83,6 +83,11 @@ export default function SecondLifeView({ onBack, onSelectReg }) {
       setLoading(false)
       return
     }
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      setError('This page needs a connection. Your logbook is viewable offline — download it from the Offline card — but this page is online-only for now.')
+      setLoading(false)
+      return
+    }
     fetchAllRows(() =>
       supabase
         .from('registrations')
