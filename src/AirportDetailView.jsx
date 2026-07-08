@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { offlineAirportStats } from './lib/offlineData'
 import { getAirportDiagram } from './lib/airportDiagram'
 import { FlagIcon } from './App'
 import AirportDiagram from './AirportDiagram'
 import AirportForm from './AirportForm'
-import AirportMap from './AirportMap'
+
+const AirportMap = lazy(() => import('./AirportMap'))
 
 const SHOW_AIRPORT_DIAGRAM = false
 
@@ -207,12 +208,14 @@ export default function AirportDetailView({ airport, onBack, onUpdated, onDelete
       )}
 
       {showMap && (
-        <AirportMap
-          airport={airport}
-          savedView={savedView}
-          onViewSaved={(v) => setSavedView(v)}
-          onClose={() => setShowMap(false)}
-        />
+        <Suspense fallback={<p className="ap-map-loading">Loading map…</p>}>
+          <AirportMap
+            airport={airport}
+            savedView={savedView}
+            onViewSaved={(v) => setSavedView(v)}
+            onClose={() => setShowMap(false)}
+          />
+        </Suspense>
       )}
 
       {showEdit && (
