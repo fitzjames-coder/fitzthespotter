@@ -5876,7 +5876,7 @@
 .otd-pick__links { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
 .otd-link { font-size: 0.64rem; font-weight: 700; color: var(--color-navy); border: 1px solid rgba(44,66,123,0.35); border-radius: 999px; padding: 4px 10px; background: #fff; text-decoration: none; }
 .otd-pick--future { opacity: 0.7; background: repeating-linear-gradient(135deg, #fff, #fff 8px, #faf6ec 8px, #faf6ec 16px); }
-.otd-blur-reg { filter: blur(3.25px); }
+.otd-blur-reg { filter: blur(4.5px); }
 .otd-blur-logo { filter: blur(1.25px); }
 .otd-fallback { margin: 12px 0; }
 .otd-fallback__msg { font-size: 0.9rem; color: var(--color-ink); opacity: 0.7; margin-bottom: 6px; }
