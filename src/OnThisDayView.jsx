@@ -143,8 +143,8 @@ export default function OnThisDayView({ onBack, onSelectReg }) {
                 <div key={p.sighting.id} className="otd-pick otd-pick--future">
                   <div className="otd-pick__date">{niceDate(p.date)} · <b>?</b></div>
                   <div className="otd-pick__row">
-                    {reg.airlines?.logo_url && <img className="otd-pick__logo otd-blur" src={reg.airlines.logo_url} alt="" loading="lazy" />}
-                    <div className="otd-pick__reg otd-blur">{reg.registration}</div>
+                    {reg.airlines?.logo_url && <img className="otd-pick__logo otd-blur-logo" src={reg.airlines.logo_url} alt="" loading="lazy" />}
+                    <div className="otd-pick__reg otd-blur-reg">{reg.registration}</div>
                   </div>
                   <div className="otd-pick__sub">Arrives {niceDate(p.date)}…</div>
                 </div>
