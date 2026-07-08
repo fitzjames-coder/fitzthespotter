@@ -5842,3 +5842,11 @@
 .offline-progress__bar { height: 10px; background: rgba(22,32,59,0.12); border-radius: 6px; overflow: hidden; }
 .offline-progress__fill { height: 100%; background: var(--color-amber); transition: width 0.2s ease; }
 .offline-progress__label { font-size: 0.82rem; color: var(--color-ink); opacity: 0.7; margin-top: 8px; text-align: center; }
+.offline-pending { margin-top: 22px; border-top: 1px solid rgba(22,32,59,0.1); padding-top: 14px; }
+.offline-pending__title { font-size: 0.95rem; color: var(--color-ink); margin: 0 0 10px; }
+.offline-pending__empty { font-size: 0.82rem; color: var(--color-ink); opacity: 0.6; line-height: 1.5; }
+.offline-pending__row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(22,32,59,0.07); }
+.offline-pending__info { display: flex; flex-direction: column; min-width: 0; }
+.offline-pending__info b { color: var(--color-ink); font-size: 0.9rem; }
+.offline-pending__info span { color: var(--color-ink); opacity: 0.6; font-size: 0.72rem; }
+.offline-pending__del { background: #fff; color: var(--color-coral); border: 1px solid var(--color-coral); border-radius: 8px; padding: 5px 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; flex-shrink: 0; }

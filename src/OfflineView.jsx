@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { downloadAll, tableCounts } from './lib/offlineDownload'
 import { idbGet, idbClearAll, estimateBytes } from './lib/offlineStore'
+import { writeQueueGetAll, writeQueueRemove } from './lib/writeQueue'
 
 function fmtDate(iso) {
   if (!iso) return 'Never'
@@ -20,6 +21,7 @@ export default function OfflineView({ onBack }) {
   const [progress, setProgress] = useState({ done: 0, total: 0 })
   const [delta, setDelta] = useState(null)
   const [error, setError] = useState(null)
+  const [pending, setPending] = useState([])
   const online = typeof navigator !== 'undefined' ? navigator.onLine : true
 
   async function refreshMeta() {
@@ -37,7 +39,17 @@ export default function OfflineView({ onBack }) {
     }
   }
 
-  useEffect(() => { refreshMeta() }, [])
+  async function loadPending() {
+    try { setPending(await writeQueueGetAll()) } catch { setPending([]) }
+  }
+
+  async function handleDeletePending(id) {
+    if (!window.confirm('Delete this pending entry? It will not be added to your logbook.')) return
+    await writeQueueRemove(id)
+    await loadPending()
+  }
+
+  useEffect(() => { refreshMeta(); loadPending() }, [])
 
   async function handleDownload() {
     setRunning(true); setError(null); setProgress({ done: 0, total: 0 })
@@ -91,6 +103,23 @@ export default function OfflineView({ onBack }) {
           <b>{!meta ? '—' : !online ? 'Offline — cannot check' : delta == null ? '—' : delta > 0 ? `${delta} new entries added` : 'Up to date'}</b>
         </div>
         <div className="offline-stat"><span>Space used (approx.)</span><b>{fmtMB(bytes) ?? 'Unavailable'}</b></div>
+
+        <div className="offline-pending">
+          <h3 className="offline-pending__title">Pending entries ({pending.length})</h3>
+          {pending.length === 0 ? (
+            <p className="offline-pending__empty">No entries waiting. New registrations saved while offline appear here.</p>
+          ) : (
+            pending.map((p) => (
+              <div key={p.id} className="offline-pending__row">
+                <div className="offline-pending__info">
+                  <b>{p.registration || '(no reg)'}</b>
+                  <span>{p.sighting?.spotted_on || 'no date'} · {(p.sighting?.airports || []).filter(Boolean).join(', ') || 'no airport'}</span>
+                </div>
+                <button className="offline-pending__del" onClick={() => handleDeletePending(p.id)} aria-label="Delete pending entry">Delete</button>
+              </div>
+            ))
+          )}
+        </div>
 
         {meta && (
           <button className="offline-btn offline-btn--clear" onClick={handleClear} disabled={running}>Clear offline copy</button>
