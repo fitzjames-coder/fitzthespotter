@@ -248,6 +248,20 @@ function PhotoGallery({ slides, onSlideClick }) {
   )
 }
 
+export function formatSinceLastSeen(iso) {
+  const [y, m, d] = iso.split('-').map(Number)
+  const then = new Date(y, m - 1, d || 1)
+  const now = new Date()
+  let months = (now.getFullYear() - then.getFullYear()) * 12 + (now.getMonth() - then.getMonth())
+  if (now.getDate() < then.getDate()) months -= 1
+  if (months <= 0) return 'under a month ago'
+  const yrs = Math.floor(months / 12)
+  const mos = months % 12
+  if (yrs === 0) return `${mos} mo ago`
+  if (mos === 0) return `${yrs} yrs ago`
+  return `${yrs} yrs ${mos} mo ago`
+}
+
 function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
   const manufacturer = reg.aircraft_types?.manufacturers?.name
   const model = stripTypeParens(reg.aircraft_types?.name ?? '')
@@ -329,6 +343,12 @@ function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
         <div className="info-row">
           <span className="info-row__label">Last spotted</span>
           <span className="info-row__value"><span className="info-date--last">{lastDate}</span></span>
+        </div>
+      )}
+      {lastDate && (
+        <div className="info-row">
+          <span className="info-row__label">Last seen</span>
+          <span className="info-row__value info-last-seen">{formatSinceLastSeen(lastDate)}</span>
         </div>
       )}
     </div>
