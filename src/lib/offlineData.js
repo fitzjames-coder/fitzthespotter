@@ -151,3 +151,38 @@ export async function offlineStatsData() {
   const apData = airportsRaw.map((a) => ({ iata: a.iata, country: a.country }))
   return { regData, sightData, apData }
 }
+
+export async function offlineSearchAirlines(q) {
+  const airlines = (await idbGet('airlines')) || []
+  const term = (q || '').toLowerCase()
+  return airlines
+    .filter((a) => (a.name || '').toLowerCase().includes(term))
+    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+    .slice(0, 8)
+    .map((a) => ({ id: a.id, label: a.name }))
+}
+
+export async function offlineSearchManufacturers(q) {
+  const mfrs = (await idbGet('manufacturers')) || []
+  const term = (q || '').toLowerCase()
+  return mfrs
+    .filter((m) => (m.name || '').toLowerCase().includes(term))
+    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+    .slice(0, 8)
+    .map((m) => ({ id: m.id, label: m.name }))
+}
+
+export async function offlineSearchTypes(q, manufacturerId) {
+  const types = (await idbGet('aircraft_types')) || []
+  const term = (q || '').toLowerCase()
+  return types
+    .filter((t) => (!manufacturerId || t.manufacturer_id === manufacturerId) && (t.name || '').toLowerCase().includes(term))
+    .sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+    .slice(0, 8)
+    .map((t) => ({ id: t.id, label: t.name }))
+}
+
+export async function offlineAirportExists(code) {
+  const airports = (await idbGet('airports')) || []
+  return airports.some((a) => a.iata === code)
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { writeQueueAdd, writeQueueCount } from './lib/writeQueue'
+import { offlineSearchAirlines, offlineSearchManufacturers, offlineSearchTypes, offlineAirportExists } from './lib/offlineData'
 import TypeaheadPicker from './TypeaheadPicker'
 import AirlineForm from './AirlineForm'
 import CopyButton from './CopyButton'
@@ -104,6 +105,7 @@ function monthBucket(spottedOn) {
 }
 
 async function fetchAirlines(q) {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return offlineSearchAirlines(q)
   if (!supabase) return []
   const { data } = await supabase
     .from('airlines')
@@ -115,6 +117,7 @@ async function fetchAirlines(q) {
 }
 
 async function fetchManufacturers(q) {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return offlineSearchManufacturers(q)
   if (!supabase) return []
   const { data } = await supabase
     .from('manufacturers')
@@ -127,6 +130,7 @@ async function fetchManufacturers(q) {
 
 function makeFetchTypes(manufacturerId) {
   return async function (q) {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return offlineSearchTypes(q, manufacturerId)
     if (!supabase) return []
     let qb = supabase
       .from('aircraft_types')
@@ -324,6 +328,7 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
   }
 
   async function checkAirportExists(code) {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return offlineAirportExists(code)
     if (!supabase) return true
     const { data } = await supabase
       .from('airports')
