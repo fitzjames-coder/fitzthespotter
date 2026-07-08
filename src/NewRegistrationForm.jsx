@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { writeQueueAdd, writeQueueCount } from './lib/writeQueue'
 import TypeaheadPicker from './TypeaheadPicker'
 import AirlineForm from './AirlineForm'
 import CopyButton from './CopyButton'
@@ -529,6 +530,44 @@ export default function NewRegistrationForm({ onClose, onSaved, existingReg, ini
       build_date: inputToBuildDate(buildDate),
       remark: finalRemark || null,
       statuses: Object.keys(statuses).length > 0 ? statuses : null,
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      if (isEdit) {
+        setSaving(false)
+        setSaveError('Editing an existing registration needs a connection. New registrations can be saved to the offline queue.')
+        return
+      }
+      const entry = {
+        id: 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2),
+        kind: 'new_registration',
+        created_at: new Date().toISOString(),
+        registration: trimmed,
+        payload,
+        sighting: {
+          airports: airports.length > 0 ? airports : [null],
+          spotted_on: firstSpotted || null,
+          time_block: firstTimeBlock || null,
+          southern_hemisphere: firstSouthern,
+          special_livery: statusSpecialLivery,
+          retro: statusRetro,
+          alliance: statusAlliance,
+          livery_name: (showLiveryName && liveryName.trim()) ? liveryName.trim() : null,
+        },
+        flown_in: statusFlownIn,
+        airline_id: airline?.id ?? null,
+      }
+      try {
+        await writeQueueAdd(entry)
+        const n = await writeQueueCount()
+        setSaving(false)
+        window.alert('Saved to your offline queue — it will sync when you are back online.\n\nPending entries: ' + n)
+        onClose()
+      } catch (e) {
+        setSaving(false)
+        setSaveError('Could not save to the offline queue: ' + (e && e.message ? e.message : 'unknown error'))
+      }
+      return
     }
 
     if (isEdit) {
