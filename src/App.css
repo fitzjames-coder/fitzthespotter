@@ -5850,3 +5850,6 @@
 .offline-pending__info b { color: var(--color-ink); font-size: 0.9rem; }
 .offline-pending__info span { color: var(--color-ink); opacity: 0.6; font-size: 0.72rem; }
 .offline-pending__del { background: #fff; color: var(--color-coral); border: 1px solid var(--color-coral); border-radius: 8px; padding: 5px 12px; font-size: 0.75rem; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+.offline-sync-results { margin: 10px 0 4px; }
+.offline-sync-results__ok { font-size: 0.8rem; color: #2e7d32; margin: 4px 0; }
+.offline-sync-results__fail { font-size: 0.8rem; color: var(--color-coral); margin: 4px 0; }

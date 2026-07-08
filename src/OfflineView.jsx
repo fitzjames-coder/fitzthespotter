@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { downloadAll, tableCounts } from './lib/offlineDownload'
 import { idbGet, idbClearAll, estimateBytes } from './lib/offlineStore'
 import { writeQueueGetAll, writeQueueRemove } from './lib/writeQueue'
+import { commitQueue } from './lib/queueCommit'
 
 function fmtDate(iso) {
   if (!iso) return 'Never'
@@ -22,6 +23,8 @@ export default function OfflineView({ onBack }) {
   const [delta, setDelta] = useState(null)
   const [error, setError] = useState(null)
   const [pending, setPending] = useState([])
+  const [syncing, setSyncing] = useState(false)
+  const [syncResults, setSyncResults] = useState(null)
   const online = typeof navigator !== 'undefined' ? navigator.onLine : true
 
   async function refreshMeta() {
@@ -47,6 +50,21 @@ export default function OfflineView({ onBack }) {
     if (!window.confirm('Delete this pending entry? It will not be added to your logbook.')) return
     await writeQueueRemove(id)
     await loadPending()
+  }
+
+  async function handleSyncNow() {
+    if (!window.confirm('Commit all pending entries to your logbook now?')) return
+    setSyncing(true)
+    setSyncResults(null)
+    try {
+      const results = await commitQueue(() => {})
+      setSyncResults(results)
+    } catch (e) {
+      setSyncResults([{ id: 'err', registration: '', ok: false, reason: (e && e.message) || 'Sync failed' }])
+    }
+    setSyncing(false)
+    await loadPending()
+    await refreshMeta()
   }
 
   useEffect(() => { refreshMeta(); loadPending() }, [])
@@ -106,6 +124,22 @@ export default function OfflineView({ onBack }) {
 
         <div className="offline-pending">
           <h3 className="offline-pending__title">Pending entries ({pending.length})</h3>
+          {pending.length > 0 && online && !syncing && (
+            <button className="offline-btn offline-btn--primary" onClick={handleSyncNow}>Sync now — commit {pending.length} {pending.length === 1 ? 'entry' : 'entries'}</button>
+          )}
+          {pending.length > 0 && !online && (
+            <p className="offline-pending__empty">Connect to the internet to sync these entries.</p>
+          )}
+          {syncing && <p className="offline-pending__empty">Syncing…</p>}
+          {syncResults && (
+            <div className="offline-sync-results">
+              {syncResults.map((r) => (
+                <p key={r.id} className={r.ok ? 'offline-sync-results__ok' : 'offline-sync-results__fail'}>
+                  {r.ok ? '✓' : '✗'} {r.registration || '(entry)'}{r.ok ? ' — added to your logbook' : ' — ' + r.reason}
+                </p>
+              ))}
+            </div>
+          )}
           {pending.length === 0 ? (
             <p className="offline-pending__empty">No entries waiting. New registrations saved while offline appear here.</p>
           ) : (
