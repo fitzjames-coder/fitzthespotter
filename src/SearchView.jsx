@@ -19,6 +19,7 @@ import LegendView from './LegendView'
 import GuideView from './GuideView'
 import OfflineView from './OfflineView'
 import OnThisDayView from './OnThisDayView'
+import MilestonesView from './MilestonesView'
 import { weekStartISO, getWeekCount } from './lib/onThisDay'
 
 function SearchTopBar() {
@@ -200,6 +201,16 @@ function GuideCard({ onOpen }) {
   )
 }
 
+function MilestonesCard({ onOpen }) {
+  return (
+    <button className="stats-card" onClick={onOpen}>
+      <span className="stats-card__title">Milestones</span>
+      <span className="stats-card__sub">The counting joys — #500, 1,000th, firsts</span>
+      <span className="stats-card__chevron" aria-hidden="true">›</span>
+    </button>
+  )
+}
+
 function OnThisDayCard({ onOpen }) {
   const count = getWeekCount(weekStartISO())
   return (
@@ -242,6 +253,7 @@ export default function SearchView() {
   const [showGuide, setShowGuide] = useState(false)
   const [showOffline, setShowOffline] = useState(false)
   const [showOnThisDay, setShowOnThisDay] = useState(false)
+  const [showMilestones, setShowMilestones] = useState(false)
 
   function fetchAll() {
     if (!supabase) {
@@ -395,6 +407,10 @@ export default function SearchView() {
     return <OnThisDayView onBack={() => setShowOnThisDay(false)} onSelectReg={setSelectedReg} />
   }
 
+  if (showMilestones) {
+    return <MilestonesView onBack={() => setShowMilestones(false)} onSelectReg={setSelectedReg} />
+  }
+
   return (
     <div className="page search-page">
       <SearchTopBar />
@@ -472,6 +488,7 @@ export default function SearchView() {
             <span className="stats-flownin-card__chevron" aria-hidden="true">›</span>
           </button>
           <OnThisDayCard onOpen={() => setShowOnThisDay(true)} />
+          <MilestonesCard onOpen={() => setShowMilestones(true)} />
           <StatsCard onOpen={() => setShowStats(true)} />
           <SightingStatsCard onOpen={() => setShowSightingStats(true)} />
           <SecondLifeCard onOpen={() => setShowSecondLife(true)} />
