@@ -18,6 +18,8 @@ import SpottingThroughTimeView from './SpottingThroughTimeView'
 import LegendView from './LegendView'
 import GuideView from './GuideView'
 import OfflineView from './OfflineView'
+import OnThisDayView from './OnThisDayView'
+import { weekStartISO, getWeekCount } from './lib/onThisDay'
 
 function SearchTopBar() {
   const [showForm, setShowForm] = useState(false)
@@ -198,6 +200,17 @@ function GuideCard({ onOpen }) {
   )
 }
 
+function OnThisDayCard({ onOpen }) {
+  const count = getWeekCount(weekStartISO())
+  return (
+    <button className="stats-card stats-card--otd" onClick={onOpen}>
+      <span className="stats-card__title">On this day{count != null && count > 0 ? ` · ${count} this week` : ''}</span>
+      <span className="stats-card__sub">Your logbook, years ago this week</span>
+      <span className="stats-card__chevron" aria-hidden="true">›</span>
+    </button>
+  )
+}
+
 function OfflineCard({ onOpen }) {
   return (
     <button className="stats-card" onClick={onOpen}>
@@ -228,6 +241,7 @@ export default function SearchView() {
   const [showLegend, setShowLegend] = useState(false)
   const [showGuide, setShowGuide] = useState(false)
   const [showOffline, setShowOffline] = useState(false)
+  const [showOnThisDay, setShowOnThisDay] = useState(false)
 
   function fetchAll() {
     if (!supabase) {
@@ -377,6 +391,10 @@ export default function SearchView() {
     return <OfflineView onBack={() => setShowOffline(false)} />
   }
 
+  if (showOnThisDay) {
+    return <OnThisDayView onBack={() => setShowOnThisDay(false)} onSelectReg={setSelectedReg} />
+  }
+
   return (
     <div className="page search-page">
       <SearchTopBar />
@@ -453,6 +471,7 @@ export default function SearchView() {
             </span>
             <span className="stats-flownin-card__chevron" aria-hidden="true">›</span>
           </button>
+          <OnThisDayCard onOpen={() => setShowOnThisDay(true)} />
           <StatsCard onOpen={() => setShowStats(true)} />
           <SightingStatsCard onOpen={() => setShowSightingStats(true)} />
           <SecondLifeCard onOpen={() => setShowSecondLife(true)} />
