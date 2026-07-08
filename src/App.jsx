@@ -107,7 +107,7 @@ function AirlineCard({ airline, regCount, onSelect }) {
       <div className="airline-card__main">
         <div className="airline-card__logo">
           {airline.logo_url
-            ? <img className="airline-card__logo-img" src={airline.logo_url} alt="" />
+            ? <img className="airline-card__logo-img" src={airline.logo_url} alt="" loading="lazy" />
             : <span className="airline-card__logo-initials">{cardInitials(airline.name)}</span>}
         </div>
         <div className="airline-card__text">
@@ -148,7 +148,7 @@ function AirlineGridTile({ airline, regCount, onSelect }) {
       </span>
       <div className="airline-grid-tile__logo">
         {airline.logo_url
-          ? <img className="airline-grid-tile__logo-img" src={airline.logo_url} alt="" />
+          ? <img className="airline-grid-tile__logo-img" src={airline.logo_url} alt="" loading="lazy" />
           : <span className="airline-grid-tile__logo-initials">{cardInitials(airline.name)}</span>}
       </div>
       <span className="airline-grid-tile__name">{airline.name}</span>
