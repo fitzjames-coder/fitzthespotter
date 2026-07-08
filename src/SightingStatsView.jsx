@@ -44,6 +44,47 @@ function MostRow({ label, top1, top3 }) {
   )
 }
 
+function fmtGap(days) {
+  const months = Math.floor(days / 30.44)
+  const yrs = Math.floor(months / 12)
+  const mos = months % 12
+  if (yrs === 0 && mos === 0) return `${days} days`
+  if (yrs === 0) return `${mos} mo`
+  if (mos === 0) return `${yrs} yrs`
+  return `${yrs} yrs ${mos} mo`
+}
+
+function computeReunions(sightings) {
+  const byReg = new Map()
+  for (const s of sightings) {
+    const reg = s.registrations
+    if (!reg || !s.spotted_on) continue
+    if (!byReg.has(reg.id)) byReg.set(reg.id, { reg, dates: [] })
+    byReg.get(reg.id).dates.push(s.spotted_on)
+  }
+  const gaps = []
+  for (const { reg, dates } of byReg.values()) {
+    if (dates.length < 2) continue
+    const sorted = [...new Set(dates)].sort()
+    for (let i = 1; i < sorted.length; i++) {
+      const a = new Date(sorted[i - 1])
+      const b = new Date(sorted[i])
+      const days = Math.round((b - a) / 86400000)
+      gaps.push({ reg, from: sorted[i - 1], to: sorted[i], days })
+    }
+  }
+  gaps.sort((x, y) => y.days - x.days)
+  const seen = new Set()
+  const top = []
+  for (const g of gaps) {
+    if (seen.has(g.reg.id)) continue
+    seen.add(g.reg.id)
+    top.push(g)
+    if (top.length === 5) break
+  }
+  return top
+}
+
 function computeSightingStats(sightings) {
   const byReg = new Map()
   const airlineCounts = {}
@@ -99,7 +140,7 @@ export default function SightingStatsView({ onBack, onSelectReg }) {
       fetchAllRows(() =>
         supabase
           .from('sightings')
-          .select('id, airport, registrations!inner ( id, registration, airlines ( id, name, country, country_flag ) )')
+          .select('id, airport, spotted_on, registrations!inner ( id, registration, airlines ( id, name, country, country_flag ) )')
           .order('id', { ascending: true })
       ),
       supabase
@@ -114,6 +155,7 @@ export default function SightingStatsView({ onBack, onSelectReg }) {
   }, [])
 
   const stats = useMemo(() => computeSightingStats(sightings), [sightings])
+  const reunions = useMemo(() => computeReunions(sightings), [sightings])
 
   return (
     <div className="page search-page">
@@ -159,6 +201,23 @@ export default function SightingStatsView({ onBack, onSelectReg }) {
                   </div>
                 ))}
                 {stats.topAirlines.length === 0 && <p className="search-state">No sightings yet.</p>}
+              </div>
+            </StatCard>
+
+            <StatCard title="Longest Reunions">
+              <div className="sight-reg-grid">
+                {reunions.map((g) => (
+                  <button
+                    key={g.reg.id}
+                    className="sight-reg-pill"
+                    onClick={() => onSelectReg({ id: g.reg.id, airlines: g.reg.airlines })}
+                  >
+                    <span className="sight-reg-pill__reg">{g.reg.registration}</span>
+                    <span className="sight-reg-pill__airline">{g.from} → {g.to}</span>
+                    <span className="sight-reg-pill__count reunion-gap">{fmtGap(g.days)}</span>
+                  </button>
+                ))}
+                {reunions.length === 0 && <p className="search-state">No registration seen twice yet.</p>}
               </div>
             </StatCard>
 
