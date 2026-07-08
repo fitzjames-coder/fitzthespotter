@@ -85,6 +85,16 @@ const SECTIONS = [
       'It charts your sightings by time-of-day and by season. Toggle between percentage and count, and between seasons and months.',
     ],
   },
+  {
+    title: 'Offline — what works and what needs a connection',
+    body: [
+      'First, download your logbook: Search/Stats tab, Offline card, Download for offline. Wait for both phases (records, then images) to finish. Refresh it before a trip — the card shows how many entries were added since your last download.',
+      'WORKS OFFLINE after downloading: browsing everything (airlines, registrations and their profiles, airports and their stats, Search), all images (logos, templates, airport headers, photos), the Spotting Stats card, this Guide and the Legend.',
+      'ENTERING OFFLINE: you can log NEW registrations with a first sighting — the airline, manufacturer, type and airport pickers all work from your downloaded copy. Each save goes to a Pending queue with a confirmation. Back online, open the Offline card and tap Sync now to commit them. A duplicate is never auto-inserted — it is flagged for you to review.',
+      'NEEDS A CONNECTION: editing existing registrations or sightings, creating new airports / airlines / manufacturers / types, uploading photos (they go straight to storage and cannot be queued), and the analysis cards (Sighting Stats, Second Life, Age, Coffee Table, Flown-in, Manufacturers, Notes, Spotting Through Time).',
+      'Tips: heading somewhere with a new airport? Add the airport while you are still online — then offline entries can use it. If a pending entry is wrong, delete it and re-enter it (queued entries cannot be edited). If iOS ever clears the offline copy after long disuse, nothing is lost — your logbook lives in the database, and the next download rebuilds it.',
+    ],
+  },
 ]
 
 function GuideSection({ title, body, open, onToggle }) {

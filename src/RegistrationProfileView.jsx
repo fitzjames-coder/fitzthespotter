@@ -597,11 +597,19 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
 
   function handleConfirmUpload() {
     setShowUploadConfirm(false)
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      window.alert('Photos need a connection — they upload directly to storage and cannot be queued offline. Try again when you are back online.')
+      return
+    }
     fileInputRef.current?.click()
   }
 
   async function handleUploadPhoto(file) {
     if (uploadingPhoto) return
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      window.alert('Photos need a connection — they upload directly to storage and cannot be queued offline. Try again when you are back online.')
+      return
+    }
     setUploadingPhoto(true)
     setPhotoError(null)
     try {
