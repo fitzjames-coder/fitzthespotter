@@ -126,7 +126,7 @@ function TypeTile({ type, count, onRetire }) {
     >
       <div className="type-tile">
         {type.template_url ? (
-          <img className="type-tile__img" src={type.template_url} alt="" aria-hidden="true" />
+          <img className="type-tile__img" src={type.template_url} alt="" aria-hidden="true" loading="lazy" />
         ) : (
           <div className="type-tile__placeholder" aria-hidden="true">
             {thumbAbbrev(type.name)}
