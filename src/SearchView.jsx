@@ -20,6 +20,7 @@ import GuideView from './GuideView'
 import OfflineView from './OfflineView'
 import OnThisDayView from './OnThisDayView'
 import MilestonesView from './MilestonesView'
+import VisualGuideView from './VisualGuideView'
 import { weekStartISO, getWeekCount } from './lib/onThisDay'
 
 function SearchTopBar() {
@@ -191,6 +192,16 @@ function LegendCard({ onOpen }) {
   )
 }
 
+function VisualGuideCard({ onOpen }) {
+  return (
+    <button className="stats-card" onClick={onOpen}>
+      <span className="stats-card__title">Visual Guide</span>
+      <span className="stats-card__sub">The whole app, in pictures</span>
+      <span className="stats-card__chevron" aria-hidden="true">›</span>
+    </button>
+  )
+}
+
 function GuideCard({ onOpen }) {
   return (
     <button className="stats-card" onClick={onOpen}>
@@ -251,6 +262,7 @@ export default function SearchView() {
   const [showSpottingTime, setShowSpottingTime] = useState(false)
   const [showLegend, setShowLegend] = useState(false)
   const [showGuide, setShowGuide] = useState(false)
+  const [showVisualGuide, setShowVisualGuide] = useState(false)
   const [showOffline, setShowOffline] = useState(false)
   const [showOnThisDay, setShowOnThisDay] = useState(false)
   const [showMilestones, setShowMilestones] = useState(false)
@@ -411,6 +423,10 @@ export default function SearchView() {
     return <MilestonesView onBack={() => setShowMilestones(false)} onSelectReg={setSelectedReg} />
   }
 
+  if (showVisualGuide) {
+    return <VisualGuideView onBack={() => setShowVisualGuide(false)} />
+  }
+
   return (
     <div className="page search-page">
       <SearchTopBar />
@@ -500,6 +516,7 @@ export default function SearchView() {
           <SpottingThroughTimeCard onOpen={() => setShowSpottingTime(true)} />
           <LegendCard onOpen={() => setShowLegend(true)} />
           <GuideCard onOpen={() => setShowGuide(true)} />
+          <VisualGuideCard onOpen={() => setShowVisualGuide(true)} />
           <OfflineCard onOpen={() => setShowOffline(true)} />
         </div>
       </main>
