@@ -5896,3 +5896,25 @@
 .ms-airline-group { margin-bottom: 10px; }
 .ms-airline-group__name { font-size: 0.78rem; font-weight: 700; color: var(--color-deep-blue); margin: 0 0 6px; }
 .info-milestone { color: var(--color-amber); font-weight: 700; }
+.otd-link--session { background: var(--color-navy); color: #fff; border-color: var(--color-navy); cursor: pointer; }
+.sess-sub { font-size: 0.72rem; color: var(--color-ink); opacity: 0.55; margin: 0 0 12px; }
+.sess-card { background: #fff; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 1px 4px rgba(22,32,59,0.1); }
+.sess-card--firsts { border-left: 4px solid var(--color-amber); }
+.sess-card__t { font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-navy); font-weight: 700; margin: 0 0 8px; }
+.sess-first { display: flex; align-items: center; gap: 8px; padding: 4px 0; font-size: 0.82rem; color: var(--color-ink); background: none; border: none; cursor: pointer; width: 100%; text-align: left; }
+.sess-first__tag { font-size: 0.58rem; font-weight: 800; color: #fff; background: var(--color-amber); border-radius: 999px; padding: 2px 8px; letter-spacing: 0.05em; flex-shrink: 0; }
+.sess-tl { display: flex; align-items: center; gap: 4px; }
+.sess-tl__block { flex: 1; text-align: center; font-size: 0.6rem; font-weight: 700; padding: 7px 0; border-radius: 8px; background: rgba(44,66,123,0.08); color: var(--color-ink); opacity: 0.4; }
+.sess-tl__block--on { background: var(--color-deep-blue); color: #fff; opacity: 1; }
+.sess-tl__cap { font-size: 0.62rem; color: var(--color-ink); opacity: 0.5; margin-top: 6px; }
+.sess-split { display: flex; gap: 10px; }
+.sess-half { flex: 1; background: rgba(44,66,123,0.05); border-radius: 10px; padding: 9px; text-align: center; }
+.sess-half__n { font-family: Georgia, serif; font-size: 1.5rem; color: var(--color-ink); }
+.sess-half--new .sess-half__n { color: var(--color-amber); }
+.sess-half__l { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--color-ink); opacity: 0.55; margin-top: 2px; }
+.sess-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+.sess-chip { font-size: 0.66rem; font-weight: 700; color: var(--color-ink); border: 1px solid rgba(44,66,123,0.3); border-radius: 999px; padding: 4px 10px; background: #fff; cursor: pointer; }
+.sess-chip--new { border-color: var(--color-amber); }
+.sess-more { font-size: 0.64rem; color: var(--color-deep-blue); font-weight: 700; padding: 4px 2px; background: none; border: none; cursor: pointer; }
+.sess-al { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; font-size: 0.82rem; color: var(--color-ink); }
+.sess-al b { color: var(--color-deep-blue); }
