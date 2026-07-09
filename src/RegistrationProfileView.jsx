@@ -248,6 +248,16 @@ function PhotoGallery({ slides, onSlideClick }) {
   )
 }
 
+function isRegMilestoneNumber(n) {
+  if ([100, 250, 500, 750, 1000].includes(n)) return true
+  return n > 1000 && (n - 1000) % 500 === 0
+}
+
+function isSightMilestoneNumber(n) {
+  if (n === 500 || n === 1000) return true
+  return n > 1000 && n % 1000 === 0
+}
+
 export function formatSinceLastSeen(iso) {
   const [y, m, d] = iso.split('-').map(Number)
   const then = new Date(y, m - 1, d || 1)
@@ -263,6 +273,46 @@ export function formatSinceLastSeen(iso) {
 }
 
 function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
+  const [honors, setHonors] = useState([])
+
+  useEffect(() => {
+    let cancelled = false
+    async function computeHonors() {
+      if (!supabase || !reg?.id) return
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return
+      const found = []
+      try {
+        const { data: me } = await supabase.from('registrations').select('id, first_spotted').eq('id', reg.id).single()
+        if (me?.first_spotted) {
+          const { count } = await supabase
+            .from('registrations')
+            .select('id', { count: 'exact', head: true })
+            .not('first_spotted', 'is', null)
+            .or(`first_spotted.lt.${me.first_spotted},and(first_spotted.eq.${me.first_spotted},id.lt.${me.id})`)
+          const pos = (count ?? 0) + 1
+          if (isRegMilestoneNumber(pos)) found.push(`Registration #${pos.toLocaleString()}`)
+        }
+        const { data: mySightings } = await supabase
+          .from('sightings')
+          .select('id, spotted_on')
+          .eq('registration_id', reg.id)
+          .not('spotted_on', 'is', null)
+        for (const s of mySightings || []) {
+          const { count } = await supabase
+            .from('sightings')
+            .select('id', { count: 'exact', head: true })
+            .not('spotted_on', 'is', null)
+            .or(`spotted_on.lt.${s.spotted_on},and(spotted_on.eq.${s.spotted_on},id.lt.${s.id})`)
+          const pos = (count ?? 0) + 1
+          if (isSightMilestoneNumber(pos)) found.push(`Carried sighting #${pos.toLocaleString()}`)
+        }
+      } catch { /* silently skip honors */ }
+      if (!cancelled) setHonors(found)
+    }
+    computeHonors()
+    return () => { cancelled = true }
+  }, [reg?.id])
+
   const manufacturer = reg.aircraft_types?.manufacturers?.name
   const model = stripTypeParens(reg.aircraft_types?.name ?? '')
   const aircraftLabel = [manufacturer, model].filter(Boolean).join(' ')
@@ -351,6 +401,12 @@ function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
           <span className="info-row__value info-last-seen">{formatSinceLastSeen(lastDate)}</span>
         </div>
       )}
+      {honors.map((h) => (
+        <div className="info-row" key={h}>
+          <span className="info-row__label">Milestone</span>
+          <span className="info-row__value info-milestone">{h}</span>
+        </div>
+      ))}
     </div>
   )
 }
