@@ -111,5 +111,4 @@ export function getWeekCount(weekStart) {
 export const OTD_LINKS = [
   { name: 'Airfleets', url: (reg) => 'https://www.airfleets.net/recherche/?key=' + encodeURIComponent(reg) },
   { name: 'FR24', url: (reg) => 'https://www.flightradar24.com/data/aircraft/' + encodeURIComponent(reg.toLowerCase()) },
-  { name: 'JetPhotos', url: (reg) => 'https://www.jetphotos.com/registration/' + encodeURIComponent(reg) },
 ]

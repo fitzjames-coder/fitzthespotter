@@ -1,11 +1,15 @@
-export function computeSession(dateISO, sightings, regs) {
+export function computeSession(dateISO, sightings, regs, blockFilter) {
   const regById = new Map(regs.map((r) => [r.id, r]))
   const daySightings = sightings.filter((s) => s.spotted_on === dateISO)
 
   const airports = [...new Set(daySightings.map((s) => s.airport).filter(Boolean))]
   const blocksUsed = new Set(daySightings.map((s) => s.time_block).filter(Boolean))
 
-  const dayRegIds = [...new Set(daySightings.map((s) => s.registration_id))]
+  const allDayRegIds = [...new Set(daySightings.map((s) => s.registration_id))]
+  const allDayRegs = allDayRegIds.map((id) => regById.get(id)).filter(Boolean)
+
+  const activeSightings = blockFilter ? daySightings.filter((s) => s.time_block === blockFilter) : daySightings
+  const dayRegIds = [...new Set(activeSightings.map((s) => s.registration_id))]
   const dayRegs = dayRegIds.map((id) => regById.get(id)).filter(Boolean)
   const newRegs = dayRegs.filter((r) => r.first_spotted === dateISO)
   const seenRegs = dayRegs.filter((r) => r.first_spotted !== dateISO)
@@ -45,5 +49,21 @@ export function computeSession(dateISO, sightings, regs) {
     if (info.date === dateISO) firsts.push({ kind: 'FIRST TYPE', name, reg: info.reg })
   }
 
-  return { airports, total: dayRegs.length, blocksUsed, newRegs, seenRegs, topAirlines, firsts }
+  let reunion = null
+  if (firsts.length === 0) {
+    const allSeen = allDayRegs.filter((r) => r.first_spotted !== dateISO)
+    let best = null
+    for (const r of allSeen) {
+      const prev = sightings
+        .filter((s) => s.registration_id === r.id && s.spotted_on && s.spotted_on < dateISO)
+        .map((s) => s.spotted_on)
+        .sort()
+      if (prev.length === 0) continue
+      const last = prev[prev.length - 1]
+      if (!best || last < best.last) best = { reg: r, last }
+    }
+    if (best) reunion = best
+  }
+
+  return { airports, dayTotal: allDayRegs.length, blocksUsed, newRegs, seenRegs, topAirlines, firsts, reunion }
 }
