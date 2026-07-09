@@ -4,11 +4,38 @@ import { fetchAllRows } from './lib/fetchAllRows'
 import { idbGet } from './lib/offlineStore'
 import { computeMilestones } from './lib/milestones'
 
+function StatCard({ title, children }) {
+  return (
+    <div className="stat-card">
+      <p className="stat-card__title">{title}</p>
+      {children}
+    </div>
+  )
+}
+
+function NumberChips({ numbers, selected, onSelect }) {
+  return (
+    <div className="ms-chips">
+      {numbers.map((n) => (
+        <button
+          key={n}
+          className={n === selected ? 'ms-chip ms-chip--on' : 'ms-chip'}
+          onClick={() => onSelect(n)}
+        >
+          {n.toLocaleString()}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export default function MilestonesView({ onBack, onSelectReg }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [regs, setRegs] = useState([])
   const [sightings, setSightings] = useState([])
+  const [regPick, setRegPick] = useState(null)
+  const [sightPick, setSightPick] = useState(null)
 
   useEffect(() => {
     async function load() {
@@ -45,6 +72,31 @@ export default function MilestonesView({ onBack, onSelectReg }) {
   }, [])
 
   const milestones = useMemo(() => computeMilestones(regs, sightings), [regs, sightings])
+  const regById = useMemo(() => new Map(regs.map((r) => [r.id, r])), [regs])
+
+  const regMilestones = milestones.filter((m) => m.kind === 'reg')
+  const sightMilestones = milestones.filter((m) => m.kind === 'sight')
+  const airlineMilestones = milestones.filter((m) => m.kind === 'airline')
+  const airportMilestones = milestones.filter((m) => m.kind === 'airport')
+  const countryMilestones = milestones.filter((m) => m.kind === 'country')
+
+  const regNumbers = regMilestones.map((m) => Number(m.label.replace(/\D/g, ''))).sort((a, b) => a - b)
+  const sightNumbers = sightMilestones.map((m) => Number(m.label.replace(/\D/g, ''))).sort((a, b) => a - b)
+  const regSelected = regPick ?? (regNumbers.length ? regNumbers[regNumbers.length - 1] : null)
+  const sightSelected = sightPick ?? (sightNumbers.length ? sightNumbers[sightNumbers.length - 1] : null)
+  const regShown = regMilestones.find((m) => Number(m.label.replace(/\D/g, '')) === regSelected)
+  const sightShown = sightMilestones.find((m) => Number(m.label.replace(/\D/g, '')) === sightSelected)
+  const sightShownReg = sightShown ? regById.get(sightShown.regId) : null
+
+  const airlineGroups = useMemo(() => {
+    const g = new Map()
+    for (const m of airlineMilestones) {
+      const name = m.reg?.airlines?.name || ''
+      if (!g.has(name)) g.set(name, [])
+      g.get(name).push(m)
+    }
+    return Array.from(g.entries()).sort((a, b) => a[0].localeCompare(b[0]))
+  }, [airlineMilestones])
 
   return (
     <div className="page search-page">
@@ -55,26 +107,96 @@ export default function MilestonesView({ onBack, onSelectReg }) {
       <main className="content stats-content">
         {loading && <p className="search-state">Loading…</p>}
         {error && <p className="search-state search-state--error">{error}</p>}
-        {!loading && !error && milestones.length === 0 && (
-          <p className="search-state">No milestones yet — the first arrives at registration #100.</p>
+        {!loading && !error && (
+          <>
+            <StatCard title="Registration Milestones">
+              {regNumbers.length === 0 && <p className="search-state">First arrives at registration #100.</p>}
+              {regNumbers.length > 0 && (
+                <>
+                  <NumberChips numbers={regNumbers} selected={regSelected} onSelect={setRegPick} />
+                  {regShown && (
+                    <div className="sight-reg-grid">
+                      <button className="sight-reg-pill" onClick={() => onSelectReg({ id: regShown.reg.id, airlines: regShown.reg.airlines })}>
+                        <span className="sight-reg-pill__reg">{regShown.reg.registration}</span>
+                        <span className="sight-reg-pill__airline">{regShown.reg.airlines?.name || ''}</span>
+                        <span className="sight-reg-pill__count">{regShown.date}</span>
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </StatCard>
+
+            <StatCard title="Sighting Milestones">
+              {sightNumbers.length === 0 && <p className="search-state">First arrives at sighting #500.</p>}
+              {sightNumbers.length > 0 && (
+                <>
+                  <NumberChips numbers={sightNumbers} selected={sightSelected} onSelect={setSightPick} />
+                  {sightShown && (
+                    <div className="sight-reg-grid">
+                      {sightShownReg ? (
+                        <button className="sight-reg-pill" onClick={() => onSelectReg({ id: sightShownReg.id, airlines: sightShownReg.airlines })}>
+                          <span className="sight-reg-pill__reg">{sightShownReg.registration}</span>
+                          <span className="sight-reg-pill__airline">{sightShown.detail || ''}</span>
+                          <span className="sight-reg-pill__count">{sightShown.date}</span>
+                        </button>
+                      ) : (
+                        <div className="sight-reg-pill sight-reg-pill--static">
+                          <span className="sight-reg-pill__reg">{sightShown.detail || '—'}</span>
+                          <span className="sight-reg-pill__count">{sightShown.date}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </StatCard>
+
+            <StatCard title="Airline Milestones">
+              {airlineGroups.length === 0 && <p className="search-state">First arrives at the 50th registration of one airline.</p>}
+              {airlineGroups.map(([name, list]) => (
+                <div key={name} className="ms-airline-group">
+                  <p className="ms-airline-group__name">{name}</p>
+                  <div className="sight-reg-grid">
+                    {list.map((m, i) => (
+                      <button key={i} className="sight-reg-pill" onClick={() => onSelectReg({ id: m.reg.id, airlines: m.reg.airlines })}>
+                        <span className="sight-reg-pill__reg">{m.reg.registration}</span>
+                        <span className="sight-reg-pill__airline">{m.label}</span>
+                        <span className="sight-reg-pill__count">{m.date}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </StatCard>
+
+            <StatCard title="Airport Milestones">
+              {airportMilestones.length === 0 && <p className="search-state">First arrives at airport #10.</p>}
+              <div className="sight-reg-grid">
+                {airportMilestones.map((m, i) => (
+                  <div key={i} className="sight-reg-pill sight-reg-pill--static">
+                    <span className="sight-reg-pill__reg">{m.detail}</span>
+                    <span className="sight-reg-pill__airline">{m.label}</span>
+                    <span className="sight-reg-pill__count">{m.date}</span>
+                  </div>
+                ))}
+              </div>
+            </StatCard>
+
+            <StatCard title="Country Milestones">
+              {countryMilestones.length === 0 && <p className="search-state">First arrives at country #10.</p>}
+              <div className="sight-reg-grid">
+                {countryMilestones.map((m, i) => (
+                  <div key={i} className="sight-reg-pill sight-reg-pill--static">
+                    <span className="sight-reg-pill__reg">{m.detail}</span>
+                    <span className="sight-reg-pill__airline">{m.label}</span>
+                    <span className="sight-reg-pill__count">{m.date}</span>
+                  </div>
+                ))}
+              </div>
+            </StatCard>
+          </>
         )}
-        {!loading && !error && milestones.map((m, i) => {
-          const inner = (
-            <>
-              <span className="milestone__label">{m.label}</span>
-              <span className="milestone__detail">{m.detail}</span>
-              <span className="milestone__date">{m.date}</span>
-            </>
-          )
-          if (m.reg) {
-            return (
-              <button key={i} className="milestone milestone--tap" onClick={() => onSelectReg({ id: m.reg.id, airlines: m.reg.airlines })}>
-                {inner}
-              </button>
-            )
-          }
-          return <div key={i} className="milestone">{inner}</div>
-        })}
       </main>
     </div>
   )
