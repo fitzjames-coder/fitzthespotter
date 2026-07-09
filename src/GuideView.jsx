@@ -92,6 +92,7 @@ const SECTIONS = [
       'EVERY REGISTRATION: profile with airline, type template, MSN, build date, age (first-spotted and current), statuses (R/S, special livery, retro, livery change, flown-in, alliances), airports, photos, remark and dramatize flow, plus how long since you last saw it.',
       'STATS CARDS: Spotting Stats (totals, most-populous, top airlines/airports), Sighting Stats (most-sighted registrations/airlines/airports and Longest Reunions), Second Life (reused registrations by MSN), Age (fleet age breakdown), Coffee Table candidates, Notes, Manufacturers, Flown-in airlines, Spotting Through Time graphs.',
       'ON THIS DAY: up to 3 picks a week from past years (blurred teasers until their day), with Airfleets / FR24 / JetPhotos links preloaded for each pick.',
+      'MILESTONES: a timeline of the counting joys — registration #100/#250/#500 and up, sighting #500/#1000 and up, your 50th and 100th of an airline, airport and country counts — each anchored to the registration that crossed it.',
       'OFFLINE: download the whole logbook (data + images) to the device, browse everything with no signal, log NEW registrations offline into a pending queue, then Sync when back online. Guide and Legend also work offline.',
       'DATA CARE: CSV backup of the whole logbook (cargo-container icon in the Search top bar), aircraft-type grouping via parentheses in type names, duplicate protection on sync.',
     ],
