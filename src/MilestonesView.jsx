@@ -36,6 +36,8 @@ export default function MilestonesView({ onBack, onSelectReg }) {
   const [sightings, setSightings] = useState([])
   const [regPick, setRegPick] = useState(null)
   const [sightPick, setSightPick] = useState(null)
+  const [airlinePick, setAirlinePick] = useState(null)
+  const [airlineStep, setAirlineStep] = useState('all')
 
   useEffect(() => {
     async function load() {
@@ -98,6 +100,15 @@ export default function MilestonesView({ onBack, onSelectReg }) {
     return Array.from(g.entries()).sort((a, b) => a[0].localeCompare(b[0]))
   }, [airlineMilestones])
 
+  const airlineNames = airlineGroups.map(([name]) => name)
+  const airlineSelected = airlinePick ?? (airlineNames.length ? airlineNames[0] : null)
+  const airlineList = (airlineGroups.find(([name]) => name === airlineSelected)?.[1] || [])
+    .filter((m) => airlineStep === 'all' || m.label.startsWith(airlineStep))
+
+  const byNum = (a, b) => Number(a.label.replace(/\D/g, '')) - Number(b.label.replace(/\D/g, ''))
+  const airportsAsc = [...airportMilestones].sort(byNum)
+  const countriesAsc = [...countryMilestones].sort(byNum)
+
   return (
     <div className="page search-page">
       <header className="stats-top-bar">
@@ -154,26 +165,36 @@ export default function MilestonesView({ onBack, onSelectReg }) {
 
             <StatCard title="Airline Milestones">
               {airlineGroups.length === 0 && <p className="search-state">First arrives at the 50th registration of one airline.</p>}
-              {airlineGroups.map(([name, list]) => (
-                <div key={name} className="ms-airline-group">
-                  <p className="ms-airline-group__name">{name}</p>
+              {airlineNames.length > 0 && (
+                <>
+                  <select className="ms-airline-select" value={airlineSelected || ''} onChange={(e) => setAirlinePick(e.target.value)}>
+                    {airlineNames.map((name) => <option key={name} value={name}>{name}</option>)}
+                  </select>
+                  <div className="ms-chips">
+                    {['all', '50th', '100th'].map((s) => (
+                      <button key={s} className={airlineStep === s ? 'ms-chip ms-chip--on' : 'ms-chip'} onClick={() => setAirlineStep(s)}>
+                        {s === 'all' ? 'All' : s}
+                      </button>
+                    ))}
+                  </div>
                   <div className="sight-reg-grid">
-                    {list.map((m, i) => (
+                    {airlineList.map((m, i) => (
                       <button key={i} className="sight-reg-pill" onClick={() => onSelectReg({ id: m.reg.id, airlines: m.reg.airlines })}>
                         <span className="sight-reg-pill__reg">{m.reg.registration}</span>
                         <span className="sight-reg-pill__airline">{m.label}</span>
                         <span className="sight-reg-pill__count">{m.date}</span>
                       </button>
                     ))}
+                    {airlineList.length === 0 && <p className="search-state">No milestone at this step yet.</p>}
                   </div>
-                </div>
-              ))}
+                </>
+              )}
             </StatCard>
 
             <StatCard title="Airport Milestones">
               {airportMilestones.length === 0 && <p className="search-state">First arrives at airport #10.</p>}
               <div className="sight-reg-grid">
-                {airportMilestones.map((m, i) => (
+                {airportsAsc.map((m, i) => (
                   <div key={i} className="sight-reg-pill sight-reg-pill--static">
                     <span className="sight-reg-pill__reg">{m.detail}</span>
                     <span className="sight-reg-pill__airline">{m.label}</span>
@@ -186,7 +207,7 @@ export default function MilestonesView({ onBack, onSelectReg }) {
             <StatCard title="Country Milestones">
               {countryMilestones.length === 0 && <p className="search-state">First arrives at country #10.</p>}
               <div className="sight-reg-grid">
-                {countryMilestones.map((m, i) => (
+                {countriesAsc.map((m, i) => (
                   <div key={i} className="sight-reg-pill sight-reg-pill--static">
                     <span className="sight-reg-pill__reg">{m.detail}</span>
                     <span className="sight-reg-pill__airline">{m.label}</span>
