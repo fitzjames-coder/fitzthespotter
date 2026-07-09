@@ -4,6 +4,7 @@ import { fetchAllRows } from './lib/fetchAllRows'
 import { idbGet } from './lib/offlineStore'
 import { stripTypeParens } from './lib/typeGrouping'
 import { weekStartISO, buildWeekSchedule, getWeekMode, setWeekMode, setWeekCount, OTD_LINKS } from './lib/onThisDay'
+import SessionView from './SessionView'
 
 function todayISO() {
   const d = new Date()
@@ -21,6 +22,8 @@ export default function OnThisDayView({ onBack, onSelectReg }) {
   const [schedule, setSchedule] = useState(null)
   const [regById, setRegById] = useState(new Map())
   const [mode, setMode] = useState(null)
+  const [sessionDate, setSessionDate] = useState(null)
+  const [allSightings, setAllSightings] = useState([])
 
   const weekStart = weekStartISO()
   const today = todayISO()
@@ -35,8 +38,8 @@ export default function OnThisDayView({ onBack, onSelectReg }) {
       if (!offline && supabase) {
         try {
           const [{ data: sData }, { data: rData }] = await Promise.all([
-            fetchAllRows(() => supabase.from('sightings').select('id, registration_id, spotted_on, airport').order('id', { ascending: true })),
-            fetchAllRows(() => supabase.from('registrations').select('id, registration, airline_id, aircraft_type_id, airlines ( id, name, logo_url ), aircraft_types ( id, name )').order('id', { ascending: true })),
+            fetchAllRows(() => supabase.from('sightings').select('id, registration_id, spotted_on, airport, time_block').order('id', { ascending: true })),
+            fetchAllRows(() => supabase.from('registrations').select('id, registration, first_spotted, airline_id, aircraft_type_id, airlines ( id, name, logo_url ), aircraft_types ( id, name )').order('id', { ascending: true })),
           ])
           sightings = sData
           regs = rData || []
@@ -65,6 +68,7 @@ export default function OnThisDayView({ onBack, onSelectReg }) {
         })
       }
       setRegById(new Map((regs || []).map((r) => [r.id, r])))
+      setAllSightings(sightings || [])
       const sched = buildWeekSchedule(sightings || [], weekStart, savedMode)
       setSchedule(sched)
       setWeekCount(weekStart, sched.empty ? 0 : sched.picks.length)
@@ -80,6 +84,18 @@ export default function OnThisDayView({ onBack, onSelectReg }) {
     setSchedule(null)
     setError(null)
     setTimeout(() => window.location.reload(), 50)
+  }
+
+  if (sessionDate) {
+    return (
+      <SessionView
+        dateISO={sessionDate}
+        sightings={allSightings}
+        regs={[...regById.values()]}
+        onBack={() => setSessionDate(null)}
+        onSelectReg={onSelectReg}
+      />
+    )
   }
 
   const visible = (schedule?.picks || []).filter((p) => p.date <= today)
@@ -129,6 +145,7 @@ export default function OnThisDayView({ onBack, onSelectReg }) {
                     </div>
                   </button>
                   <div className="otd-pick__links">
+                    <button className="otd-link otd-link--session" onClick={() => setSessionDate(p.sighting.spotted_on)}>That day&#8217;s session ›</button>
                     {OTD_LINKS.map((l) => (
                       <a key={l.name} className="otd-link" href={l.url(reg.registration)} target="_blank" rel="noopener noreferrer">{l.name}</a>
                     ))}
