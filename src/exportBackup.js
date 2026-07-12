@@ -1,13 +1,17 @@
+import { fetchAllRows } from './lib/fetchAllRows'
+
 export async function exportBackupCsv(supabase) {
-  const { data, error } = await supabase
-    .from('registrations')
-    .select(`
+  const { data, error } = await fetchAllRows(() =>
+    supabase
+      .from('registrations')
+      .select(`
       registration, first_spotted, airports, remark, statuses, flagged, photo_urls,
       airlines ( name, country, is_closed ),
       aircraft_types ( name, manufacturers ( name ) ),
       sightings ( airport, spotted_on )
     `)
-    .order('registration', { ascending: true })
+      .order('registration', { ascending: true })
+  )
 
   if (error) throw new Error(error.message)
 
