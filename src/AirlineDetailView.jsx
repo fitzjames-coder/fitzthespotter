@@ -269,6 +269,9 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   const [retiredTypes, setRetiredTypes] = useState([])
   const [unretireTarget, setUnretireTarget] = useState(null)
   const [sightingCount, setSightingCount] = useState(null)
+  const [regQuery, setRegQuery] = useState('')
+  const [showSearch, setShowSearch] = useState(false)
+  const [sortMode, setSortMode] = useState('spotted')
 
   function loadRetiredTypes() {
     if (!supabase) return
@@ -382,17 +385,70 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
     if (registrations.length === 0) {
       return <p className="state-message">No registrations yet.</p>
     }
+    const q = regQuery.trim().toLowerCase()
+    const filtered = q ? registrations.filter((r) => r.registration.toLowerCase().includes(q)) : registrations
+    const displayed = sortMode === 'az'
+      ? [...filtered].sort((a, b) => a.registration.localeCompare(b.registration, 'en', { numeric: true }))
+      : filtered
     return (
       <>
         <ManufacturerBreakdown registrations={registrations} onSelectManufacturer={onSelectManufacturer} />
-        <p className="section-label">Registrations</p>
-        <ul className="reg-list">
-          {registrations.map((reg) => (
-            <li key={reg.id}>
-              <RegistrationCard reg={reg} onSelect={setSelectedReg} />
-            </li>
-          ))}
-        </ul>
+        <div className="reg-list-head">
+          <p className="section-label">Registrations</p>
+          <div className="reg-list-controls">
+            <div className="airlines-view-toggle" role="group" aria-label="Sort order">
+              <button
+                type="button"
+                className={`airlines-view-toggle__btn${sortMode === 'spotted' ? ' is-on' : ''}`}
+                onClick={() => setSortMode('spotted')}
+              >Spotted</button>
+              <button
+                type="button"
+                className={`airlines-view-toggle__btn${sortMode === 'az' ? ' is-on' : ''}`}
+                onClick={() => setSortMode('az')}
+              >A–Z</button>
+            </div>
+            <button
+              type="button"
+              className={`reg-search-btn${showSearch ? ' reg-search-btn--on' : ''}`}
+              onClick={() => { if (showSearch) { setShowSearch(false); setRegQuery('') } else { setShowSearch(true) } }}
+              aria-label="Search registrations"
+            >🔍</button>
+          </div>
+        </div>
+        {showSearch && (
+          <div className="reg-search-bar">
+            <input
+              className="reg-search-bar__input"
+              type="text"
+              placeholder="Filter registrations…"
+              value={regQuery}
+              onChange={(e) => setRegQuery(e.target.value)}
+              aria-label="Filter registrations"
+              autoFocus
+            />
+            <button
+              className="reg-search-bar__clear"
+              onClick={() => { setRegQuery(''); setShowSearch(false) }}
+              aria-label="Clear and close search"
+            >✕</button>
+          </div>
+        )}
+        {showSearch && q && (
+          <p className="reg-search-result">{displayed.length} of {registrations.length} registrations</p>
+        )}
+        {displayed.length === 0
+          ? <p className="state-message">No matches.</p>
+          : (
+            <ul className="reg-list">
+              {displayed.map((reg) => (
+                <li key={reg.id}>
+                  <RegistrationCard reg={reg} onSelect={setSelectedReg} />
+                </li>
+              ))}
+            </ul>
+          )
+        }
       </>
     )
   }
