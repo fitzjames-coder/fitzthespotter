@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
+import { fetchAllRows } from './lib/fetchAllRows'
 
 function galInitials(name) {
   return name.trim().split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 2)
@@ -12,10 +13,11 @@ export default function AirlinesGalleryView({ onBack }) {
 
   useEffect(() => {
     let active = true
-    supabase
-      .from('registrations')
-      .select('airlines ( id, name, logo_url )')
-      .then(({ data, error }) => {
+    fetchAllRows(() =>
+      supabase
+        .from('registrations')
+        .select('airlines ( id, name, logo_url )')
+    ).then(({ data, error }) => {
         if (!active) return
         if (error) { setError(error.message); setLoading(false); return }
         const map = new Map()

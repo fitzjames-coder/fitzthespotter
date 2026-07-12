@@ -13,6 +13,7 @@ import NewRegistrationForm from './NewRegistrationForm'
 import SearchView from './SearchView'
 import RegistrationProfileView from './RegistrationProfileView'
 import { offlineAirlinesTab } from './lib/offlineData'
+import { fetchAllRows } from './lib/fetchAllRows'
 
 function airlineBucket(name) {
   const c = (name || '').trim().charAt(0)
@@ -184,11 +185,12 @@ function PhotoWall({ onSelectReg }) {
       setLoading(false)
       return
     }
-    supabase
-      .from('registrations')
-      .select('id, registration, photo_urls, statuses, airlines(name), aircraft_types(name)')
-      .not('photo_urls', 'is', null)
-      .then(({ data, error: err }) => {
+    fetchAllRows(() =>
+      supabase
+        .from('registrations')
+        .select('id, registration, photo_urls, statuses, airlines(name), aircraft_types(name)')
+        .not('photo_urls', 'is', null)
+    ).then(({ data, error: err }) => {
         if (err) { setError(err.message); setLoading(false); return }
         const rows = (data ?? [])
           .filter((r) => Array.isArray(r.photo_urls) && r.photo_urls.length > 0)
@@ -299,9 +301,7 @@ function AirlinesTab() {
         .from('airlines')
         .select('id, name, country, country_flag, logo_url, is_closed, closed_date, parent_id, secondary_name, flown_in')
         .order('name', { ascending: true }),
-      supabase
-        .from('registrations')
-        .select('airline_id'),
+      fetchAllRows(() => supabase.from('registrations').select('airline_id')),
     ]).then(([airlinesResult, regsResult]) => {
       if (airlinesResult.error) {
         console.error('[fitzthespotter] Failed to fetch airlines:', airlinesResult.error)
