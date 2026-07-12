@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { stripTypeParens } from './lib/typeGrouping'
 import { offlineAllRegs } from './lib/offlineData'
+import { fetchAllRows } from './lib/fetchAllRows'
 import { exportBackupCsv } from './exportBackup'
 import NewRegistrationForm from './NewRegistrationForm'
 import RegistrationProfileView from './RegistrationProfileView'
@@ -290,14 +291,15 @@ export default function SearchView() {
       return
     }
 
-    supabase
-      .from('registrations')
-      .select(`
+    fetchAllRows(() =>
+      supabase
+        .from('registrations')
+        .select(`
         id, registration, airports, remark, statuses, flagged,
         airlines ( id, name, country, country_flag, is_closed ),
         aircraft_types ( id, name, manufacturers ( id, name ) )
       `)
-      .then(({ data, error: err }) => {
+    ).then(({ data, error: err }) => {
         if (err) {
           setError(err.message)
         } else {
