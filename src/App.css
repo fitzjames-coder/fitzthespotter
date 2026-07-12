@@ -5944,3 +5944,14 @@
 .photo-tile__strip { padding: 6px 8px; background: var(--color-cream); display: flex; flex-direction: column; gap: 1px; }
 .photo-tile__reg { font-size: .8rem; font-weight: 700; color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .photo-tile__sub { font-size: .65rem; color: var(--color-deep-blue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* ── Airline detail: reg search + sort ──────────────────── */
+.reg-list-head { display: flex; align-items: center; justify-content: space-between; margin: 0 0 6px; }
+.reg-list-head .section-label { margin: 0; }
+.reg-list-controls { display: flex; align-items: center; gap: 6px; }
+.reg-search-btn { background: none; border: none; font-size: 1rem; cursor: pointer; padding: 3px 5px; border-radius: 6px; line-height: 1; color: var(--color-ink); opacity: 0.45; transition: opacity .15s; }
+.reg-search-btn--on { opacity: 1; }
+.reg-search-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.reg-search-bar__input { flex: 1; background: var(--color-cream); color: var(--color-ink); border: 1.5px solid rgba(44,66,123,.25); border-radius: 8px; padding: 6px 10px; font-size: .82rem; outline: none; }
+.reg-search-bar__input:focus { border-color: var(--color-amber); }
+.reg-search-bar__clear { background: none; border: none; font-size: 1rem; line-height: 1; cursor: pointer; padding: 4px 6px; color: var(--color-ink); opacity: 0.45; }
+.reg-search-result { font-size: .7rem; color: var(--color-ink); opacity: .5; margin: 0 0 8px; }
