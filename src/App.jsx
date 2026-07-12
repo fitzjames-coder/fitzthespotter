@@ -11,6 +11,7 @@ import OpeningAnimation from './OpeningAnimation'
 import PlaceholderScreen from './PlaceholderScreen'
 import NewRegistrationForm from './NewRegistrationForm'
 import SearchView from './SearchView'
+import RegistrationProfileView from './RegistrationProfileView'
 import { offlineAirlinesTab } from './lib/offlineData'
 
 function airlineBucket(name) {
@@ -166,6 +167,89 @@ function AirlineGridTile({ airline, regCount, onSelect }) {
   )
 }
 
+function PhotoWall({ onSelectReg }) {
+  const [photos, setPhotos] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [imgErrors, setImgErrors] = useState({})
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      setError('You are offline — photos are not available without a connection.')
+      setLoading(false)
+      return
+    }
+    if (!supabase) {
+      setError('Supabase is not configured.')
+      setLoading(false)
+      return
+    }
+    supabase
+      .from('registrations')
+      .select('id, registration, photo_urls, statuses, airlines(name), aircraft_types(name)')
+      .not('photo_urls', 'is', null)
+      .then(({ data, error: err }) => {
+        if (err) { setError(err.message); setLoading(false); return }
+        const rows = (data ?? [])
+          .filter((r) => Array.isArray(r.photo_urls) && r.photo_urls.length > 0)
+          .sort((a, b) => {
+            const an = a.airlines?.name ?? ''
+            const bn = b.airlines?.name ?? ''
+            if (an !== bn) return an.localeCompare(bn, 'en', { sensitivity: 'base' })
+            return a.registration.localeCompare(b.registration, 'en', { numeric: true, sensitivity: 'base' })
+          })
+        setPhotos(rows)
+        setLoading(false)
+      })
+  }, [])
+
+  if (loading) return <p className="state-message">Loading photos…</p>
+  if (error) return <p className="state-message state-message--error">{error}</p>
+  if (photos.length === 0) return <p className="state-message">No photos yet.</p>
+
+  function handleImgError(id) {
+    setImgErrors((prev) => ({ ...prev, [id]: true }))
+  }
+
+  return (
+    <div className="photo-wall">
+      {photos.map((r) => {
+        const liveryChip = r.statuses?.special_livery && r.statuses?.livery_name ? r.statuses.livery_name : null
+        const count = r.photo_urls.length
+        const imgSrc = r.photo_urls[0]
+        const broken = imgErrors[r.id]
+        return (
+          <button
+            key={r.id}
+            className="photo-tile"
+            onClick={() => onSelectReg({ id: r.id, airlines: r.airlines })}
+            aria-label={r.registration}
+          >
+            <div className="photo-tile__img-wrap">
+              {!broken && imgSrc
+                ? <img
+                    className="photo-tile__img"
+                    src={imgSrc}
+                    alt={r.registration}
+                    loading="lazy"
+                    onError={() => handleImgError(r.id)}
+                  />
+                : <div className="photo-tile__placeholder">📷</div>
+              }
+              {liveryChip && <span className="photo-tile__livery">{liveryChip}</span>}
+              {count > 1 && <span className="photo-tile__count">+{count - 1}</span>}
+            </div>
+            <div className="photo-tile__strip">
+              <span className="photo-tile__reg">{r.registration}</span>
+              <span className="photo-tile__sub">{[r.airlines?.name, r.aircraft_types?.name].filter(Boolean).join(' · ')}</span>
+            </div>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
+
 let airlinesViewMode = 'list'
 
 function AirlinesTab() {
@@ -179,6 +263,7 @@ function AirlinesTab() {
   const [reloadNonce, setReloadNonce] = useState(0)
   const [airlineQuery, setAirlineQuery] = useState('')
   const [viewMode, setViewMode] = useState(airlinesViewMode)
+  const [selectedReg, setSelectedReg] = useState(null)
 
   function changeViewMode(mode) { airlinesViewMode = mode; setViewMode(mode) }
 
@@ -240,6 +325,17 @@ function AirlinesTab() {
       .catch(() => { loadFromOffline() })
   }, [reloadNonce])
 
+  if (selectedReg) {
+    return (
+      <RegistrationProfileView
+        regId={selectedReg.id}
+        airline={selectedReg.airlines}
+        onBack={() => setSelectedReg(null)}
+        onChanged={() => {}}
+      />
+    )
+  }
+
   if (selectedManufacturer) {
     return (
       <ManufacturerDetailView
@@ -278,6 +374,10 @@ function AirlinesTab() {
       const y = el.getBoundingClientRect().top + window.scrollY - STICKY_OFFSET
       el.style.position = prevPosition
       window.scrollTo({ top: y, behavior: 'smooth' })
+    }
+
+    if (viewMode === 'gallery') {
+      return <PhotoWall onSelectReg={setSelectedReg} />
     }
 
     if (loading) {
@@ -384,6 +484,12 @@ function AirlinesTab() {
               onClick={() => changeViewMode('grid')}
               aria-label="Grid view"
             >▦</button>
+            <button
+              type="button"
+              className={`airlines-view-toggle__btn${viewMode === 'gallery' ? ' is-on' : ''}`}
+              onClick={() => changeViewMode('gallery')}
+              aria-label="Gallery view"
+            >📷</button>
           </div>
         </div>
         {renderBody()}
