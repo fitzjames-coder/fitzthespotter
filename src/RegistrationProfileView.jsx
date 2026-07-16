@@ -356,6 +356,18 @@ function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
           </span>
         </div>
       )}
+      {reg.engines && (
+        <div className="info-row">
+          <span className="info-row__label">Engines</span>
+          <span className="info-row__value">{reg.engines}</span>
+        </div>
+      )}
+      {reg.production_site && (
+        <div className="info-row">
+          <span className="info-row__label">Built at</span>
+          <span className="info-row__value">{reg.production_site}</span>
+        </div>
+      )}
       {airports.length > 0 && (
         <div className="info-row info-row--airports">
           <span className="info-row__label">Airports</span>
@@ -538,6 +550,8 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           photo_urls,
           msn,
           build_date,
+          engines,
+          production_site,
           aircraft_types (
             id,
             name,
