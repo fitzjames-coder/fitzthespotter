@@ -283,7 +283,7 @@ function AirlineIdentityCard({ details, regCount }) {
   if (!hasAny) return null
 
   return (
-    <div className="info-card">
+    <div className="info-card identity-card">
       {details.founded && (
         <div className="info-row">
           <span className="info-row__label">Founded</span>
@@ -313,7 +313,7 @@ function AirlineIdentityCard({ details, regCount }) {
         </div>
       )}
       {details.fleet_size && details.fleet_size_date && (
-        <div className="info-row">
+        <div className="info-row info-row--fleet">
           <span className="info-row__label">Fleet</span>
           <span className="info-row__value">
             {details.fleet_size} aircraft as of {formatShortDate(details.fleet_size_date)} — {regCount} captured ({((regCount / details.fleet_size) * 100).toFixed(1)}%)
