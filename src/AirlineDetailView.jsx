@@ -87,7 +87,7 @@ function RetiredPill({ item, onLongPress }) {
   )
 }
 
-function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit, onAddReg, retiredTypes, onRetireLongPress, details }) {
+function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit, onAddReg, retiredTypes, onRetireLongPress, details, detailsOpen, onToggleDetails }) {
   const isClosed = airline.is_closed
   const year = closedYear(airline)
 
@@ -162,6 +162,16 @@ function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit
           src="/Closed.PNG"
           alt="Closed — ceased operations"
         />
+      )}
+      {details && (details.founded || (Array.isArray(details.hubs) && details.hubs.length > 0) || details.airline_group || details.predecessors || (details.fleet_size && details.fleet_size_date)) && (
+        <button
+          type="button"
+          style={{ background: 'none', border: 'none', padding: '4px 0 2px', cursor: 'pointer', fontSize: '0.6rem', color: 'rgba(246,239,220,0.55)', display: 'block', width: '100%', textAlign: 'center', letterSpacing: '0.04em' }}
+          onClick={onToggleDetails}
+          aria-expanded={detailsOpen}
+        >
+          More info {detailsOpen ? '▾' : '▸'}
+        </button>
       )}
     </div>
   )
@@ -346,6 +356,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   const [showSearch, setShowSearch] = useState(false)
   const [sortMode, setSortMode] = useState('spotted')
   const [airlineDetails, setAirlineDetails] = useState(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
 
   useEffect(() => {
     if (!supabase || !airline.id) return
@@ -476,7 +487,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
       : filtered
     return (
       <>
-        <AirlineIdentityCard details={airlineDetails} regCount={regCount} />
+        {detailsOpen && <AirlineIdentityCard details={airlineDetails} regCount={regCount} />}
         <ManufacturerBreakdown registrations={registrations} onSelectManufacturer={onSelectManufacturer} />
         <div className="reg-list-head">
           <p className="section-label">Registrations</p>
@@ -552,6 +563,8 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
           retiredTypes={retiredTypes}
           onRetireLongPress={setUnretireTarget}
           details={airlineDetails}
+          detailsOpen={detailsOpen}
+          onToggleDetails={() => setDetailsOpen((o) => !o)}
         />
         <main className="content">
           {renderBody()}
