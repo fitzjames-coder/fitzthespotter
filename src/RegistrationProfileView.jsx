@@ -274,6 +274,7 @@ export function formatSinceLastSeen(iso) {
 
 function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
   const [honors, setHonors] = useState([])
+  const [moreOpen, setMoreOpen] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -356,17 +357,33 @@ function InfoSection({ reg, lastSighting, sightingCount, isRetiredType }) {
           </span>
         </div>
       )}
-      {reg.engines && (
-        <div className="info-row">
-          <span className="info-row__label">Engines</span>
-          <span className="info-row__value">{reg.engines}</span>
-        </div>
-      )}
-      {reg.production_site && (
-        <div className="info-row">
-          <span className="info-row__label">Built at</span>
-          <span className="info-row__value">{reg.production_site}</span>
-        </div>
+      {(reg.engines || reg.production_site) && (
+        <>
+          <button
+            type="button"
+            style={{ background: 'none', border: 'none', padding: '3px 0', cursor: 'pointer', fontSize: '0.6rem', color: 'var(--color-ink)', opacity: 0.45, display: 'block', letterSpacing: '0.03em' }}
+            onClick={() => setMoreOpen((o) => !o)}
+            aria-expanded={moreOpen}
+          >
+            {moreOpen ? '▾' : '▸'} More info
+          </button>
+          {moreOpen && (
+            <>
+              {reg.engines && (
+                <div className="info-row">
+                  <span className="info-row__label">Engines</span>
+                  <span className="info-row__value">{reg.engines}</span>
+                </div>
+              )}
+              {reg.production_site && (
+                <div className="info-row">
+                  <span className="info-row__label">Built at</span>
+                  <span className="info-row__value">{reg.production_site}</span>
+                </div>
+              )}
+            </>
+          )}
+        </>
       )}
       {airports.length > 0 && (
         <div className="info-row info-row--airports">
