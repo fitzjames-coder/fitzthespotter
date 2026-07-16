@@ -5955,3 +5955,8 @@
 .reg-search-bar__input:focus { border-color: var(--color-amber); }
 .reg-search-bar__clear { background: none; border: none; font-size: 1rem; line-height: 1; cursor: pointer; padding: 4px 6px; color: var(--color-ink); opacity: 0.45; }
 .reg-search-result { font-size: .7rem; color: var(--color-ink); opacity: .5; margin: 0 0 8px; }
+/* ── Airline identity card styling ──────────────────────── */
+.identity-card { border-top: 3px solid var(--color-amber); }
+.identity-card .info-row__label { background: var(--color-cream); }
+.identity-card .info-row--fleet { background: rgba(251,173,25,.12); }
+.identity-card .info-row--fleet .info-row__value { font-family: Georgia, serif; }

@@ -23,6 +23,13 @@ function closedYear(airline) {
   return isNaN(y) ? null : y
 }
 
+function formatShortDate(iso) {
+  if (!iso) return null
+  const [y, m, d] = iso.split('-').map(Number)
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  return `${d} ${months[m - 1]} ${y}`
+}
+
 function FlagIcon({ countryCode }) {
   if (!countryCode) return null
   return (
@@ -80,7 +87,7 @@ function RetiredPill({ item, onLongPress }) {
   )
 }
 
-function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit, onAddReg, retiredTypes, onRetireLongPress }) {
+function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit, onAddReg, retiredTypes, onRetireLongPress, details, detailsOpen, onToggleDetails }) {
   const isClosed = airline.is_closed
   const year = closedYear(airline)
 
@@ -88,6 +95,19 @@ function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit
   if (airline.country) metaParts.push(airline.country)
   if (isClosed && year) metaParts.push(`closed ${year}`)
   const meta = metaParts.join(' · ')
+
+  let identityMeta = null
+  if (details) {
+    const parts = []
+    const codes = [details.iata, details.icao].filter(Boolean)
+    if (codes.length) parts.push(codes.join(' · '))
+    if (details.callsign) parts.push(`"${details.callsign}"`)
+    if (details.founded) {
+      const y = parseInt(details.founded.slice(0, 4), 10)
+      if (!isNaN(y)) parts.push(`est. ${y}`)
+    }
+    if (parts.length) identityMeta = parts.join(' · ')
+  }
 
   return (
     <div className="airline-hero">
@@ -108,6 +128,9 @@ function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit
           </div>
           {airline.secondary_name && (
             <p className="airline-hero__secondary">{airline.secondary_name}</p>
+          )}
+          {identityMeta && (
+            <p className="airline-hero__meta">{identityMeta}</p>
           )}
           {(airline.country_flag || meta) && (
             <p className="airline-hero__meta">
@@ -139,6 +162,16 @@ function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit
           src="/Closed.PNG"
           alt="Closed — ceased operations"
         />
+      )}
+      {details && (details.founded || (Array.isArray(details.hubs) && details.hubs.length > 0) || details.airline_group || details.predecessors || (details.fleet_size && details.fleet_size_date)) && (
+        <button
+          type="button"
+          style={{ background: 'none', border: 'none', padding: '4px 0 2px', cursor: 'pointer', fontSize: '0.6rem', color: 'rgba(246,239,220,0.55)', display: 'block', width: '100%', textAlign: 'center', letterSpacing: '0.04em' }}
+          onClick={onToggleDetails}
+          aria-expanded={detailsOpen}
+        >
+          More info {detailsOpen ? '▾' : '▸'}
+        </button>
       )}
     </div>
   )
@@ -241,6 +274,56 @@ function ManufacturerBreakdown({ registrations, onSelectManufacturer }) {
   )
 }
 
+function AirlineIdentityCard({ details, regCount }) {
+  if (!details) return null
+  const hasAny = details.founded ||
+    (Array.isArray(details.hubs) && details.hubs.length > 0) ||
+    details.airline_group || details.predecessors ||
+    (details.fleet_size && details.fleet_size_date)
+  if (!hasAny) return null
+
+  return (
+    <div className="info-card identity-card">
+      {details.founded && (
+        <div className="info-row">
+          <span className="info-row__label">Founded</span>
+          <span className="info-row__value">{formatShortDate(details.founded)}</span>
+        </div>
+      )}
+      {Array.isArray(details.hubs) && details.hubs.length > 0 && (
+        <div className="info-row info-row--airports">
+          <span className="info-row__label">Hub · Bases</span>
+          <div className="info-row__pills">
+            {details.hubs.map((code) => (
+              <span key={code} className="airport-pill">{code}</span>
+            ))}
+          </div>
+        </div>
+      )}
+      {details.airline_group && (
+        <div className="info-row">
+          <span className="info-row__label">Group</span>
+          <span className="info-row__value">{details.airline_group}</span>
+        </div>
+      )}
+      {details.predecessors && (
+        <div className="info-row">
+          <span className="info-row__label">Predecessors</span>
+          <span className="info-row__value">{details.predecessors}</span>
+        </div>
+      )}
+      {details.fleet_size && details.fleet_size_date && (
+        <div className="info-row info-row--fleet">
+          <span className="info-row__label">Fleet</span>
+          <span className="info-row__value">
+            {details.fleet_size} aircraft as of {formatShortDate(details.fleet_size_date)} — {regCount} captured ({((regCount / details.fleet_size) * 100).toFixed(1)}%)
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function RegistrationCard({ reg, onSelect }) {
   const typeName = reg.aircraft_types?.name ? stripTypeParens(reg.aircraft_types.name) : null
   const abbrev = typeName ? thumbAbbrev(typeName) : ''
@@ -272,6 +355,18 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   const [regQuery, setRegQuery] = useState('')
   const [showSearch, setShowSearch] = useState(false)
   const [sortMode, setSortMode] = useState('spotted')
+  const [airlineDetails, setAirlineDetails] = useState(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
+
+  useEffect(() => {
+    if (!supabase || !airline.id) return
+    supabase
+      .from('airlines')
+      .select('iata, icao, callsign, founded, predecessors, airline_group, hubs, fleet_size, fleet_size_date')
+      .eq('id', airline.id)
+      .single()
+      .then(({ data }) => { if (data) setAirlineDetails(data) })
+  }, [airline.id])
 
   function loadRetiredTypes() {
     if (!supabase) return
@@ -392,6 +487,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
       : filtered
     return (
       <>
+        {detailsOpen && <AirlineIdentityCard details={airlineDetails} regCount={regCount} />}
         <ManufacturerBreakdown registrations={registrations} onSelectManufacturer={onSelectManufacturer} />
         <div className="reg-list-head">
           <p className="section-label">Registrations</p>
@@ -466,6 +562,9 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
           onAddReg={() => setShowRegForm(true)}
           retiredTypes={retiredTypes}
           onRetireLongPress={setUnretireTarget}
+          details={airlineDetails}
+          detailsOpen={detailsOpen}
+          onToggleDetails={() => setDetailsOpen((o) => !o)}
         />
         <main className="content">
           {renderBody()}
