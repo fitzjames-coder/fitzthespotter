@@ -5960,3 +5960,16 @@
 .identity-card .info-row__label { background: var(--color-cream); }
 .identity-card .info-row--fleet { background: rgba(251,173,25,.12); }
 .identity-card .info-row--fleet .info-row__value { font-family: Georgia, serif; }
+/* ── Closed airline card ─────────────────────────────────── */
+.airline-card.airline-card--closed { background: var(--color-coral); }
+.airline-card.airline-card--closed .airline-card__name { color: #ffffff; }
+.airline-card.airline-card--closed .airline-card__country { color: rgba(255,255,255,0.78); }
+.airline-card.airline-card--closed .airline-card__logo,
+.airline-card.airline-card--closed .airline-card__logo-initials,
+.airline-card.airline-card--closed .airline-card__flag-placeholder { background: rgba(255,255,255,0.88); }
+/* ── Closed airline grid tile ────────────────────────────── */
+.airline-grid-tile.airline-grid-tile--closed { background: var(--color-coral); }
+.airline-grid-tile.airline-grid-tile--closed .airline-grid-tile__name { color: #ffffff; }
+.airline-grid-tile.airline-grid-tile--closed .airline-grid-tile__logo,
+.airline-grid-tile.airline-grid-tile--closed .airline-grid-tile__logo-initials,
+.airline-grid-tile.airline-grid-tile--closed .airline-grid-tile__corner--tl { background: rgba(255,255,255,0.88); }

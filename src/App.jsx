@@ -105,7 +105,7 @@ function cardInitials(name) {
 function AirlineCard({ airline, regCount, onSelect }) {
   const isClosed = airline.is_closed
   return (
-    <button className="airline-card" onClick={() => onSelect(airline)}>
+    <button className={`airline-card${isClosed ? ' airline-card--closed' : ''}`} onClick={() => onSelect(airline)}>
       <div className="airline-card__main">
         <div className="airline-card__logo">
           {airline.logo_url
@@ -139,7 +139,7 @@ function AirlineCard({ airline, regCount, onSelect }) {
 function AirlineGridTile({ airline, regCount, onSelect }) {
   const isClosed = airline.is_closed
   return (
-    <button className="airline-grid-tile" onClick={() => onSelect(airline)}>
+    <button className={`airline-grid-tile${isClosed ? ' airline-grid-tile--closed' : ''}`} onClick={() => onSelect(airline)}>
       {airline.country_flag && (
         <span className="airline-grid-tile__corner airline-grid-tile__corner--tl">
           <FlagIcon countryCode={airline.country_flag} />
