@@ -105,7 +105,7 @@ function cardInitials(name) {
 function AirlineCard({ airline, regCount, onSelect }) {
   const isClosed = airline.is_closed
   return (
-    <button className="airline-card" onClick={() => onSelect(airline)}>
+    <button className={`airline-card${isClosed ? ' airline-card--closed' : ''}`} onClick={() => onSelect(airline)}>
       <div className="airline-card__main">
         <div className="airline-card__logo">
           {airline.logo_url
