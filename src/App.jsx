@@ -139,7 +139,7 @@ function AirlineCard({ airline, regCount, onSelect }) {
 function AirlineGridTile({ airline, regCount, onSelect }) {
   const isClosed = airline.is_closed
   return (
-    <button className="airline-grid-tile" onClick={() => onSelect(airline)}>
+    <button className={`airline-grid-tile${isClosed ? ' airline-grid-tile--closed' : ''}`} onClick={() => onSelect(airline)}>
       {airline.country_flag && (
         <span className="airline-grid-tile__corner airline-grid-tile__corner--tl">
           <FlagIcon countryCode={airline.country_flag} />

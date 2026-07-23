@@ -5967,3 +5967,9 @@
 .airline-card.airline-card--closed .airline-card__logo,
 .airline-card.airline-card--closed .airline-card__logo-initials,
 .airline-card.airline-card--closed .airline-card__flag-placeholder { background: rgba(255,255,255,0.88); }
+/* ── Closed airline grid tile ────────────────────────────── */
+.airline-grid-tile.airline-grid-tile--closed { background: var(--color-coral); }
+.airline-grid-tile.airline-grid-tile--closed .airline-grid-tile__name { color: #ffffff; }
+.airline-grid-tile.airline-grid-tile--closed .airline-grid-tile__logo,
+.airline-grid-tile.airline-grid-tile--closed .airline-grid-tile__logo-initials,
+.airline-grid-tile.airline-grid-tile--closed .airline-grid-tile__corner--tl { background: rgba(255,255,255,0.88); }
