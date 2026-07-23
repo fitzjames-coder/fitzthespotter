@@ -5961,9 +5961,9 @@
 .identity-card .info-row--fleet { background: rgba(251,173,25,.12); }
 .identity-card .info-row--fleet .info-row__value { font-family: Georgia, serif; }
 /* ── Closed airline card ─────────────────────────────────── */
-.airline-card--closed { background: var(--color-coral); }
-.airline-card--closed .airline-card__name { color: #ffffff; }
-.airline-card--closed .airline-card__country { color: rgba(255,255,255,0.78); }
-.airline-card--closed .airline-card__logo,
-.airline-card--closed .airline-card__logo-initials,
-.airline-card--closed .airline-card__flag-placeholder { background: rgba(255,255,255,0.88); }
+.airline-card.airline-card--closed { background: var(--color-coral); }
+.airline-card.airline-card--closed .airline-card__name { color: #ffffff; }
+.airline-card.airline-card--closed .airline-card__country { color: rgba(255,255,255,0.78); }
+.airline-card.airline-card--closed .airline-card__logo,
+.airline-card.airline-card--closed .airline-card__logo-initials,
+.airline-card.airline-card--closed .airline-card__flag-placeholder { background: rgba(255,255,255,0.88); }
