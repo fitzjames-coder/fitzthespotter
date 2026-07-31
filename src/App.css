@@ -5590,6 +5590,13 @@
 }
 
 /* ── Sightings sub-count ─────────────────────────────────────────── */
+.airline-regs-logged__prefix {
+  font-size: 0.6rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(246, 239, 220, 0.38);
+}
 .airline-regs-logged__sub {
   display: block;
   width: 100%;

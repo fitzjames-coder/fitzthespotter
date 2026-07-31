@@ -12,6 +12,13 @@ function heroInitials(name) {
   return name.split(/\s+/).map((w) => w[0]).join('').toUpperCase().slice(0, 3)
 }
 
+function deriveRegPrefix(reg) {
+  const dashIdx = reg.indexOf('-')
+  if (dashIdx !== -1) return reg.slice(0, dashIdx + 1)
+  const m = reg.match(/^[A-Za-z]+/)
+  return m ? m[0] + '-' : null
+}
+
 function thumbAbbrev(model) {
   const seg = model.split(/[-\s]/)[0]
   return seg.length <= 5 ? seg : seg.slice(0, 4)
@@ -87,7 +94,7 @@ function RetiredPill({ item, onLongPress }) {
   )
 }
 
-function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit, onAddReg, retiredTypes, onRetireLongPress, details, detailsOpen, onToggleDetails }) {
+function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit, onAddReg, retiredTypes, onRetireLongPress, details, detailsOpen, onToggleDetails, regPrefixes }) {
   const isClosed = airline.is_closed
   const year = closedYear(airline)
 
@@ -142,6 +149,9 @@ function AirlineHero({ airline, regCount, sightingCount, loading, onBack, onEdit
             <div className="airline-hero__stats">
               <span className="airline-regs-logged__number">{regCount}</span>
               <span className="airline-regs-logged__label">REGS LOGGED</span>
+              {regPrefixes && regPrefixes.length > 0 && (
+                <span className="airline-regs-logged__prefix">({regPrefixes.join(' · ')})</span>
+              )}
               {typeof sightingCount === 'number' && (
                 <span className="airline-regs-logged__sub">{sightingCount} sightings</span>
               )}
@@ -475,6 +485,9 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
   }
 
   const regCount = registrations.length
+  const regPrefixes = [...new Set(
+    registrations.map((r) => deriveRegPrefix(r.registration)).filter(Boolean)
+  )].sort()
 
   function renderBody() {
     if (loading) {
@@ -571,6 +584,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
           details={airlineDetails}
           detailsOpen={detailsOpen}
           onToggleDetails={() => setDetailsOpen((o) => !o)}
+          regPrefixes={regPrefixes}
         />
         <main className="content">
           {renderBody()}
