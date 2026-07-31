@@ -173,6 +173,7 @@ function PhotoWall({ onSelectReg }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [imgErrors, setImgErrors] = useState({})
+  const [showcaseMode, setShowcaseMode] = useState('showcase')
 
   useEffect(() => {
     if (typeof navigator !== 'undefined' && navigator.onLine === false) {
@@ -188,7 +189,7 @@ function PhotoWall({ onSelectReg }) {
     fetchAllRows(() =>
       supabase
         .from('registrations')
-        .select('id, registration, photo_urls, statuses, airlines(name), aircraft_types(name)')
+        .select('id, registration, photo_urls, showcase_urls, statuses, airlines(name), aircraft_types(name)')
         .not('photo_urls', 'is', null)
     ).then(({ data, error: err }) => {
         if (err) { setError(err.message); setLoading(false); return }
@@ -207,48 +208,80 @@ function PhotoWall({ onSelectReg }) {
 
   if (loading) return <p className="state-message">Loading photos…</p>
   if (error) return <p className="state-message state-message--error">{error}</p>
-  if (photos.length === 0) return <p className="state-message">No photos yet.</p>
+
+  const displayed = showcaseMode === 'showcase'
+    ? photos.filter((r) => Array.isArray(r.showcase_urls) && r.showcase_urls.length > 0)
+    : photos
 
   function handleImgError(id) {
     setImgErrors((prev) => ({ ...prev, [id]: true }))
   }
 
-  return (
-    <div className="photo-wall">
-      {photos.map((r) => {
-        const liveryChip = r.statuses?.special_livery && r.statuses?.livery_name ? r.statuses.livery_name : null
-        const count = r.photo_urls.length
-        const imgSrc = r.photo_urls[0]
-        const broken = imgErrors[r.id]
-        return (
-          <button
-            key={r.id}
-            className="photo-tile"
-            onClick={() => onSelectReg({ id: r.id, airlines: r.airlines })}
-            aria-label={r.registration}
-          >
-            <div className="photo-tile__img-wrap">
-              {!broken && imgSrc
-                ? <img
-                    className="photo-tile__img"
-                    src={imgSrc}
-                    alt={r.registration}
-                    loading="lazy"
-                    onError={() => handleImgError(r.id)}
-                  />
-                : <div className="photo-tile__placeholder">📷</div>
-              }
-              {liveryChip && <span className="photo-tile__livery">{liveryChip}</span>}
-              {count > 1 && <span className="photo-tile__count">+{count - 1}</span>}
-            </div>
-            <div className="photo-tile__strip">
-              <span className="photo-tile__reg">{r.registration}</span>
-              <span className="photo-tile__sub">{[r.airlines?.name, r.aircraft_types?.name].filter(Boolean).join(' · ')}</span>
-            </div>
-          </button>
-        )
-      })}
+  const seg = (
+    <div className="photo-seg">
+      <button
+        type="button"
+        className={`photo-seg__btn${showcaseMode === 'showcase' ? ' photo-seg__btn--on' : ''}`}
+        onClick={() => setShowcaseMode('showcase')}
+      >SHOWCASE</button>
+      <button
+        type="button"
+        className={`photo-seg__btn${showcaseMode === 'all' ? ' photo-seg__btn--on' : ''}`}
+        onClick={() => setShowcaseMode('all')}
+      >ALL</button>
     </div>
+  )
+
+  if (displayed.length === 0) {
+    return (
+      <>
+        {seg}
+        <p className="state-message">
+          {showcaseMode === 'showcase' ? 'No showcase photos yet — star a photo to feature it.' : 'No photos yet.'}
+        </p>
+      </>
+    )
+  }
+
+  return (
+    <>
+      {seg}
+      <div className="photo-wall">
+        {displayed.map((r) => {
+          const liveryChip = r.statuses?.special_livery && r.statuses?.livery_name ? r.statuses.livery_name : null
+          const count = r.photo_urls.length
+          const imgSrc = showcaseMode === 'showcase' ? r.showcase_urls[0] : r.photo_urls[0]
+          const broken = imgErrors[r.id]
+          return (
+            <button
+              key={r.id}
+              className="photo-tile"
+              onClick={() => onSelectReg({ id: r.id, airlines: r.airlines })}
+              aria-label={r.registration}
+            >
+              <div className="photo-tile__img-wrap">
+                {!broken && imgSrc
+                  ? <img
+                      className="photo-tile__img"
+                      src={imgSrc}
+                      alt={r.registration}
+                      loading="lazy"
+                      onError={() => handleImgError(r.id)}
+                    />
+                  : <div className="photo-tile__placeholder">📷</div>
+                }
+                {liveryChip && <span className="photo-tile__livery">{liveryChip}</span>}
+                {count > 1 && <span className="photo-tile__count">+{count - 1}</span>}
+              </div>
+              <div className="photo-tile__strip">
+                <span className="photo-tile__reg">{r.registration}</span>
+                <span className="photo-tile__sub">{[r.airlines?.name, r.aircraft_types?.name].filter(Boolean).join(' · ')}</span>
+              </div>
+            </button>
+          )
+        })}
+      </div>
+    </>
   )
 }
 
