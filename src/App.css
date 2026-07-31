@@ -5936,7 +5936,7 @@
 .vg-zoom .vg-shot { max-height: 86vh; width: auto; max-width: 100%; border: none; }
 .vg-zoom__cap { color: #fff; opacity: 0.75; font-size: 0.78rem; margin-top: 10px; }
 /* ── Photo Wall ─────────────────────────────────────────── */
-.photo-seg { display:flex; margin:12px 12px 0; border:2px solid var(--color-amber); border-radius:9px; overflow:hidden; }
+.photo-seg { display:flex; margin:12px 12px 0; border:2px solid var(--color-amber); border-radius:9px; overflow:hidden; background: var(--color-navy); }
 .photo-seg__btn { flex:1; background:transparent; border:none; color:var(--color-cream); font-size:.72rem; font-weight:700; letter-spacing:.06em; padding:7px 0; cursor:pointer; }
 .photo-seg__btn--on { background:var(--color-amber); color:var(--color-ink); }
 .photo-wall { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 12px 80px; }
