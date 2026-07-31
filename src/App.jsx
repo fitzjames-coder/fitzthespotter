@@ -189,7 +189,7 @@ function PhotoWall({ onSelectReg }) {
     fetchAllRows(() =>
       supabase
         .from('registrations')
-        .select('id, registration, photo_urls, showcase_urls, statuses, airlines(name), aircraft_types(name)')
+        .select('id, registration, photo_urls, showcase_urls, statuses, airlines(name), aircraft_types(name), sightings(livery_name, spotted_on, special_livery)')
         .not('photo_urls', 'is', null)
     ).then(({ data, error: err }) => {
         if (err) { setError(err.message); setLoading(false); return }
@@ -248,7 +248,13 @@ function PhotoWall({ onSelectReg }) {
       {seg}
       <div className="photo-wall">
         {displayed.map((r) => {
-          const liveryChip = r.statuses?.special_livery && r.statuses?.livery_name ? r.statuses.livery_name : null
+          const liveryChip = (() => {
+            if (r.statuses?.special_livery && r.statuses?.livery_name) return r.statuses.livery_name
+            const historicSighting = [...(r.sightings ?? [])]
+              .filter((s) => s.special_livery && s.livery_name)
+              .sort((a, b) => (b.spotted_on ?? '').localeCompare(a.spotted_on ?? ''))
+            return historicSighting[0]?.livery_name ?? null
+          })()
           const count = r.photo_urls.length
           const imgSrc = showcaseMode === 'showcase' ? r.showcase_urls[0] : r.photo_urls[0]
           const broken = imgErrors[r.id]
