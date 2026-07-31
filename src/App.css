@@ -5950,6 +5950,8 @@
 .photo-tile__strip { padding: 6px 8px; background: var(--color-cream); display: flex; flex-direction: column; gap: 1px; }
 .photo-tile__reg { font-size: .8rem; font-weight: 700; color: var(--color-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .photo-tile__sub { font-size: .65rem; color: var(--color-deep-blue); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* ── Paired info-row (Founded + Ceased inline) ───────────── */
+.info-row--paired .info-row__value { flex: none; }
 /* ── Airline detail: reg search + sort ──────────────────── */
 .reg-list-head { display: flex; align-items: center; justify-content: space-between; margin: 0 0 6px; }
 .reg-list-head .section-label { margin: 0; }
