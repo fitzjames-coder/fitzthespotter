@@ -209,7 +209,7 @@ function ImageSpotlightOverlay({ src, alt, onClose, onDelete, deleting }) {
   )
 }
 
-function PhotoGallery({ slides, onSlideClick }) {
+function PhotoGallery({ slides, onSlideClick, showcaseUrls, onStarToggle, templateUrl }) {
   const trackRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
 
@@ -219,6 +219,10 @@ function PhotoGallery({ slides, onSlideClick }) {
     const idx = Math.round(track.scrollLeft / track.clientWidth)
     setActiveIndex(Math.max(0, Math.min(idx, slides.length - 1)))
   }
+
+  const currentUrl = slides[activeIndex]
+  const showStar = Boolean(onStarToggle && currentUrl && currentUrl !== templateUrl)
+  const isShowcase = showStar && (showcaseUrls ?? []).includes(currentUrl)
 
   return (
     <div className="reg-gallery">
@@ -243,6 +247,15 @@ function PhotoGallery({ slides, onSlideClick }) {
             />
           ))}
         </div>
+      )}
+      {showStar && (
+        <button
+          type="button"
+          className={`reg-gallery__star${isShowcase ? ' reg-gallery__star--on' : ''}`}
+          onClick={() => onStarToggle(currentUrl)}
+          aria-label={isShowcase ? 'Remove from showcase' : 'Add to showcase'}
+          aria-pressed={isShowcase}
+        >★</button>
       )}
     </div>
   )
@@ -495,6 +508,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
   const [siblingIds, setSiblingIds] = useState([])
   const [spotlightSrc, setSpotlightSrc] = useState(null)
   const [photoUrls, setPhotoUrls] = useState([])
+  const [showcaseUrls, setShowcaseUrls] = useState([])
   const [showFlagConfirm, setShowFlagConfirm] = useState(false)
   const [flagBusy, setFlagBusy] = useState(false)
   const [showUploadConfirm, setShowUploadConfirm] = useState(false)
@@ -541,6 +555,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
         setReg(res.reg)
         setFlagged(Boolean(res.reg.flagged))
         setPhotoUrls(Array.isArray(res.reg.photo_urls) ? res.reg.photo_urls : [])
+        setShowcaseUrls(Array.isArray(res.reg.showcase_urls) ? res.reg.showcase_urls : [])
         setLastSighting(res.lastSighting)
         setSightingCount(res.sightingCount)
         setError(null)
@@ -569,6 +584,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
           build_date,
           engines,
           production_site,
+          showcase_urls,
           aircraft_types (
             id,
             name,
@@ -593,6 +609,7 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
       setReg(data)
       setFlagged(Boolean(data.flagged))
       setPhotoUrls(Array.isArray(data.photo_urls) ? data.photo_urls : [])
+      setShowcaseUrls(Array.isArray(data.showcase_urls) ? data.showcase_urls : [])
 
       const { data: ls } = await supabase
         .from('sightings')
@@ -759,6 +776,19 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
     setSpotlightSrc(null)
   }
 
+  async function handleStarToggle(url) {
+    const prev = showcaseUrls
+    const next = prev.includes(url) ? prev.filter((u) => u !== url) : [...prev, url]
+    setShowcaseUrls(next)
+    if (supabase) {
+      const { error: err } = await supabase
+        .from('registrations')
+        .update({ showcase_urls: next })
+        .eq('id', currentRegId)
+      if (err) setShowcaseUrls(prev)
+    }
+  }
+
   async function handleDelete() {
     setDeleting(true)
     setDeleteError(null)
@@ -805,7 +835,13 @@ export default function RegistrationProfileView({ regId, airline, onBack, onChan
         {slides.length === 0 ? (
           <GalleryPlaceholder />
         ) : (
-          <PhotoGallery slides={slides} onSlideClick={(src) => setSpotlightSrc(src)} />
+          <PhotoGallery
+            slides={slides}
+            onSlideClick={(src) => setSpotlightSrc(src)}
+            showcaseUrls={showcaseUrls}
+            onStarToggle={handleStarToggle}
+            templateUrl={templateUrl}
+          />
         )}
         <main className="content reg-info-area" style={{ opacity: loading ? 0.6 : 1 }}>
           <div className="section-label-row">

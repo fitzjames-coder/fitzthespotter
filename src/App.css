@@ -1346,6 +1346,9 @@
   background: var(--color-amber);
 }
 
+.reg-gallery__star { position:absolute; top:8px; right:8px; width:34px; height:34px; border:2px solid var(--color-ink); border-radius:50%; background:rgba(246,239,220,.92); color:rgba(22,32,59,.35); font-size:1.05rem; line-height:1; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:2px 2px 0 rgba(22,32,59,.18); }
+.reg-gallery__star--on { background:var(--color-amber); color:var(--color-ink); border-color:var(--color-ink); }
+
 /* ── Info card ──────────────────────────────────────────────────── */
 .info-card {
   background: #ffffff;
@@ -5933,6 +5936,9 @@
 .vg-zoom .vg-shot { max-height: 86vh; width: auto; max-width: 100%; border: none; }
 .vg-zoom__cap { color: #fff; opacity: 0.75; font-size: 0.78rem; margin-top: 10px; }
 /* ── Photo Wall ─────────────────────────────────────────── */
+.photo-seg { display:flex; margin:12px 12px 0; border:2px solid var(--color-amber); border-radius:9px; overflow:hidden; background: var(--color-navy); }
+.photo-seg__btn { flex:1; background:transparent; border:none; color:var(--color-cream); font-size:.72rem; font-weight:700; letter-spacing:.06em; padding:7px 0; cursor:pointer; }
+.photo-seg__btn--on { background:var(--color-amber); color:var(--color-ink); }
 .photo-wall { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 12px 80px; }
 .photo-tile { display: flex; flex-direction: column; background: var(--color-surface, #1c2a4a); border: 1px solid rgba(251,173,25,.15); border-radius: 10px; overflow: hidden; text-align: left; cursor: pointer; transition: transform .15s; padding: 0; }
 .photo-tile:active { transform: scale(.97); }
