@@ -285,9 +285,15 @@ function AirlineIdentityCard({ details, regCount }) {
   return (
     <div className="info-card identity-card">
       {details.founded && (
-        <div className="info-row">
+        <div className={`info-row${details.closed_date ? ' info-row--paired' : ''}`}>
           <span className="info-row__label">Founded</span>
           <span className="info-row__value">{formatShortDate(details.founded)}</span>
+          {details.closed_date && (
+            <>
+              <span className="info-row__label">Ceased</span>
+              <span className="info-row__value">{formatShortDate(details.closed_date)}</span>
+            </>
+          )}
         </div>
       )}
       {Array.isArray(details.hubs) && details.hubs.length > 0 && (
@@ -362,7 +368,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
     if (!supabase || !airline.id) return
     supabase
       .from('airlines')
-      .select('iata, icao, callsign, founded, predecessors, airline_group, hubs, fleet_size, fleet_size_date')
+      .select('iata, icao, callsign, founded, closed_date, predecessors, airline_group, hubs, fleet_size, fleet_size_date')
       .eq('id', airline.id)
       .single()
       .then(({ data }) => { if (data) setAirlineDetails(data) })
