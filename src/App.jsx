@@ -1,4 +1,4 @@
-import { useEffect, useState, Fragment } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, Fragment } from 'react'
 import './App.css'
 import { supabase } from './lib/supabaseClient'
 import markFlownIn from './assets/marks/mark-flown-in.png'
@@ -292,6 +292,7 @@ function PhotoWall({ onSelectReg }) {
 }
 
 let airlinesViewMode = 'list'
+let airlinesScrollY = 0
 
 function AirlinesTab() {
   const [airlines, setAirlines] = useState([])
@@ -309,6 +310,20 @@ function AirlinesTab() {
   function changeViewMode(mode) { airlinesViewMode = mode; setViewMode(mode) }
 
   function reloadAirlines() { setReloadNonce((n) => n + 1) }
+
+  const returningFromDetail = useRef(false)
+
+  function selectAirline(airline) {
+    airlinesScrollY = window.scrollY
+    setSelectedAirline(airline)
+  }
+
+  useLayoutEffect(() => {
+    if (returningFromDetail.current) {
+      window.scrollTo(0, airlinesScrollY)
+      returningFromDetail.current = false
+    }
+  }, [selectedAirline])
 
   useEffect(() => {
     if (!supabase) {
@@ -390,7 +405,7 @@ function AirlinesTab() {
     return (
       <AirlineDetailView
         airline={selectedAirline}
-        onBack={() => setSelectedAirline(null)}
+        onBack={() => { returningFromDetail.current = true; setSelectedAirline(null) }}
         onSelectManufacturer={(mfr) => {
           setSelectedManufacturer(mfr)
           setManufacturerAirline(selectedAirline ? { id: selectedAirline.id, name: selectedAirline.name } : null)
@@ -458,7 +473,7 @@ function AirlinesTab() {
                     <AirlineCard
                       airline={airline}
                       regCount={regCounts[airline.id] ?? 0}
-                      onSelect={setSelectedAirline}
+                      onSelect={selectAirline}
                     />
                   </li>
                 ))}
@@ -475,7 +490,7 @@ function AirlinesTab() {
                     key={airline.id}
                     airline={airline}
                     regCount={regCounts[airline.id] ?? 0}
-                    onSelect={setSelectedAirline}
+                    onSelect={selectAirline}
                   />
                 ))}
               </Fragment>
