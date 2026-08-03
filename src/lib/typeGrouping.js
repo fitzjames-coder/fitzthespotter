@@ -18,14 +18,18 @@ export function stripTypeParens(name) {
   return (name || '').replace(/[()]/g, '')
 }
 
+export function baseTypeName(name) {
+  return (name || '').replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim()
+}
+
 export function effectiveGroupKey(type, manufacturerId) {
   const cat = type.category ? type.category.trim() : ''
   if (cat) return `cat::${cat}`
-  return typeGroupKey(type.name, manufacturerId) ?? `id:${String(type.id)}`
+  return `${manufacturerId}::base::${baseTypeName(type.name).toLowerCase()}`
 }
 
 export function effectiveGroupLabel(type) {
   const cat = type.category ? type.category.trim() : ''
   if (cat) return cat
-  return typeGroupLabel(type.name) || stripTypeParens(type.name)
+  return baseTypeName(type.name)
 }
