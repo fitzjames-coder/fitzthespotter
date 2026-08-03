@@ -17,3 +17,15 @@ export function typeGroupLabel(name) {
 export function stripTypeParens(name) {
   return (name || '').replace(/[()]/g, '')
 }
+
+export function effectiveGroupKey(type, manufacturerId) {
+  const cat = type.category ? type.category.trim() : ''
+  if (cat) return `cat::${cat}`
+  return typeGroupKey(type.name, manufacturerId) ?? `id:${String(type.id)}`
+}
+
+export function effectiveGroupLabel(type) {
+  const cat = type.category ? type.category.trim() : ''
+  if (cat) return cat
+  return typeGroupLabel(type.name) || stripTypeParens(type.name)
+}
