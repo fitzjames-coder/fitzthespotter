@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from './lib/supabaseClient'
-import { typeGroupKey, typeGroupLabel, stripTypeParens } from './lib/typeGrouping'
+import { effectiveGroupKey, effectiveGroupLabel } from './lib/typeGrouping'
 import { fetchAllRows } from './lib/fetchAllRows'
 import { offlineStatsData } from './lib/offlineData'
 
@@ -58,10 +58,10 @@ function computeStats(regs, airportCountryByIata = {}) {
     if (reg.aircraft_types?.id) {
       const t = reg.aircraft_types
       const mid = String(t.manufacturers?.id ?? 'none')
-      const gkey = typeGroupKey(t.name, mid) ?? `id:${String(t.id)}`
+      const gkey = effectiveGroupKey(t, mid)
       typeIds.add(gkey)
       typeCounts[gkey] = (typeCounts[gkey] ?? 0) + 1
-      if (!typeLabels[gkey]) typeLabels[gkey] = typeGroupLabel(t.name) || stripTypeParens(t.name)
+      if (!typeLabels[gkey]) typeLabels[gkey] = effectiveGroupLabel(t)
     }
     const aps = Array.isArray(reg.airports) ? reg.airports : []
     for (const code of aps) {
@@ -326,7 +326,7 @@ export default function StatsView({ onBack }) {
               .select(`
           id, registration, msn, first_spotted, airports, statuses,
           airlines ( id, name, country, logo_url ),
-          aircraft_types ( id, name, manufacturers ( id, name, logo_url ) )
+          aircraft_types ( id, name, category, manufacturers ( id, name, logo_url ) )
         `)
               .order('id', { ascending: true })
           ),

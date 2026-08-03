@@ -17,3 +17,19 @@ export function typeGroupLabel(name) {
 export function stripTypeParens(name) {
   return (name || '').replace(/[()]/g, '')
 }
+
+export function baseTypeName(name) {
+  return (name || '').replace(/\([^)]*\)/g, '').replace(/\s+/g, ' ').trim()
+}
+
+export function effectiveGroupKey(type, manufacturerId) {
+  const cat = type.category ? type.category.trim() : ''
+  if (cat) return `cat::${cat}`
+  return `${manufacturerId}::base::${baseTypeName(type.name).toLowerCase()}`
+}
+
+export function effectiveGroupLabel(type) {
+  const cat = type.category ? type.category.trim() : ''
+  if (cat) return cat
+  return baseTypeName(type.name)
+}

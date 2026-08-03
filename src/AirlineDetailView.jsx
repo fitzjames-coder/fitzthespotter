@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, useRef } from 'react'
 import { supabase } from './lib/supabaseClient'
-import { stripTypeParens } from './lib/typeGrouping'
+import { stripTypeParens, effectiveGroupLabel } from './lib/typeGrouping'
 import { offlineAirlineRegs } from './lib/offlineData'
 import RegistrationProfileView from './RegistrationProfileView'
 import StatusMarks from './StatusMarks'
@@ -191,7 +191,8 @@ function deriveManufacturerBreakdown(registrations) {
   const mfrMap = new Map()
   for (const reg of registrations) {
     const mfr = reg.aircraft_types?.manufacturers
-    const model = reg.aircraft_types?.name ? stripTypeParens(reg.aircraft_types.name) : null
+    const t = reg.aircraft_types
+    const model = t ? effectiveGroupLabel(t) || null : null
     if (!mfr?.name || !model) continue
     if (!mfrMap.has(mfr.id)) mfrMap.set(mfr.id, { id: mfr.id, name: mfr.name, count: 0, models: new Map() })
     const entry = mfrMap.get(mfr.id)
@@ -441,6 +442,7 @@ export default function AirlineDetailView({ airline, onBack, onSelectManufacture
         aircraft_types (
           id,
           name,
+          category,
           manufacturers (
             id,
             name
