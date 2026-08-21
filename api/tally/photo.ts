@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import sharp from 'sharp'
 
 const WIDTH = 126
 const HEIGHT = 84
@@ -31,22 +30,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return
   }
 
+  // Lazy sharp import — avoids module-scope load failure if native binding missing at boot
+  let sharp: typeof import('sharp')
+  try {
+    sharp = (await import('sharp')).default as unknown as typeof import('sharp')
+  } catch (err) {
+    console.error('[tally/photo] sharp load failed:', err)
+    return noPhoto(res, 502)
+  }
+
   // 1. Query planespotters.net
   let psRes: Response
   try {
-    psRes = await fetchWithTimeout(`https://api.planespotters.net/pub/photos/hex/${encodeURIComponent(hex)}`)
-  } catch {
+    psRes = await fetchWithTimeout(
+      `https://api.planespotters.net/pub/photos/hex/${encodeURIComponent(hex)}`
+    )
+  } catch (err) {
+    console.error('[tally/photo] planespotters fetch failed:', err)
     return noPhoto(res, 502)
   }
 
   if (!psRes.ok) {
+    console.error('[tally/photo] planespotters non-ok status:', psRes.status)
     return noPhoto(res, 502)
   }
 
-  let psBody: { photos?: Array<{ thumbnail_large?: { src?: string }, photographer?: string }> }
+  let psBody: { photos?: Array<{ thumbnail_large?: { src?: string }; photographer?: string }> }
   try {
     psBody = await psRes.json()
-  } catch {
+  } catch (err) {
+    console.error('[tally/photo] planespotters json parse failed:', err)
     return noPhoto(res, 502)
   }
 
@@ -68,26 +81,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return noPhoto(res, 404)
   }
 
-  // 3. Fetch + transcode thumbnail
+  // 3. Fetch thumbnail
   let imgRes: Response
   try {
     imgRes = await fetchWithTimeout(thumbUrl)
-  } catch {
+  } catch (err) {
+    console.error('[tally/photo] thumbnail fetch failed:', err)
     return noPhoto(res, 502)
   }
 
   if (!imgRes.ok) {
+    console.error('[tally/photo] thumbnail non-ok status:', imgRes.status)
     return noPhoto(res, 502)
   }
 
   let imgBuffer: Buffer
   try {
     imgBuffer = Buffer.from(await imgRes.arrayBuffer())
-  } catch {
+  } catch (err) {
+    console.error('[tally/photo] thumbnail buffer read failed:', err)
     return noPhoto(res, 502)
   }
 
-  // Resize cover → 126×84, then extract raw RGB, convert to RGB565 big-endian
+  // Resize cover → 126×84, extract raw RGB
   let rawRgb: Buffer
   try {
     rawRgb = await sharp(imgBuffer)
@@ -95,7 +111,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       .removeAlpha()
       .raw()
       .toBuffer()
-  } catch {
+  } catch (err) {
+    console.error('[tally/photo] transcode failed:', err)
     return noPhoto(res, 502)
   }
 
@@ -107,8 +124,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     const g = rawRgb[i * 3 + 1]
     const b = rawRgb[i * 3 + 2]
     const word = ((r & 0xf8) << 8) | ((g & 0xfc) << 3) | (b >> 3)
-    rgb565[i * 2] = (word >> 8) & 0xff      // high byte
-    rgb565[i * 2 + 1] = word & 0xff          // low byte
+    rgb565[i * 2] = (word >> 8) & 0xff
+    rgb565[i * 2 + 1] = word & 0xff
   }
 
   res.status(200)
