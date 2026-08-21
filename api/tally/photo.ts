@@ -8,11 +8,16 @@ function noPhoto(res: VercelResponse, status: number): void {
   res.status(status).json({ photo: false })
 }
 
-async function fetchWithTimeout(url: string): Promise<Response> {
+const UA = 'Fitzthespotter-TALLY/1.0 (+https://fitzthespotter.vercel.app)'
+
+async function fetchWithTimeout(url: string, headers?: Record<string, string>): Promise<Response> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
   try {
-    return await fetch(url, { signal: controller.signal })
+    return await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': UA, ...headers },
+    })
   } finally {
     clearTimeout(timer)
   }
@@ -43,7 +48,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   let psRes: Response
   try {
     psRes = await fetchWithTimeout(
-      `https://api.planespotters.net/pub/photos/hex/${encodeURIComponent(hex)}`
+      `https://api.planespotters.net/pub/photos/hex/${encodeURIComponent(hex)}`,
+      { Accept: 'application/json' }
     )
   } catch (err) {
     console.error('[tally/photo] planespotters fetch failed:', err)
@@ -51,7 +57,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   }
 
   if (!psRes.ok) {
-    console.error('[tally/photo] planespotters non-ok status:', psRes.status)
+    let psErrBody = ''
+    try { psErrBody = (await psRes.text()).slice(0, 200) } catch { /* ignore */ }
+    console.error('[tally/photo] planespotters non-ok status:', psRes.status, psErrBody)
     return noPhoto(res, 502)
   }
 
@@ -84,7 +92,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   // 3. Fetch thumbnail
   let imgRes: Response
   try {
-    imgRes = await fetchWithTimeout(thumbUrl)
+    imgRes = await fetchWithTimeout(thumbUrl, { Accept: 'image/jpeg' })
   } catch (err) {
     console.error('[tally/photo] thumbnail fetch failed:', err)
     return noPhoto(res, 502)
