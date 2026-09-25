@@ -16,7 +16,7 @@ export const VG_SECTIONS = [
   {
     title: "Airlines & registrations",
     items: [
-      { img: "IMG_4835", title: "Airlines tab, list view", caption: "Every airline with flag, registration count, and the CLOSED banner where operations ceased. The Fitzthespotter+ wordmark top-left is a button - tap it anywhere in the app to open a New Registration. The list/grid toggle switches this view to logo tiles. The A-Z rail jumps to any letter - both directions. The search field filters the list live." },
+      { img: "IMG_4835", title: "Airlines tab, list view", caption: "Every airline with flag, registration count, and the CLOSED banner where operations ceased. The Tally Logbook+ wordmark top-left is a button - tap it anywhere in the app to open a New Registration. The list/grid toggle switches this view to logo tiles. The A-Z rail jumps to any letter - both directions. The search field filters the list live." },
       { img: "IMG_4836", title: "An airline opened", caption: "The airline's home: Edit opens the Edit Airline form (rename, logo, flags, delete). Manufacturer Breakdown expands into your fleet-by-type counts - types sharing a (family) code in their names combine into one line. Below, every registration as a card - tap any card to open that tail's full profile." },
       { img: "IMG_4837", title: "Edit Airline", caption: "Rename, change country, swap or remove the logo, toggle ceased/flown - and Delete airline lives here (removes the airline; use with care)." },
       { img: "IMG_4838", title: "New Registration from an airline", caption: "Opened from inside an airline, the airline field arrives pre-filled - the fast path when logging a session's haul airline by airline." },
