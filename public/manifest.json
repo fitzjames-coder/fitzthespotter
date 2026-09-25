@@ -1,6 +1,6 @@
 {
-  "name": "Fitzthespotter",
-  "short_name": "Fitzthespotter",
+  "name": "Tally Logbook",
+  "short_name": "Tally Logbook",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

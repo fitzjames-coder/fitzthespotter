@@ -42,10 +42,7 @@ export function TopBar({ searchValue, onSearchChange, searchPlaceholder, onSearc
           onClick={() => setShowForm(true)}
           aria-label="Add new entry"
         >
-          <span className="top-bar__title--cream">Fitz</span>
-          <span className="top-bar__title--amber">the</span>
-          <span className="top-bar__title--cream">spotter</span>
-          <sup className="top-bar__plus" aria-hidden="true">+</sup>
+          <img className="top-bar__wordmark-img" src="/tally%20logbook.PNG" alt="Tally Logbook" />
         </button>
         {onSearchChange && (
           <div className="top-bar__search">

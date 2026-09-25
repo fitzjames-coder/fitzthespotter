@@ -36,6 +36,13 @@
   line-height: 1;
 }
 
+.top-bar__wordmark-img {
+  display: block;
+  height: 26px;
+  width: auto;
+  max-width: 100%;
+}
+
 .top-bar__title--cream {
   color: var(--color-cream);
 }
