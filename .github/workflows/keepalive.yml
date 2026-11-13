@@ -36,8 +36,32 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
+          # Strip any whitespace or line breaks a phone paste may have added,
+          # and any trailing slash on the URL.
+          SUPABASE_URL="$(printf '%s' "${SUPABASE_URL}" | tr -d '[:space:]')"
+          SUPABASE_URL="${SUPABASE_URL%/}"
+          SUPABASE_ANON_KEY="$(printf '%s' "${SUPABASE_ANON_KEY}" | tr -d '[:space:]')"
+
           if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_ANON_KEY}" ]; then
             echo "Missing secret: set both SUPABASE_URL and SUPABASE_ANON_KEY." >&2
+            exit 1
+          fi
+
+          # Shape check without printing the value.
+          case "${SUPABASE_URL}" in
+            https://*.supabase.co) echo "SUPABASE_URL shape OK (${#SUPABASE_URL} chars)." ;;
+            *)
+              echo "SUPABASE_URL is not in the form https://<project-ref>.supabase.co (${#SUPABASE_URL} chars)." >&2
+              case "${SUPABASE_URL}" in https://*) ;; *) echo "  - does not start with https://" >&2 ;; esac
+              case "${SUPABASE_URL}" in *.supabase.co) ;; *) echo "  - does not end with .supabase.co" >&2 ;; esac
+              if printf '%s' "${SUPABASE_URL}" | LC_ALL=C grep -q '[^ -~]'; then
+                echo "  - contains hidden non-ASCII characters" >&2
+              fi
+              exit 1
+              ;;
+          esac
+          if printf '%s' "${SUPABASE_ANON_KEY}" | LC_ALL=C grep -q '[^ -~]'; then
+            echo "SUPABASE_ANON_KEY contains hidden non-ASCII characters." >&2
             exit 1
           fi
 
