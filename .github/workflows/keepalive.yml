@@ -1,0 +1,79 @@
+# Supabase keepalive
+#
+# Why this exists: Supabase's free tier pauses a project after 7 consecutive
+# days with no activity, and a paused project has to be resumed by hand before
+# the app works again. This workflow touches the database every 3 days, so even
+# if one scheduled run is missed or skipped the gap stays under the 7-day limit
+# (3 + 3 = 6 days) and the project never pauses.
+#
+# This is strictly READ-ONLY. It issues a single HTTP GET for at most one row
+# of the registrations table using the public anon key — the same key the
+# browser app already uses. It never writes, and it never uses the
+# service_role key.
+#
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   SUPABASE_URL       e.g. https://<project-ref>.supabase.co
+#   SUPABASE_ANON_KEY  the project's anon / publishable key
+# Neither value is stored in this file.
+
+name: Supabase keepalive
+
+on:
+  schedule:
+    # 01:00 UTC every third day of the month.
+    - cron: '0 1 */3 * *'
+  workflow_dispatch: {}
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # No repository access needed — this job only talks to Supabase.
+    permissions: {}
+    steps:
+      - name: Ping registrations (read-only)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_ANON_KEY}" ]; then
+            echo "Missing secret: set both SUPABASE_URL and SUPABASE_ANON_KEY." >&2
+            exit 1
+          fi
+
+          # Host on its own, so curl's own error text can be redacted below.
+          host="${SUPABASE_URL#*://}"
+          host="${host%%/*}"
+          errlog="$(mktemp)"
+
+          set +e
+          status="$(curl \
+            --fail \
+            --silent \
+            --show-error \
+            --retry 3 \
+            --retry-delay 10 \
+            --output /dev/null \
+            --write-out '%{http_code}' \
+            --header "apikey: ${SUPABASE_ANON_KEY}" \
+            --header "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            "${SUPABASE_URL}/rest/v1/registrations?select=id&limit=1" \
+            2>"${errlog}")"
+          curl_exit=$?
+          set -e
+
+          echo "HTTP status: ${status:-000}"
+
+          if [ "${curl_exit}" -ne 0 ] || [ "${status}" != "200" ]; then
+            # Surface curl's reason, with the project URL and host redacted.
+            if [ -s "${errlog}" ]; then
+              reason="$(cat "${errlog}")"
+              reason="${reason//${SUPABASE_URL}/<SUPABASE_URL>}"
+              reason="${reason//${host}/<SUPABASE_HOST>}"
+              printf '%s\n' "${reason}" >&2
+            fi
+            echo "Keepalive failed: expected HTTP 200, got ${status:-000} (curl exit ${curl_exit})." >&2
+            exit 1
+          fi
+
+          echo "Keepalive OK - registrations reachable, project kept active."
